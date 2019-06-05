@@ -3,7 +3,7 @@ from bopt.statespace.rc import TwTi_RoRi
 from bopt.regressors import Regressor
 from bopt.core import Normal
 
-df = pd.read_csv('data/armadillo/armadillo_data_H2.csv').set_index('Time')
+df = pd.read_csv('../data/armadillo/armadillo_data_H2.csv').set_index('Time')
 y0 = 0.2670106194217502
 
 parameters = [
