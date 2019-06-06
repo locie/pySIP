@@ -24,7 +24,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from bopt.regressor import Regressor
+from bopt.regressors import Regressor
 from bopt.statespace.rc import TwTi_RoRi
 from bopt.utils import save_model
 
