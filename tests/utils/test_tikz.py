@@ -1,8 +1,7 @@
-from bopt.utils.draw import TikzStateSpace
+from pysip.utils import TikzStateSpace
 
 
 def test_constrained_model():
-
     class A(TikzStateSpace):
         inputs = ['T_0', 'Q_0']
         outputs = ['T_i']
@@ -21,7 +20,6 @@ def test_constrained_model():
 
 
 def test_handmade_model():
-
     class A(TikzStateSpace):
         """Handmade model"""
 
@@ -36,7 +34,6 @@ def test_handmade_model():
 
 
 def test_no_model():
-
     class A(TikzStateSpace):
         """No model"""
 

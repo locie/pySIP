@@ -2,7 +2,8 @@ numpy>=1.15.0
 scipy>=1.1.0
 pandas>=0.24.0
 matplotlib>=3.0.0
-
-dataclasses>=0.6
+joblib>=0.13.2
+pylfsr>=1.0.4
 networkx>=2.2
 tqdm>=4.23.0
+numdifftools>=0.9.39

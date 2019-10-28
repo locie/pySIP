@@ -1,5 +1,5 @@
 from setuptools import setup, find_packages
-
+from pysip import __version__
 
 with open('README.md', 'r') as f:
     long_description = f.read()
@@ -8,10 +8,10 @@ with open('requirements.txt', 'r') as f:
     requirements = f.read().split()
 
 setup(
-    name='bopt',
-    version='0.1',
-    description='Thermal bayesian optimization',
-    url='https://gitlab.lancey.fr/ai/bayesian-optimization',
+    name='pysip',
+    version=__version__,
+    description='PySIP',
+    url='https://gitlab.lancey.fr/ai/models/pysip',
     long_description=long_description,
     long_description_content_type='text/markdown',
     packages=find_packages(),
@@ -19,6 +19,6 @@ setup(
     classifiers=[
         'Programming Language :: Python :: 3.7',
         'Operating System :: OS Independent',
-        'Development Status :: 4 - Beta'
-    ]
+        'Development Status :: 4 - Beta',
+    ],
 )

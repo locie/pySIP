@@ -1,12 +1,10 @@
 import random
-
 import matplotlib.axes._subplots
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
-from bopt.utils import ccf, check_ccf, plot_ccf
-from bopt.utils import cpgram, check_cpgram, plot_cpgram
+from pysip.utils import ccf, check_ccf, cpgram, check_cpgram, plot_ccf, plot_cpgram
 
 
 @pytest.mark.skip(reason="todo")
@@ -17,7 +15,7 @@ def test_ttest():
 def test_ccf():
     lags, correlation_coeffs, confidence = ccf([1, 2, 3], [4, 5, 6])
     np.testing.assert_array_equal(lags, np.array([0, 1, 2]))
-    np.testing.assert_array_equal(correlation_coeffs, np.array([1., 0., -0.5]))
+    np.testing.assert_array_equal(correlation_coeffs, np.array([1.0, 0.0, -0.5]))
     np.testing.assert_allclose(confidence, np.array([1.13158573, 1.13158573, 1.13158573]))
 
 
@@ -34,14 +32,12 @@ def test_ccf_raises():
 
 def test_check_ccf():
     lags, correlation_coeffs, confidence = ccf([1, 2, 3], [4, 5, 6])
-
-    assert check_ccf(lags, correlation_coeffs, confidence)
+    assert check_ccf(lags, correlation_coeffs, confidence)[0]
 
 
 def test_plot_ccf():
     lags, correlation_coeffs, confidence = ccf([1, 2, 3], [4, 5, 6])
     n_figs = plt.gcf().number
-
     ax = plot_ccf(lags, correlation_coeffs, confidence)
 
     assert isinstance(ax, matplotlib.axes.Axes)
@@ -59,7 +55,7 @@ def test_cpgram():
 def test_check_cpgram():
     y, freq, crit = cpgram([random.random() for i in range(1400)])
 
-    assert not check_cpgram(y, freq, crit)
+    assert not check_cpgram(y, freq, crit)[0]
 
 
 def test_plot_cpgram():

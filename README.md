@@ -2,11 +2,9 @@
 
 # Python Stochastic State-Space Inference and Prediction (pySIP)
 
-[![Python 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/)
+**pySIP** provides a framework for *infering continuous time stochastic state-space models*.
 
-**pySIP** provides a framework for *infering continuous time stochastic state-space models*. 
-
-This kind of models can be found in a broad class of applications involving time-varying phenomena which are only observed at discrete time instants. It allows to estimate the system dynamics and parameters given noisy measurements. pySIP provides a frequentist and a Bayesian workflow for model identification and prediction. The two workflows have methods for parameter estimation, model selection and convergence diagnosis. 
+This kind of models can be found in a broad class of applications involving time-varying phenomena which are only observed at discrete time instants. It allows to estimate the system dynamics and parameters given noisy measurements. pySIP provides a frequentist and a Bayesian workflow for model identification and prediction. The two workflows have methods for parameter estimation, model selection and convergence diagnosis.
 
 **pySIP** is being developed in the perspective to build a library which gather models from different engineering applications. Currently, two applications are being prioritized:
 * dynamic thermal models (using RC networks)
@@ -14,7 +12,7 @@ This kind of models can be found in a broad class of applications involving time
 
 **pySIP** offers also the possibility to combine a physical model with a *Gaussian Process* to form a *Latent Force Model*, which can be used to model unknow input signals (latent forces) in physical systems.
 
-**pySIP** is currently under development and in beta version. A first stable release will be available (hopefully) before the 2019 Christmas. Please feel free to contact us if you want to be involved in the current development process. 
+**pySIP** is currently under development and in beta version. A first stable release will be available before the 2019 Christmas. Please feel free to contact us if you want to be involved in the current development process.
 
 ## Getting started
 
@@ -62,7 +60,7 @@ print(reg.summary_)
 save_model('model_saved', reg)
 
 # Prediction
-# The training dataset is sampled at 30 minutes but the output 
+# The training dataset is sampled at 30 minutes but the output
 # predictive distribution can be evaluated at **any** timesteps
 dt = 60
 tnew = np.arange(df.index[0], df.index[-1] + dt, dt)
@@ -82,7 +80,7 @@ plt.show()
 ## Contributors
 
 * [Loïc Raillon](https://github.com/LoicRaillon) - [Univ. Grenoble Alpes, Univ. Savoie Mont Blanc](https://www.locie.univ-smb.fr/en/home/ ) CNRS, LOCIE, 73000 Chambéry, France,
-* [Maxime Janvier](https://github.com/mjanv) - [Lancey Energy Storage]( https://www.lancey.fr/en/) 
+* [Maxime Janvier](https://github.com/mjanv) - [Lancey Energy Storage]( https://www.lancey.fr/en/)
 
 ## Funding
 

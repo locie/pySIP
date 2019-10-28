@@ -1,0 +1,5 @@
+sphinx
+sphinx_rtd_theme
+sphinxcontrib-tikz==0.4.7
+sphinx-autodoc-typehints
+pydot
