@@ -1,5 +1,6 @@
 import numpy as np
-from scipy.linalg import solve_triangular
+import warnings
+from scipy.linalg import solve_triangular, LinAlgError, ldl
 
 
 def log1p_exp(a):
@@ -29,13 +30,8 @@ def cholesky_inverse(matrix):
     return solve_triangular(tril_inv, identity, lower=True)
 
 
-def r_squared(y, yhat):
-    """R² metric"""
-    return 1.0 - np.sum((y - yhat) ** 2) / np.sum((y - np.mean(y)) ** 2)
-
-
 def rmse(y, yhat):
-    """Root Mean Squared Erro"""
+    """Root Mean Squared Error"""
     return np.linalg.norm(y - yhat) / np.sqrt(len(y))
 
 
@@ -45,7 +41,7 @@ def mae(y, yhat):
 
 
 def mad(y, yhat):
-    """Maximum Absolute difference"""
+    """Maximum Absolute Difference"""
     return np.max(np.abs(y - yhat))
 
 
@@ -65,14 +61,25 @@ def fit(y, yhat):
 
 
 def nearest_cholesky(A) -> np.ndarray:
-    """nearest positive semi definite Cholesky decomposition for symmetric matrices
+    """nearest positive semi definite Cholesky decomposition
 
     Returns:
         Upper triangular Cholesky factor of `A`
     """
-    X = (A + A.T) / 2.0 + np.eye(A.shape[0]) * 1e-8
-    w, v = np.linalg.eigh(X)
-    return np.linalg.qr(np.diag([w ** 0.5 if w > 0 else 0 for w in w]) @ v.T, 'r')
+    l, d, _ = ldl(A, lower=False)
+    return np.diag([w ** 0.5 if w > 0 else 0 for w in d.diagonal()]) @ l.T
+    # X = (A + A.T) / 2.0
+    # n = X.shape[0]
+    # jitter = 1e-9
+    # while jitter < 1.0:
+    #     try:
+    #         chol = np.linalg.cholesky(X + jitter * np.eye(n)).T
+    #         return chol
+    #     except (LinAlgError, RuntimeError):
+    #         jitter *= 10.0
+
+    # w, v = np.linalg.eigh(X)
+    # return np.linalg.qr(np.diag([w ** 0.5 if w > 0 else 0 for w in w]) @ v.T, 'r')
 
 
 def time_series_pca(X: np.ndarray, verbose: bool = False):
@@ -90,5 +97,5 @@ def time_series_pca(X: np.ndarray, verbose: bool = False):
     idx = w.argsort()[::-1]
     w, v = w[idx], v[:, idx]
     if verbose:
-        print(f"explain {np.squeeze(w[0] / w.sum()):.3f} % of the variance")
+        print(f"explain {np.squeeze(w[0] / w.sum()):.3e} % of the variance")
     return X @ (v[:, 0] / v[:, 0].sum())

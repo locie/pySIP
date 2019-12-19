@@ -7,3 +7,6 @@ pylfsr>=1.0.4
 networkx>=2.2
 tqdm>=4.23.0
 numdifftools>=0.9.39
+arviz>=0.4.1
+black>=19.3b0
+flake8>=3.7.9

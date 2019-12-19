@@ -5,8 +5,8 @@ import seaborn as sns
 
 from pysip.regressors import FreqRegressor as Regressor
 from pysip.statespace import Periodic
-from pysip.statespace.resonator import Resonator
 
+# Generate artificial periodic data
 np.random.seed(1)
 xlim = (0, 7)
 alim = (1, 3)
@@ -20,56 +20,32 @@ y[y <= 0] = 0.0
 data = pd.DataFrame(index=t, data=y, columns=['y'])
 
 
+# Parameter settings for the Periodic covariance function
 parameters = [
-    dict(name="period", value=1.0, transform="fixed"),
-    dict(name="mscale", value=1.0, transform="log"),
-    dict(name="lscale", value=1.0, transform="log"),
-    dict(name="sigv", value=0.1, transform="log"),
+    dict(name='period', value=1.0, transform='fixed'),
+    dict(name='mscale', value=1.0, transform='log'),
+    dict(name='lscale', value=1.0, transform='log'),
+    dict(name='sigv', value=0.1, transform='log'),
 ]
 
-pres = [
-    dict(name="freq", value=1.0, transform="log"),
-    dict(name="damp", value=1.0, transform="log"),
-    dict(name="sigw", value=1.0, transform="log"),
-    dict(name="sigv", value=1.0, transform="log"),
-    dict(name="x0_f", value=1.0, transform="log"),
-    dict(name="x0_df", value=1.0, transform="log"),
-    dict(name="sigx0_f", value=1.0, transform="fixed"),
-    dict(name="sigx0_df", value=1.0, transform="fixed"),
-]
+# Instantiate regressor with the Periodic covariance function
+reg = Regressor(Periodic(parameters))
 
-# reg = Regressor(Resonator(pres))
-reg = Regressor(Periodic(parameters, J=7))
+fit_summary, corr_matrix, opt_summary = reg.fit(df=data, outputs='y')
 
-results = reg.fit(df=data, outputs='y')
+# Fit results
+print(f'\n{fit_summary}')
 
-Nnew = 500
-tnew = np.linspace(xlim[0], xlim[1] + 3, Nnew)
-ym, ystd = reg.predict(df=data, outputs='y', tnew=tnew, smooth=True)
+# Predict on test data
+tnew = np.linspace(xlim[0], xlim[1] + 1, 500)
+ym, ysd = reg.predict(df=data, outputs='y', tnew=tnew, smooth=True)
 
-fig = plt.figure(figsize=(9, 6), constrained_layout=True)
-plt.rc('axes', linewidth=1.5)
-plt.rc('legend', fontsize=14)
-
-gs = fig.add_gridspec(1, 1)
-axes = fig.add_subplot(gs[:, :])
-axes.plot(t, y, 'kx', mew=2, label='data')
-axes.plot(tnew, ym, color=sns.xkcd_rgb['windows blue'], lw=2, label='mean')
-axes.fill_between(
-    tnew,
-    ym - 1.96 * ystd,
-    ym + 1.96 * ystd,
-    color=sns.xkcd_rgb['windows blue'],
-    alpha=0.2,
-    label=r'95% CI',
-)
-
-axes.legend(bbox_to_anchor=(1.1, 1.1), bbox_transform=axes.transAxes)
-axes.set_xlabel('t', fontsize=14)
-axes.set_ylabel('f(t)', fontsize=14)
-axes.set_title(
-    'Gaussian Process with periodic covariance', fontsize=14, fontweight='bold', loc='center'
-)
-axes.tick_params(axis='both', which='major', labelsize=14)
-axes.spines['right'].set_visible(False)
-axes.spines['top'].set_visible(False)
+# Plot output mean and 95% credible intervals
+sns.set_style('darkgrid')
+sns.set_context('talk')
+plt.plot(t, y, linestyle='', marker='+', mew=2, label='data', color='darkred')
+plt.plot(tnew, ym, color='navy', label='mean')
+plt.fill_between(tnew, ym - 2 * ysd, ym + 2 * ysd, color='darkblue', alpha=0.2, label=r'95% CI')
+plt.tight_layout()
+sns.despine()
+plt.legend()

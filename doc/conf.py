@@ -54,7 +54,7 @@ source_suffix = ['.rst', '.md']
 master_doc = 'index'
 
 # General information about the project.
-project = 'Thermal Bayesian Optimization'
+project = 'Stochastic state-space Inference and Prediction'
 copyright = '2018, Loic Raillon, Maxime Janvier'
 author = 'Loic Raillon, Maxime Janvier'
 
@@ -145,7 +145,7 @@ latex_documents = [
         master_doc,
         'ThermalBayesianoptimization.tex',
         'Thermal Bayesian optimization Documentation',
-        'Loic Raillon, Maxime Janvier',
+        'Loïc Raillon, Maxime Janvier',
         'manual',
     )
 ]

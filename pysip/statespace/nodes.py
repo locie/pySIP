@@ -4,27 +4,33 @@ from typing import Union
 
 
 class Io(Enum):
+    """Input/Output data type"""
+
     TEMPERATURE = ('Temperature', '°C')
     POWER = ('Power', 'W')
-    ANY = ('Any type', '')
+    ANY = ('Any type', 'any')
 
 
 class Par(Enum):
-    THERMAL_RESISTANCE = ('Thermal resistance', 'K/W')
-    THERMAL_CAPACITY = ('Thermal capacity', 'J/K')
-    SOLAR_APERTURE = ('Solar aperture', 'm2')
-    STATE_DEVIATION = ('State deviation', '')
-    MEASURE_DEVIATION = ('Measure deviation', '')
-    INITIAL_DEVIATION = ('Initial deviation', '')
-    INITIAL_MEAN = ('Initial mean', '')
-    COEFFICIENT = ('Coefficient', '')
-    MAGNITUDE_SCALE = ('Magnitude scale', '')
-    LENGTH_SCALE = ('Length scale', '')
-    PERIOD = ('Period', '')
+    """Parameter type"""
+
+    THERMAL_RESISTANCE = ('Thermal resistance', '°C/W')
+    THERMAL_CAPACITY = ('Thermal capacity', 'J/°C')
+    SOLAR_APERTURE = ('Solar aperture', 'm²')
+    STATE_DEVIATION = ('State deviation', 'any')
+    MEASURE_DEVIATION = ('Measure deviation', 'any')
+    INITIAL_DEVIATION = ('Initial deviation', 'any')
+    INITIAL_MEAN = ('Initial mean', 'any')
+    COEFFICIENT = ('Coefficient', 'any')
+    MAGNITUDE_SCALE = ('Magnitude scale', 'any')
+    LENGTH_SCALE = ('Length scale', 'any')
+    PERIOD = ('Period', 'any')
 
 
 @dataclass
 class Node:
+    """Description of variables"""
+
     category: Union[Io, Par] = field()
     name: str = field(default='')
     description: str = field(default='')

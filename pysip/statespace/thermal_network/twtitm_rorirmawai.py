@@ -5,42 +5,42 @@ from ..base import RCModel
 
 @dataclass
 class TwTiTm_RoRiRmAwAi(RCModel):
-    """Second order RC model"""
+    """Third order RC model"""
 
     states = [
-        ('TEMPERATURE', 'xw', 'wall temperature'),
-        ('TEMPERATURE', 'xi', 'indoor space temperature'),
+        ('TEMPERATURE', 'xw', 'envelope temperature'),
+        ('TEMPERATURE', 'xi', 'indoor temperature'),
         ('TEMPERATURE', 'xm', 'internal mass temperature'),
     ]
 
     params = [
-        ('THERMAL_RESISTANCE', 'Ro', 'between the outdoor and the wall node'),
-        ('THERMAL_RESISTANCE', 'Ri', 'between the wall node and the indoor'),
+        ('THERMAL_RESISTANCE', 'Ro', 'between the outdoor and the envelope'),
+        ('THERMAL_RESISTANCE', 'Ri', 'between the envelope and the indoor'),
         ('THERMAL_RESISTANCE', 'Rm', 'between the indoor and the internal mass'),
-        ('THERMAL_CAPACITY', 'Cw', 'of the wall'),
-        ('THERMAL_CAPACITY', 'Ci', 'of the indoor air, indoor walls, furnitures, etc.'),
+        ('THERMAL_CAPACITY', 'Cw', 'of the envelope'),
+        ('THERMAL_CAPACITY', 'Ci', 'of the indoor'),
         ('THERMAL_CAPACITY', 'Cm', 'of the internal mass'),
-        ('SOLAR_APERTURE', 'Aw', 'of the wall'),
+        ('SOLAR_APERTURE', 'Aw', 'of the envelope'),
         ('SOLAR_APERTURE', 'Ai', 'of the windows'),
-        ('STATE_DEVIATION', 'sigw_w', ''),
-        ('STATE_DEVIATION', 'sigw_i', ''),
-        ('STATE_DEVIATION', 'sigw_m', ''),
-        ('MEASURE_DEVIATION', 'sigv', ''),
-        ('INITIAL_MEAN', 'x0_w', ''),
-        ('INITIAL_MEAN', 'x0_i', ''),
-        ('INITIAL_MEAN', 'x0_m', ''),
-        ('INITIAL_DEVIATION', 'sigx0_w', ''),
-        ('INITIAL_DEVIATION', 'sigx0_i', ''),
-        ('INITIAL_DEVIATION', 'sigx0_m', ''),
+        ('STATE_DEVIATION', 'sigw_w', 'of the envelope dynamic'),
+        ('STATE_DEVIATION', 'sigw_i', 'of the indoor dynamic'),
+        ('STATE_DEVIATION', 'sigw_m', 'of the internal mass dynamic'),
+        ('MEASURE_DEVIATION', 'sigv', 'of the indoor temperature measurements'),
+        ('INITIAL_MEAN', 'x0_w', 'of the envelope temperature'),
+        ('INITIAL_MEAN', 'x0_i', 'of the infoor temperature'),
+        ('INITIAL_MEAN', 'x0_m', 'of the internal mass temperature'),
+        ('INITIAL_DEVIATION', 'sigx0_w', 'of the envelope temperature'),
+        ('INITIAL_DEVIATION', 'sigx0_i', 'of the infoor temperature'),
+        ('INITIAL_DEVIATION', 'sigx0_m', 'of the internal mass temperature'),
     ]
 
     inputs = [
-        ('TEMPERATURE', 'To', 'outdoor air temperature'),
-        ('POWER', 'Qgh', 'global horizontal solar radiation'),
+        ('TEMPERATURE', 'To', 'outdoor temperature'),
+        ('POWER', 'Qgh', 'solar irradiance'),
         ('POWER', 'Qh', 'HVAC system heat'),
     ]
 
-    outputs = [('TEMPERATURE', 'xi', 'indoor air temperature')]
+    outputs = [('TEMPERATURE', 'xi', 'indoor temperature')]
 
     def __post_init__(self):
         super().__post_init__()

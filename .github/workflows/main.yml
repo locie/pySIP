@@ -1,0 +1,36 @@
+name: CI
+on:
+  push:
+    branches:
+    - master
+
+
+jobs:
+  release:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: actions/checkout@v1
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r doc/requirements.txt
+    - name: Build sphinx documentation
+      run: |
+        make -C doc html
+        touch .nojekyll
+        cp -r doc/_build/html/. .
+    - name: Push to Github Pages
+      run: |
+        rm .gitignore
+        git config --global user.email "gh@lancey.fr"
+        git config --global user.name "Lancey"
+        git checkout -b gh-pages
+        git add .
+        git commit -m 'Deploy to GitHub Pages'
+        git push --force https://${{secrets.GH_PAT}}@github.com/${GITHUB_REPOSITORY}.git gh-pages

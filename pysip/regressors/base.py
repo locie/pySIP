@@ -1,5 +1,6 @@
 """Regressor template"""
-from typing import Tuple
+from typing import Tuple, Union
+from numbers import Real
 import numpy as np
 import pandas as pd
 from scipy.interpolate import interp1d
@@ -9,15 +10,15 @@ from ..statespace.base import StateSpace
 
 
 class BaseRegressor:
-    """Regressor template for frequentist and Baysian regressor
+    """Regressor with common methods for frequentist and Baysian regressor
 
     Args:
-        ss: StateSpace instance
-        bayesian_filter: BayesianFilter instance
+        ss: StateSpace()
+        bayesian_filter: BayesianFilter()
         time_scale: Time series frequency, e.g. 's': seconds, 'D': days, etc.
             Works only for pandas.DataFrame with DateTime index
-        use_jacobian: Use jacobian adjustement in the posterior distribution function
-        use_penalty: Use penalty function in the posterior distribution function
+        use_jacobian: Use jacobian adjustement
+        use_penalty: Use penalty function
     """
 
     def __init__(
@@ -30,49 +31,146 @@ class BaseRegressor:
     ):
 
         self.ss = ss
-        self.time_scale = time_scale
         self.filter = bayesian_filter()
+        self._time_scale = time_scale
         self._use_jacobian = use_jacobian
         self._use_penalty = use_penalty
 
-    def _simulate_output(self, dt, u, u1, x0=None):
-        """Stochastic simulation of the state-space model output
+    def _simulate_output(
+        self, dt: np.ndarray, u: np.ndarray, u1: np.ndarray, x0: np.ndarray = None
+    ) -> np.ndarray:
+        """Stochastic simulation of the state-space model
 
-        TODO
-            Stochastic x0
+        Args:
+            dt: Sampling time
+            u: Input data
+            u1: Forward finite difference of the input data
+            x0: Initial state mean different from `ss.x0`
+
+        Returns:
+            Simulated output
         """
+
         ssm, index = self.ss.get_discrete_ssm(dt)
         return self.filter.simulate(ssm, index, u, u1, x0)
 
-    def _estimate_states(self, dt, u, u1, y, x0=None, P0=None, smooth=False):
+    def _estimate_output(
+        self,
+        dt: np.ndarray,
+        u: np.ndarray,
+        u1: np.ndarray,
+        y: np.ndarray,
+        x0: np.ndarray = None,
+        P0: np.ndarray = None,
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """Estimate the output filtered distribution
+
+        Args:
+            dt: Sampling time
+            u: Input data
+            u1: Forward finite difference of the input data
+            y: Output data
+            x0: Initial state mean different from `ss.x0`
+            P0: Initial state deviation different from `ss.P0`
+
+        Returns:
+            2-element tuple containing
+                - Filtered output mean
+                - Filtered output standard deviation
+        """
+
+        ssm, index = self.ss.get_discrete_ssm(dt)
+        return self.filter.simulate_output(ssm, index, u, u1, y, x0, P0)
+
+    def _estimate_states(
+        self,
+        dt: np.ndarray,
+        u: np.ndarray,
+        u1: np.ndarray,
+        y: np.ndarray,
+        x0: np.ndarray = None,
+        P0: np.ndarray = None,
+        smooth: bool = False,
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """Estimate the state filtered/smoothed distribution
 
-        Notes:
-            In argument the initial state deviation `P0` is required but the state
-            covariance `P` is returned.
+        Args:
+            dt: Sampling time
+            u: Input data
+            u1: Forward finite difference of the input data
+            y: Output data
+            x0: Initial state mean different from `ss.x0`
+            P0: Initial state deviation different from `ss.P0`
+            smooth: Use RTS smoother
+
+        Returns:
+            2-element tuple containing
+                - Filtered or smoothed state mean
+                - Filtered or smoothed state covariance
         """
+
         ssm, index = self.ss.get_discrete_ssm(dt)
         if smooth:
             return self.filter.smoothing(ssm, index, u, u1, y, x0, P0)
         return self.filter.filtering(ssm, index, u, u1, y, x0, P0)[:2]
 
-    def _eval_log_likelihood(self, dt, u, u1, y, x0=None, P0=None, pointwise=False):
-        """Evaluate the negative log-likelihood"""
+    def _eval_log_likelihood(
+        self, dt: np.ndarray, u: np.ndarray, u1: np.ndarray, y: np.ndarray, pointwise: bool = False
+    ) -> Union[float, np.ndarray]:
+        """Evaluate the negative log-likelihood
+
+        Args:
+            dt: Sampling time
+            u: Input data
+            u1: Forward finite difference of the input data
+            y: Output data
+            pointwise: Return the negative log-likelihood for each time instants
+
+        Returns:
+            The negative log-likelihood or the predictive density evaluated for each observation
+        """
 
         ssm, index = self.ss.get_discrete_ssm(dt)
-        return self.filter.log_likelihood(ssm, index, u, u1, y, x0, P0, pointwise)
+        return self.filter.log_likelihood(ssm, index, u, u1, y, pointwise)
 
-    def _eval_dlog_likelihood(self, dt, u, u1, y):
-        """Evaluate the negative log-likelihood and the gradient"""
+    def _eval_dlog_likelihood(
+        self, dt: np.ndarray, u: np.ndarray, u1: np.ndarray, y: np.ndarray
+    ) -> Union[float, np.ndarray]:
+        """Evaluate the negative log-likelihood and the gradient
+
+        Args:
+            dt: Sampling time
+            u: Input data
+            u1: Forward finite difference of the input data
+            y: Output data
+
+        Returns:
+            2-element tuple containing
+                - The negative log-likelihood
+                - The gradient of the negative log-likelihood
+        """
 
         ssm, dssm, index = self.ss.get_discrete_dssm(dt)
         return self.filter.dlog_likelihood(ssm, dssm, index, u, u1, y)
 
-    def _eval_log_posterior(self, eta, dt, u, u1, y):
-        """Evaluate the negative log-posterior"""
+    def _eval_log_posterior(
+        self, eta: np.ndarray, dt: np.ndarray, u: np.ndarray, u1: np.ndarray, y: np.ndarray
+    ) -> float:
+        """Evaluate the negative log-posterior
+
+        Args:
+            eta: Unconstrained parameters
+            dt: Sampling time
+            u: Input data
+            u1: Forward finite difference of the input data
+            y: Output data
+
+        Returns:
+            The negative log-posterior
+        """
 
         self.ss.parameters.eta = eta
-        log_likelihood = self._eval_log_likelihood(dt, u, u1, y)
+        log_likelihood = self._eval_log_likelihood(dt, u, u1, y, pointwise=False)
         log_posterior = log_likelihood - self.ss.parameters.prior
 
         if self._use_jacobian:
@@ -83,8 +181,23 @@ class BaseRegressor:
 
         return log_posterior
 
-    def _eval_dlog_posterior(self, eta, dt, u, u1, y):
-        """Evaluate the negative log-posterior and the gradient"""
+    def _eval_dlog_posterior(
+        self, eta: np.ndarray, dt: np.ndarray, u: np.ndarray, u1: np.ndarray, y: np.ndarray
+    ) -> Union[float, np.ndarray]:
+        """Evaluate the negative log-posterior and the gradient
+
+        Args:
+            eta: Unconstrained parameters
+            dt: Sampling time
+            u: Input data
+            u1: Forward finite difference of the input data
+            y: Output data
+
+        Returns:
+            2-element tuple containing
+                - The negative log-posterior
+                - The gradient of the negative log-posterior
+        """
 
         self.ss.parameters.eta = eta
         log_likelihood, dlog_likelihood = self._eval_dlog_likelihood(dt, u, u1, y)
@@ -102,28 +215,51 @@ class BaseRegressor:
 
         return log_posterior, dlog_posterior
 
-    def _prepare_data(self, df, inputs, outputs, tnew=None, time_scale='s'):
+    def _prepare_data(
+        self,
+        df: pd.DataFrame,
+        inputs: Union[str, list],
+        outputs: Union[str, list],
+        tnew: [np.ndarray, pd.Series] = None,
+    ) -> Union[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """Prepare the data
 
-        TODO
-            interpolated with tnew doesn't support times scale
+        This method converts data from the public methods (DataFrame) to the private methods (array)
+
+        Args:
+            df: Input/output data with a time index
+            inputs: Input name(s)
+            outputs: Output name(s)
+            tnew: Interpolated/extrapolated time index
+
+        Returns:
+            5-elements tuple containing
+                - **dt**: Sampling time
+                - **u**: Input data
+                - **u1**: Forward finite difference of the input data
+                - **y**: Output data
+                - **index_back**: Index corresponding to the new time array `tnew`
+
+        Notes:
+            The use of `tnew` is discouraged at the moment; DateTimeIndex are not yet supported.
         """
+
         if not isinstance(df, pd.DataFrame):
-            raise TypeError("`df` must be a dataframe")
+            raise TypeError('`df` must be a dataframe')
 
         if inputs is not None:
             if not isinstance(inputs, (str, list)):
-                raise TypeError("the input name(s) must be a string or a list")
+                raise TypeError('the input name(s) must be a string or a list of strings')
 
             if isinstance(inputs, str):
                 inputs = [inputs]
 
             if self.ss.nu != len(inputs):
-                raise ValueError(f"{self.ss.nu} inputs are expected")
+                raise ValueError(f'The model {self.ss.name} requires {self.ss.nu} inputs')
 
         if tnew is None:
             if isinstance(df.index, pd.DatetimeIndex):
-                dt = np.diff(df.index) / np.timedelta64(1, time_scale)
+                dt = np.diff(df.index) / np.timedelta64(1, self._time_scale)
             else:
                 dt = np.diff(df.index.astype(np.float64))
             index_back = ()
@@ -149,10 +285,10 @@ class BaseRegressor:
             dt = np.append(dt, dt[-1])
 
         if not np.isfinite(dt).all():
-            raise ValueError("The tiie vector contains undefinite values")
+            raise ValueError('The time vector contains undefinite values')
 
         if np.any(dt < 0):
-            raise ValueError("The time vector isn't monotonically increasing")
+            raise ValueError('The time vector is not monotonically increasing')
 
         # Input array
         u1 = np.zeros((self.ss.nu, n))
@@ -160,7 +296,7 @@ class BaseRegressor:
             u = np.atleast_2d(df[inputs].T)
 
             if not np.isfinite(u).all():
-                raise ValueError("The input vector contains undefinite values")
+                raise ValueError('The input vector contains undefinite values')
 
             if self.ss.hold_order == 1:
                 if tnew is None:
@@ -185,12 +321,11 @@ class BaseRegressor:
                 outputs = [outputs]
 
             if self.ss.ny != len(outputs):
-                raise TypeError(f"{self.ss.ny} outputs are expected")
+                raise TypeError(f'The model {self.ss.name} requires {self.ss.ny} outputs')
 
             y = np.atleast_2d(df[outputs].T)
-
             if not np.isnan(y[~np.isfinite(y)]).all():
-                raise TypeError("The output vector must contains " " numerical values or numpy.nan")
+                raise TypeError('The output vector must contains numerical values or numpy.nan')
 
             if tnew is not None:
                 y = np.append(y, np.full((self.ss.ny, tp.shape[0]), np.nan, np.float), axis=1)
@@ -198,39 +333,37 @@ class BaseRegressor:
 
         return dt, u, u1, y, index_back
 
-    def _init_parameters(self, n_init=1, method='unconstrained', hpd=0.95):
+    def _init_parameters(
+        self, n_init: int = 1, method: str = 'unconstrained', hpd: float = 0.95
+    ) -> np.ndarray:
         """Random initialization of the parameters
 
         Args:
-            n: Number of random initialization
+            n_init: Number of random initialization
             method:
-                - **unconstrained**: Uniform draw between [-2, 2] in the uncsontrained space
+                - **unconstrained**: Uniform draw between [-1, 1] in the uncsontrained space
                 - **prior**: Uniform draw from the prior distribution
                 - **zero**: Set the unconstrained parameters to 0
                 - **fixed**: The current parameter values are used
-            hpd: Highest Prior Density to draw sample from. This is true for unimodal distribution
+                - **value**: Uniform draw between the parameter value +/- 25%
+            hpd: Highest Prior Density to draw sample from (True for unimodal distribution)
 
         Returns:
-            eta0: Array with Np rows and n columns, where Np is the number of free parameters and
-                n the number of random initialization
+            eta0: Array of unconstrained parameters of shape (n_par, n_init), where n_par is the
+            number of free parameters and n_init the number of random initialization
         """
+
         if not isinstance(n_init, int) or n_init <= 0:
             raise TypeError('`n_init` must an integer greater or equal to 1')
 
-        available_methods = ['unconstrained', 'prior', 'zero', 'fixed', 'mode']
+        available_methods = ['unconstrained', 'prior', 'zero', 'fixed', 'value']
         if method not in available_methods:
             raise ValueError(f'`method` must be one of the following {available_methods}')
 
-        if not 0.0 < hpd <= 1.0:
-            raise ValueError('`prior_mass` must be between ]0, 1]')
-
-        if method == 'mode':
-            value = np.asarray(self.ss.parameters.theta_scaled)
-            lb = value - 0.25 * value
-            ub = value + 0.25 * value
+        if not isinstance(hpd, Real) or not 0.0 < hpd <= 1.0:
+            raise ValueError('`hpd` must be between ]0, 1]')
 
         n_par = len(self.ss.parameters.eta_free)
-
         if method == 'unconstrained':
             eta0 = np.random.uniform(-1, 1, (n_par, n_init))
         elif method == 'zero':
@@ -240,23 +373,35 @@ class BaseRegressor:
             for n in range(n_init):
                 if method == 'prior':
                     self.ss.parameters.prior_init(hpd=hpd)
-                elif method == 'mode':
-                    self.ss.parameters.theta_free = np.random.uniform(lb, ub)
+                elif method == 'value':
+                    value = np.asarray(self.ss.parameters.theta_sd)
+                    lb = value - 0.25 * value
+                    ub = value + 0.25 * value
+                    self.ss.parameters.theta_sd = np.random.uniform(lb, ub)
 
                 eta0[:, n] = self.ss.parameters.eta_free
 
         return np.squeeze(eta0)
 
-    def fit(self, df: pd.DataFrame, outputs: list, inputs: list = None, options: dict = None):
+    def fit(
+        self,
+        df: pd.DataFrame,
+        outputs: Union[str, list],
+        inputs: [str, list] = None,
+        options: dict = None,
+    ):
         """Fit the state-space model
 
         Args:
             df: Training data
-            outputs: Outputs names
-            inputs: Inputs names
-            options: See specific options for frequentist and Bayesian regressor
+            outputs: Output name(s)
+            inputs: Inputs names(s)
+            options: See options for frequentist and Bayesian regressor
 
         Returns:
             Fit object
+
+        Raise:
+            Must be overriden
         """
         raise NotImplementedError

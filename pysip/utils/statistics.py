@@ -93,18 +93,15 @@ def ttest(theta, sigma, N):
     return pvalue
 
 
-def ccf(x, y=None, n_lags=None, ci=0.95, half=True, show_zero=True):
+def ccf(x, y=None, n_lags=None, ci=0.95):
     """Cross correlation (CCF) between two time-series x and y.
 
     If only one time-series is specified, the auto correlation of x is computed.
 
     Args:
-        x:  time series of length N
-        y: (optional) time series of length N
-        n_lags: number of lags, if n_lags = None --> n_lags = N - 1
+        x, y: Time series of length N
+        n_lags: Number of lags
         ci: confidence interval [0, 1], by default 95%
-        half: if True, plot only the positive lags
-        show_zero: if True the lag at 0 is plotted (acf[0] = 1)
     """
 
     if y is None:
@@ -119,19 +116,16 @@ def ccf(x, y=None, n_lags=None, ci=0.95, half=True, show_zero=True):
     if n_lags >= N or n_lags < 0:
         raise ValueError(f'maxlags must belong to [1 {n_lags - 1}]')
 
-    lags = np.arange(-N + 1, N)
+    lags = np.arange(0, N)
 
-    correlation_coeffs = correlate(x - np.mean(x), y - np.mean(y), method='direct') / (
-        np.std(x) * np.std(y) * N
-    )
+    correlation_coeffs = correlate(x - np.mean(x), y - np.mean(y)) / (np.std(x) * np.std(y) * N)
 
-    t = int(show_zero) if half else 1 + n_lags
-    cut = range(N - t, N + n_lags)
+    cut = range(N - 1, N + n_lags)
 
     # confidence interval lines
     confidence = np.ones(len(cut)) * sp.stats.norm.ppf((1 + ci) / 2) / np.sqrt(N)
 
-    return lags[cut], correlation_coeffs[cut], confidence
+    return lags, correlation_coeffs[cut], confidence
 
 
 def check_ccf(lags, coeffs, confidence, threshold=0.95):
@@ -192,63 +186,3 @@ def check_cpgram(y, freq, crit, threshold=0.95):
     cum_sum = np.cumsum(y) / np.sum(y) - 2 * freq
     in_band = np.sum(np.abs(cum_sum) < crit) / len(freq)
     return in_band >= threshold, in_band
-
-
-def autocorrf(x):
-    """Compute the unbiased autocorrelation function by using the Fast Fourier
-    Transform (FFT) with zeros padding
-
-    Argument
-    --------
-    x: array-like
-      x is a one dimensional time series
-
-    Return
-    ------
-    acorr: the normalized autocorrelation function
-    """
-    # check for one dimensional time series
-    x = np.atleast_1d(x)
-    if len(x.shape) != 1:
-        raise ValueError("the time series x must be one dimensional")
-
-    # length of the time series
-    n = len(x)
-
-    # find the next power of two for FFT computation efficiency
-    next_pow_2 = 2 ** np.ceil(np.log2(n)).astype("int")
-
-    # compute the FFT of the signal with the mean removed
-    f = np.fft.fft(x - np.mean(x), n=2 * next_pow_2)
-
-    # compute the autocorrelation
-    acorr = np.fft.ifft(f * np.conjugate(f))[:n].real
-
-    # unbiased estimator
-    acorr /= np.arange(n, 0, -1)
-
-    # Normalize to unity (divide by variance gives the same results)
-    acorr /= acorr[0]
-
-    return acorr
-
-
-def autocovf(x):
-    """Compute the unbiased autocovariance function by using the Fast Fourier
-    Transform (FFT) with zeros padding
-
-    Argument
-    --------
-    x: array-like
-      x is a one dimensional time series
-
-    Return
-    ------
-    acov: the normalized autocorrelation function
-    """
-    # estimate the autocorrelation function
-    acorr = autocorrf(x)
-
-    # multiply by the variance with zero degree of freedom (sample variance)
-    # to obtain the autocorrelation function
-    return acorr * np.var(x)

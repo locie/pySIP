@@ -5,42 +5,42 @@ from ..base import RCModel
 
 @dataclass
 class TwTiTh_RoRiRhAwAi(RCModel):
-    """3rd order RC model"""
+    """Third order RC model"""
 
     states = [
-        ('TEMPERATURE', 'xw', 'wall temperature'),
+        ('TEMPERATURE', 'xw', 'envelope temperature'),
         ('TEMPERATURE', 'xi', 'indoor temperature'),
         ('TEMPERATURE', 'xh', 'heaters temperature'),
     ]
 
     params = [
-        ('THERMAL_RESISTANCE', 'Ro', 'between the outdoor and the wall node'),
-        ('THERMAL_RESISTANCE', 'Ri', 'between the wall node and the indoor'),
+        ('THERMAL_RESISTANCE', 'Ro', 'between the outdoor and the envelope'),
+        ('THERMAL_RESISTANCE', 'Ri', 'between the envelope and the indoor'),
         ('THERMAL_RESISTANCE', 'Rh', 'between the heaters and the indoor'),
-        ('THERMAL_CAPACITY', 'Cw', 'of the wall'),
-        ('THERMAL_CAPACITY', 'Ci', 'of the indoor air, indoor walls, furnitures, etc.'),
+        ('THERMAL_CAPACITY', 'Cw', 'of the envelope'),
+        ('THERMAL_CAPACITY', 'Ci', 'of the indoor'),
         ('THERMAL_CAPACITY', 'Ch', 'of the heaters'),
-        ('SOLAR_APERTURE', 'Aw', 'of the wall'),
+        ('SOLAR_APERTURE', 'Aw', 'of the envelope'),
         ('SOLAR_APERTURE', 'Ai', 'of the windows'),
-        ('STATE_DEVIATION', 'sigw_w', 'of the wall temperature'),
-        ('STATE_DEVIATION', 'sigw_i', 'of the indoor temperature'),
-        ('STATE_DEVIATION', 'sigw_h', 'of the heaters temperature'),
-        ('MEASURE_DEVIATION', 'sigv', 'of  the indoor temperature measure'),
-        ('INITIAL_MEAN', 'x0_w', 'of the wall temperature'),
-        ('INITIAL_MEAN', 'x0_i', 'of the indoor temperature'),
-        ('INITIAL_MEAN', 'x0_h', 'of the heaters temperature'),
-        ('INITIAL_DEVIATION', 'sigx0_w', 'of the wall temperature'),
-        ('INITIAL_DEVIATION', 'sigx0_i', 'of the indoor temperature'),
-        ('INITIAL_DEVIATION', 'sigx0_h', 'of the heaters temperature'),
+        ('STATE_DEVIATION', 'sigw_w', 'of the envelope dynamic'),
+        ('STATE_DEVIATION', 'sigw_i', 'of the indoor dynamic'),
+        ('STATE_DEVIATION', 'sigw_h', 'of the heaters dynamic'),
+        ('MEASURE_DEVIATION', 'sigv', 'of the indoor temperature measurements'),
+        ('INITIAL_MEAN', 'x0_w', 'of the envelope temperature'),
+        ('INITIAL_MEAN', 'x0_i', 'of the infoor temperature'),
+        ('INITIAL_MEAN', 'x0_h', 'of the heater temperature'),
+        ('INITIAL_DEVIATION', 'sigx0_w', 'of the envelope temperature'),
+        ('INITIAL_DEVIATION', 'sigx0_i', 'of the infoor temperature'),
+        ('INITIAL_DEVIATION', 'sigx0_h', 'of the heater temperature'),
     ]
 
     inputs = [
-        ('TEMPERATURE', 'To', 'outdoor air temperature'),
-        ('POWER', 'Qgh', 'global horizontal solar radiation'),
-        ('POWER', 'Qh', 'HVAC system power'),
+        ('TEMPERATURE', 'To', 'outdoor temperature'),
+        ('POWER', 'Qgh', 'solar irradiance'),
+        ('POWER', 'Qh', 'HVAC system heat'),
     ]
 
-    outputs = [('TEMPERATURE', 'xi', 'indoor air temperature')]
+    outputs = [('TEMPERATURE', 'xi', 'indoor temperature')]
 
     def __post_init__(self):
         super().__post_init__()

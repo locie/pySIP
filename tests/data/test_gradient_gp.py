@@ -148,7 +148,7 @@ def test_QuasiPeriodic(data_Periodic):
         dict(name='sigv', transform='log'),
     ]
     regressor = Regressor(ss=QuasiPeriodic12(parameters=p))
-    regressor.ss.parameters.theta = np.random.uniform(0.3, 3.0, 4)
+    regressor.ss.parameters.theta = np.random.uniform(0.3, 3.0, 5)
     check_grad_fd(data_Periodic, regressor)
 
 

@@ -1,5 +1,5 @@
 """Standalone file for Dynamic Hamiltonian Monte Carlo"""
-from typing import Tuple, Iterable, Union
+from typing import Tuple, Iterable, Union, NamedTuple
 from numbers import Real
 from collections import namedtuple, defaultdict
 from copy import deepcopy
@@ -8,7 +8,7 @@ from joblib import Parallel, delayed
 import tqdm.auto as tqdm
 import numpy as np
 import pandas as pd
-from scipy.linalg import LinAlgError, LinAlgWarning
+from scipy.linalg import LinAlgError
 
 from .hamiltonian import EuclideanHamiltonian
 from .adaptation import DualAveraging, WindowedAdaptation, WelfordCovEstimator, CovAdaptation
@@ -26,18 +26,15 @@ class IntegrationError(RuntimeError):
 class DynamicHMC:
     """Dynamic Hamiltonian Monte Carlo Sampler with Multinomial sampling
 
+    Args:
+        hamiltonian: Hamiltonian system with Euclidean-Gaussian kinetic energies
+
     References:
     Betancourt, M., 2017. A conceptual introduction to Hamiltonian Monte Carlo.
     arXiv preprint arXiv:1701.02434.
-
     """
 
     def __init__(self, hamiltonian: EuclideanHamiltonian):
-        """Initialize the dynamic Hamiltonian Monte Carlo
-
-        Args:
-            hamiltonian: Hamiltonian system with Euclidean-Gaussian kinetic energies
-        """
         self._hamiltonian = hamiltonian
         self._dH_max = None
         self._max_tree_depth = None
@@ -46,7 +43,7 @@ class DynamicHMC:
 
     def sample(
         self,
-        q: np.array,
+        q: np.ndarray,
         n_draws: int = 2000,
         n_chains: int = 4,
         n_warmup: int = 1000,
@@ -55,18 +52,18 @@ class DynamicHMC:
         """Draw samples from the target distribution
 
         Args:
-            q: Initial position variables
+            q: Initial position variables (e.g. initial parameters)
             n_draws: Number of samples
             n_chains: Number of Markov chains
             n_warmup: Number of iterations to use for adapting the step size and the mass matrix
-            options: Dictionary with available keys
-                - **stepsize** (float, default=0.1)
+            options:
+                - **stepsize** (float, default=0.25 / n_par**0.25)
                     Step-size of the leapfrog integrator
                 - **max_tree_depth** (int, default=10)
                     Maximum tree depth
                 - **dH_max** (float, default=1000)
                     Maximum energy change allowed in a trajectory. Larger
-                    deviations are considered as divergent transitions.
+                    deviations are considered as diverging transitions.
                 - **accp_target** (float, default=0.8):
                     Target average acceptance probability. Valid values are between ]0, 1[
                 - **t0** (float, default=10.0):
@@ -75,9 +72,9 @@ class DynamicHMC:
                     Adaptation regularization scale (primal-dual averaging algorithm parameter)
                 - **kappa** (float, default=0.75):
                     Adaptation relaxation exponent (primal-dual averaging algorithm parameter)
-                - **mu** (float, default=0.5):
+                - **mu** (float, default=log(10 * stepsize)):
                     Asymptotic mean of the step-size (primal-dual averaging algorithm parameter)
-                - **cpu**: (int, default=-1):
+                - **n_cpu**: (int, default=-1):
                     Number of cpu to use. To use all available cpu, set the value to -1,
                     otherwise valid values are between [1, +Inf[
                 - **init_buffer**: (int, default=75)
@@ -88,13 +85,11 @@ class DynamicHMC:
                     Initial width of slow adaptation interval
 
         Returns:
-            chains: Markov chains with the warm-up removed
+            chains: Markov chain traces
             stats: Hamiltonian transition statistics
             df: Hamiltonian sampler diagnostic
-
-        TODO
-            Allow n_warmup for less than half the number of draw
         """
+
         if not isinstance(q, np.ndarray):
             raise TypeError('The initial position variable `q` must be a numpy array')
 
@@ -131,7 +126,7 @@ class DynamicHMC:
         options.setdefault('stepsize', 0.25 / q.shape[0] ** 0.25)
         options.setdefault('dH_max', 1000)
         options.setdefault('max_tree_depth', 10)
-        options.setdefault('cpu', -1)
+        options.setdefault('n_cpu', -1)
 
         stepsize = options.get('stepsize')
         if not isinstance(stepsize, Real) or stepsize <= 0:
@@ -145,9 +140,9 @@ class DynamicHMC:
         if not isinstance(self._max_tree_depth, int) or self._max_tree_depth <= 0:
             raise TypeError('`max_tree_depth` must a strictly positive integer')
 
-        cpu = options.get('cpu')
-        if not isinstance(cpu, int) or (cpu != -1 and cpu <= 0):
-            raise TypeError('`cpu` must be a strictly positive integer or set to -1')
+        n_cpu = options.get('n_cpu')
+        if not isinstance(n_cpu, int) or (n_cpu != -1 and n_cpu <= 0):
+            raise TypeError('`n_cpu` must be a strictly positive integer or set to -1')
 
         # The dictionary of options is saved in the returned fit object
         options.setdefault('accp_target', 0.8)
@@ -180,14 +175,13 @@ class DynamicHMC:
             # The number of chains must be a dimension
             samples = samples[None, :, :]
             stats = {k: np.asarray(v)[None, :] for k, v in _stats.items()}
-
         else:
             pbar = [
                 tqdm.trange(n_draws, desc=f'Chain {n}', dynamic_ncols=True, position=n)
                 for n in range(n_chains)
             ]
 
-            job = Parallel(n_jobs=cpu)(
+            job = Parallel(n_jobs=n_cpu)(
                 delayed(self._sample_chain)(q[:, n], pbar[n], stepsize, step_adapter, cov_adapter)
                 for n in range(n_chains)
             )
@@ -203,20 +197,28 @@ class DynamicHMC:
 
         return samples, stats, options
 
-    def _sample_chain(self, q, pbar, stepsize, step_adapter, cov_adapter):
+    def _sample_chain(
+        self,
+        q: np.ndarray,
+        pbar: tqdm.trange,
+        stepsize: float,
+        step_adapter: DualAveraging,
+        cov_adapter: CovAdaptation,
+    ) -> Tuple[np.ndarray, dict]:
         """Sample a chain
 
         Args:
             q: Initial position variables
-            pbar: TQDM progress bar
+            pbar: Progress bar
             stepsize: Initial step-size of the leapfrog integrator
-            step_adapter: DualAveraging instance
-            cov_adapter: CovAdaptation instance
+            step_adapter: Dual averaging algorithm for learning the step-size
+            cov_adapter: Windowed Welford covariance estimator
 
         Returns:
             chain: Sampled chain
             stats: Transition statistics
         """
+
         samples = np.zeros((q.shape[0], len(pbar.iterable)))
         stats = defaultdict(list)
         # stepsize = self._find_reasonable_stepsize(q, stepsize)
@@ -246,8 +248,8 @@ class DynamicHMC:
 
         return samples, stats
 
-    def _hamiltonian_state(self, q, p):
-        """Compute Hamiltonian state at the point given in phase space
+    def _hamiltonian_state(self, q: np.ndarray, p: np.ndarray) -> NamedTuple:
+        """Compute Hamiltonian state at a point in phase space
 
         Args:
             q: Position in phase space
@@ -256,13 +258,14 @@ class DynamicHMC:
         Return:
             Hamiltonian state
         """
+
         V, dV = self._hamiltonian.dV(q)
         H = V + self._hamiltonian.K(p)
         dK = self._hamiltonian.dK(p)
 
         return State(q, p, V, dV, dK, H)
 
-    def _hmc_step(self, q, stepsize):
+    def _hmc_step(self, q: np.ndarray, stepsize: float) -> Tuple[np.ndarray, dict]:
         """Dynamic Hamiltonian Monte Carlo step
 
         Args:
@@ -273,6 +276,7 @@ class DynamicHMC:
             state_n.q: Next position
             stats: Statistic from the Hamiltonian transition
         """
+
         # Draw momentum
         p = self._hamiltonian.sample_p()
 
@@ -284,7 +288,7 @@ class DynamicHMC:
 
         return state_n.q, stats
 
-    def _transition(self, state, stepsize):
+    def _transition(self, state: NamedTuple, stepsize: float) -> Tuple[NamedTuple, dict]:
         """Dynamic Hamiltonian Monte Carlo transition with multinomial sampling
 
         Args:
@@ -296,10 +300,14 @@ class DynamicHMC:
             stats: Trajectory statistics
                 - **accept_prob**: Average acceptance probability accross trajectory
                 - **leapfrog_steps**: Number of leapfrog steps
-                - **divergent**: Flag for divergent transition
+                - **diverging**: Flag for diverging transition
                 - **energy**: Hamiltonian at the next state
                 - **tree_depth**: Depth of the binary tree
+                - **max_tree_depth**: Flag for maximum integration steps
+                - **stepsize**: Step-size of the leapfrog integrator
+                - **potential**: Potential energy (negative log-posterior)
         """
+
         state_n, state_l, state_r = deepcopy(state), deepcopy(state), deepcopy(state)
 
         H0 = state.H.copy()
@@ -309,7 +317,7 @@ class DynamicHMC:
             'leapfrog_steps': 0,
             'accept_prob': 0.0,
             'max_tree_depth': False,
-            'divergent': False,
+            'diverging': False,
             'potential': state_n.V,
             'stepsize': stepsize,
         }
@@ -353,12 +361,22 @@ class DynamicHMC:
 
         return state_n, stats
 
-    def _build_tree(self, depth, direction, state, stepsize, H0, sum_p, sum_w, stats):
-        """Recursively build a binary tree
+    def _build_tree(
+        self,
+        depth: int,
+        direction: int,
+        state: NamedTuple,
+        stepsize: float,
+        H0: float,
+        sum_p: float,
+        sum_w: float,
+        stats: dict,
+    ) -> Tuple[bool, NamedTuple, NamedTuple, NamedTuple, float]:
+        """Recursively build the binary tree
 
         Args:
             depth: Depth of the desired subtree
-            direction: direction in time to build subtree
+            direction: direction in time to build subtree [-1 or 1]
             state: State proposed from the subtree
             stepsize: Step-size of the leapfrog integrator
             H0: Hamiltonian of the initial state
@@ -367,15 +385,17 @@ class DynamicHMC:
             stats: Trajectory statistics
                 - **accept_prob**: Summed acceptance probability accross trajectory
                 - **leapfrog_steps**: Summed number of leapfrog integrations
-                - **divergent**: Flag for divergent transition
+                - **diverging**: Flag for diverging transition
 
         Returns:
-            4-elements tuple with
-                stop: Flag indicating when to stop the recursion, diverging transition or U-turn
+            5-elements tuple with
+                stop: Flag indicating a divergent transition or a U-turn
                 state_inner: State of the inner subtree
                 state_outer: State of the outer subtree
                 state_proposed: State of the proposed subtree
+                sum_w: Summed weight accross trajectory
         """
+
         # Base case recursion
         if depth == 0:
             try:
@@ -386,7 +406,7 @@ class DynamicHMC:
                     dH = np.inf
 
                 if dH > self._dH_max:
-                    stats['divergent'] = True
+                    stats['diverging'] = True
                     state = None
                     terminate = True
                 else:
@@ -399,7 +419,7 @@ class DynamicHMC:
                     stats['leapfrog_steps'] += 1
                     terminate = False
 
-            except (LinAlgError, LinAlgWarning, RuntimeError, RuntimeWarning):
+            except (LinAlgError, RuntimeError):
                 terminate = True
                 state = None
 
@@ -446,7 +466,7 @@ class DynamicHMC:
 
         return stop_s, state_i, state_o, state_p, sum_w
 
-    def _leapfrog_step(self, state, direction, stepsize):
+    def _leapfrog_step(self, state: NamedTuple, direction: int, stepsize: float) -> NamedTuple:
         """Explicit leapfrog integrator for separable Hamiltonian systems
 
         Args:
@@ -472,7 +492,7 @@ class DynamicHMC:
 
         return State(q, p, V, dV, dK, H)
 
-    def _find_reasonable_stepsize(self, q, stepsize):
+    def _find_reasonable_stepsize(self, q: np.ndarray, stepsize: float) -> float:
         """Find a reasonable step-size by heuristic tuning
 
         Args:
@@ -526,7 +546,7 @@ class Fit_Bayes:
     Args:
         chains: Markov Chains Traces
         stats: Hamiltonian transition statistics
-        optins: Sampler options
+        options: Sampler options
         n_warmup: Number of iterations used as warmup
         model: Model name
     """
@@ -573,7 +593,7 @@ class Fit_Bayes:
         )
 
     @property
-    def n_warmup(self):
+    def n_warmup(self) -> int:
         """Number of iterations used as warmup"""
         return self._n_warmup
 
@@ -585,12 +605,12 @@ class Fit_Bayes:
         self._n_warmup = x
 
     @property
-    def posterior(self):
+    def posterior(self) -> dict:
         '''Return the Markov chain traces with without warm-up'''
         return {k: v[:, self._n_warmup :] for k, v in self._chains.items()}
 
     @property
-    def stats(self):
+    def stats(self) -> dict:
         '''Return the Markov chain traces with without warm-up'''
         return {k: v[:, self._n_warmup :] for k, v in self._stats.items()}
 
@@ -620,7 +640,7 @@ class Fit_Bayes:
         return d
 
     @property
-    def diagnostic(self):
+    def diagnostic(self) -> pd.DataFrame:
         """Sampler diagnostic
 
         Returns:
@@ -638,7 +658,7 @@ class Fit_Bayes:
                 'mean accept_prob': self.stats['accept_prob'].mean(axis=1),
                 'mean tree_depth': self.stats['tree_depth'].mean(axis=1),
                 'mean leapfrog_steps': self.stats['leapfrog_steps'].mean(axis=1),
-                'sum divergent': self.stats['divergent'].sum(axis=1).astype('int'),
+                'sum diverging': self.stats['diverging'].sum(axis=1).astype('int'),
                 'sum max_tree_depth': self.stats['max_tree_depth'].sum(axis=1).astype('int'),
                 'stepsize': self.stats['stepsize'].mean(axis=1),
             },

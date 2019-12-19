@@ -31,10 +31,10 @@ class Periodic(GPModel):
     ]
 
     params = [
-        ('PERIOD', 'period', ''),
-        ('MAGNITUDE_SCALE', 'mscale', ''),
-        ('LENGTH_SCALE', 'lscale', ''),
-        ('MEASURE_DEVIATION', 'sigv', ''),
+        ('PERIOD', 'period', 'period of the function'),
+        ('MAGNITUDE_SCALE', 'mscale', 'control the overall variance of the function'),
+        ('LENGTH_SCALE', 'lscale', 'control the smoothness of the function'),
+        ('MEASURE_DEVIATION', 'sigv', 'measurement standard deviation'),
     ]
 
     inputs = []
@@ -53,7 +53,7 @@ class Periodic(GPModel):
     def update_continuous_ssm(self):
         period, mscale, lscale, sigv, *_ = self.parameters.theta
 
-        q2 = 2.0 * mscale ** 2 * np.exp(-lscale ** (-2)) * iv(range(self.J + 1), lscale ** (-2))
+        q2 = 2.0 * mscale ** 2 * np.exp(-(lscale ** (-2))) * iv(range(self.J + 1), lscale ** (-2))
         q2[0] *= 0.5
 
         if not np.all(np.isfinite(q2)):
@@ -66,12 +66,12 @@ class Periodic(GPModel):
     def update_continuous_dssm(self):
         period, mscale, lscale, *_ = self.parameters.theta
 
-        q2 = 2.0 * mscale ** 2 * np.exp(-lscale ** (-2)) * iv(range(self.J + 1), lscale ** (-2))
+        q2 = 2.0 * mscale ** 2 * np.exp(-(lscale ** (-2))) * iv(range(self.J + 1), lscale ** (-2))
         q2[0] *= 0.5
         q = np.sqrt(q2)
 
         dq2 = np.empty(int(self.J + 1))
-        dq2[:] = mscale ** 2 * lscale ** (-3) * np.exp(-lscale ** (-2))
+        dq2[:] = mscale ** 2 * lscale ** (-3) * np.exp(-(lscale ** (-2)))
         dq2[0] *= 2.0 * (iv(0, lscale ** (-2)) - iv(1, lscale ** (-2)))
         dq2[1:] *= -4.0 * iv(range(self.J), lscale ** (-2)) + 4.0 * (
             1.0 + np.arange(1, self.J + 1) / (lscale ** (-2))
@@ -83,6 +83,6 @@ class Periodic(GPModel):
         dql = 0.5 / q * dq2
         dqm = 0.5 / q * q2 * 2.0 / mscale
 
-        self.dA['period'] = self._kron / -period ** 2
+        self.dA['period'] = self._kron / -(period ** 2)
         self.dP0['lscale'][self._diag] = np.repeat(dql, 2)
         self.dP0['mscale'][self._diag] = np.repeat(dqm, 2)

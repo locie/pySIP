@@ -4,14 +4,14 @@ from ..base import GPModel
 
 @dataclass
 class Matern12(GPModel):
-    '''Matérn covariance function (smoothness parameter = 1/2)'''
+    '''Matérn covariance function with smoothness parameter = 1/2'''
 
     states = [('ANY', 'f(t)', 'stochastic process')]
 
     params = [
-        ('MAGNITUDE_SCALE', 'mscale', ''),
-        ('LENGTH_SCALE', 'lscale', ''),
-        ('MEASURE_DEVIATION', 'sigv', ''),
+        ('MAGNITUDE_SCALE', 'mscale', 'control the overall variance of the function'),
+        ('LENGTH_SCALE', 'lscale', 'control the smoothness of the function'),
+        ('MEASURE_DEVIATION', 'sigv', 'measurement standard deviation'),
     ]
 
     inputs = []
@@ -38,12 +38,12 @@ class Matern12(GPModel):
 
         self.dA['lscale'][:] = 1.0 / lscale ** 2
         self.dQ['mscale'][:] = 2.0 ** 0.5 / lscale ** 0.5
-        self.dQ['lscale'][:] = -2.0 ** 0.5 * mscale / (2.0 * lscale ** 1.5)
+        self.dQ['lscale'][:] = -(2.0 ** 0.5) * mscale / (2.0 * lscale ** 1.5)
 
 
 @dataclass
 class Matern32(GPModel):
-    '''Matérn covariance function (smoothness parameter = 3/2)'''
+    '''Matérn covariance function with smoothness parameter = 3/2'''
 
     states = [
         ('ANY', 'f(t)', 'stochastic process'),
@@ -51,9 +51,9 @@ class Matern32(GPModel):
     ]
 
     params = [
-        ('MAGNITUDE_SCALE', 'mscale', ''),
-        ('LENGTH_SCALE', 'lscale', ''),
-        ('MEASURE_DEVIATION', 'sigv', ''),
+        ('MAGNITUDE_SCALE', 'mscale', 'control the overall variance of the function'),
+        ('LENGTH_SCALE', 'lscale', 'control the smoothness of the function'),
+        ('MEASURE_DEVIATION', 'sigv', 'measurement standard deviation'),
     ]
 
     inputs = []
@@ -82,15 +82,15 @@ class Matern32(GPModel):
         self.dA['lscale'][1, :] = [6.0 / lscale ** 3, 2.0 * 3.0 ** 0.5 / lscale ** 2]
 
         self.dQ['mscale'][1, 1] = 2.0 * 3.0 ** 0.75 / lscale ** 1.5
-        self.dQ['lscale'][1, 1] = -3.0 ** 1.75 * mscale / lscale ** 2.5
+        self.dQ['lscale'][1, 1] = -(3.0 ** 1.75) * mscale / lscale ** 2.5
 
         self.dP0['mscale'][1, 1] = 3.0 ** 0.5 / lscale
-        self.dP0['lscale'][1, 1] = -3.0 ** 0.5 * mscale / lscale ** 2
+        self.dP0['lscale'][1, 1] = -(3.0 ** 0.5) * mscale / lscale ** 2
 
 
 @dataclass
 class Matern52(GPModel):
-    '''Matérn covariance function (smoothness parameter = 5/2)'''
+    '''Matérn covariance function with smoothness parameter = 5/2'''
 
     states = [
         ('ANY', 'f(t)', 'stochastic process'),
@@ -99,9 +99,9 @@ class Matern52(GPModel):
     ]
 
     params = [
-        ('MAGNITUDE_SCALE', 'mscale', ''),
-        ('LENGTH_SCALE', 'lscale', ''),
-        ('MEASURE_DEVIATION', 'sigv', ''),
+        ('MAGNITUDE_SCALE', 'mscale', 'control the overall variance of the function'),
+        ('LENGTH_SCALE', 'lscale', 'control the smoothness of the function'),
+        ('MEASURE_DEVIATION', 'sigv', 'measurement standard deviation'),
     ]
 
     inputs = []
@@ -119,7 +119,11 @@ class Matern52(GPModel):
     def update_continuous_ssm(self):
         mscale, lscale, sigv, *_ = self.parameters.theta
 
-        self.A[2, :] = [-5.0 ** 1.5 / lscale ** 3, -15.0 / lscale ** 2, -3.0 * 5.0 ** 0.5 / lscale]
+        self.A[2, :] = [
+            -(5.0 ** 1.5) / lscale ** 3,
+            -15.0 / lscale ** 2,
+            -3.0 * 5.0 ** 0.5 / lscale,
+        ]
         self.Q[2, 2] = 20.0 * 5.0 ** 0.25 / 3.0 ** 0.5 * mscale / lscale ** 2.5
         self.R[0, 0] = sigv
         tmp = (5.0 / 3.0) ** 0.5 * mscale / lscale

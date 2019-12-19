@@ -1,8 +1,10 @@
-"""prior distributions module"""
 import numpy as np
 from scipy import special, stats, optimize
-from typing import Tuple
+from typing import Tuple, Callable
 from numbers import Real
+
+
+__ALL__ = ['Normal', 'Gamma', 'Beta', 'InverseGamma', 'LogNormal']
 
 
 class Prior:
@@ -14,36 +16,36 @@ class Prior:
     and Rubin, D.B., 2013. Bayesian data analysis. Chapman and Hall/CRC.
     """
 
-    def mean(self):
+    def mean(self) -> float:
         """mean"""
         raise NotImplementedError
 
-    def mode(self):
+    def mode(self) -> float:
         """mode"""
         raise NotImplementedError
 
-    def variance(self):
+    def variance(self) -> float:
         """variance"""
         raise NotImplementedError
 
-    def pdf(self, x: float):
-        """probability density function at `x`
+    def pdf(self, x: float) -> float:
+        """Evaluate the probability density function
 
         Args:
             x: Quantiles
         """
         return np.exp(self.log_pdf(x))
 
-    def log_pdf(self, x: float):
-        """log-probability density function at `x`
+    def log_pdf(self, x: float) -> float:
+        """Evaluate the logarithm of the  probability density function
 
         Args:
             x: Quantiles
         """
         raise NotImplementedError
 
-    def dlog_pdf(self, x: float):
-        """First derivative of the log-probability density function at `x`
+    def dlog_pdf(self, x: float) -> float:
+        """Partial derivative of the logarithm of the probability density function
 
         Args:
             x: Quantiles
@@ -55,14 +57,22 @@ class Prior:
 
         Args:
             n: Number of draws
-            hpd: Highest Prior Density for drawing sample from
-
-        Returns:
-            rvs: Drown random samples
+            hpd: Highest Prior Density for drawing sample from (true for unimodal distribution)
         """
         raise NotImplementedError
 
-    def _random(self, n, hpd, f_rvs, f_ppf):
+    def _random(self, n: int, hpd: float, f_rvs: Callable, f_ppf: Callable) -> np.ndarray:
+        """Draw random samples from a given distribution
+
+        Args:
+            n: Number of samples
+            hpd: Highest probability density to draw sample from
+            f_rvs: Random variable function
+            f_ppf: Inverse of cumulative distribution function
+
+        Returns:
+            rvs: Random variable samples
+        """
 
         if not isinstance(n, int) or n <= 0:
             raise TypeError('`n` must an integer greater or equal to 1')
@@ -136,11 +146,11 @@ class Normal(Prior):
         self, lb: Real = 0, ub: Real = 1, lb_prob: Real = 0.01, ub_prob: Real = 0.01
     ):
         """Find hyper-parameter values based on lower and upper bounds
-
-        lb: Lower bound
-        ub: Upper bound
-        lb_prob: Probability at the lower bound
-        ub_prob: Probability at the upper bound
+        Args:
+            lb: Lower bound
+            ub: Upper bound
+            lb_prob: Probability at the lower bound
+            ub_prob: Probability at the upper bound
         """
 
         def delta_tail(x, lb, ub, lb_prob, ub_prob):
@@ -161,6 +171,9 @@ class Normal(Prior):
 
         if np.max(info['fvec']) < 1e-6:
             self._m, self._s = np.exp(x)
+            self._s2 = self._s ** 2
+            self._cst = -0.5 * np.log(2.0 * np.pi * self._s2)
+
             print(f'solution found: mu={self._m:.4f}, sigma={self._s:.4f}')
         else:
             print('\nTry different initial values')
@@ -372,6 +385,8 @@ class InverseGamma(Prior):
 
         if np.max(info['fvec']) < 1e-6:
             self._a, self._b = np.exp(x)
+            self._cst = self._a * np.log(self._b) - special.gammaln(self._a)
+
             print(f'solution found: shape={self._a:.4f}, scale={self._b:.4f}')
         else:
             print('\nTry different initial values')
@@ -430,156 +445,3 @@ class LogNormal(Prior):
         f_rvs = lambda n: stats.lognorm.rvs(loc=self._m, s=self._s, size=n)
         f_ppf = lambda u: stats.lognorm.ppf(u, s=self._s, loc=self._m)
         return self._random(n, hpd, f_rvs, f_ppf)
-
-
-class MultivariateNormal(Prior):
-    """Multivariate Normal Probability Density Function
-
-    A SoftAbs metric can be used to ensure that the Hessian is PSD
-
-    Args:
-        dim: Number of random variables
-        alpha: SoftAbs hardness parameter, e.g. smooth the eigenvalues at 1 / `alpha`
-
-    References:
-        Betancourt, M., 2013, August.
-        A general metric for Riemannian manifold Hamiltonian Monte Carlo.
-        In International Conference on Geometric Science of Information
-        (pp. 327-334). Springer, Berlin, Heidelberg.
-    """
-
-    def __eq__(self, other):
-        return self._mean == other._mean and self._covm == other._covm
-
-    def __init__(self, dim: int = 1, alpha: float = 1e6):
-        if not isinstance(dim, int):
-            raise TypeError("`dim` must be an integer")
-
-        if not isinstance(alpha, (int, float)):
-            raise TypeError("alpha must be an integer or a float")
-
-        self._alpha = float(alpha)
-        self._dim = dim
-        self._mean = np.zeros(dim)
-        self._covm = np.eye(dim)
-        self._sqrt = np.eye(dim)
-        self._prem = np.eye(dim)
-        self._ln_det = 0.0
-        self._Ix = np.eye(dim)
-        self._ln_2PI = np.log(2.0 * np.pi)
-
-    def __repr__(self):
-        return "MVN({:.2g}, {:.2g})".format(self._mean, self._covm)
-
-    @property
-    def mean(self):
-        """Return the mean array"""
-        return self._mean
-
-    @mean.setter
-    def mean(self, x):
-        """Set a mean array"""
-        self._mean = x
-
-    @property
-    def mode(self):
-        """Return the mode array"""
-        return self._mean
-
-    @property
-    def variance(self):
-        """Return the variance array"""
-        return np.diag(self._covm)
-
-    @property
-    def covariance(self):
-        """Return the covariance matrix"""
-        return self._covm
-
-    @covariance.setter
-    def covariance(self, x):
-        """Set a covariance matrix"""
-        w, v = self._SoftAbs(x)
-        self._covm = x
-        self._sqrt = v @ np.diag(np.sqrt(w)) @ v.T
-        self._prem = v @ np.diag(1 / w) @ v.T
-        self._ln_det = np.sum(np.log(w))
-
-    @property
-    def precision(self):
-        """Return the precision matrix"""
-        return self._prem
-
-    @precision.setter
-    def precision(self, x):
-        """Set the precision matrix"""
-
-        w, v = self._SoftAbs(x)
-        self._prem = x
-        self._sqrt = v @ np.diag(np.sqrt(1 / w)) @ v.T
-        self._covm = self._sqrt @ self._sqrt
-        self._ln_det = -np.sum(np.log(w))
-
-    @property
-    def square_root(self):
-        """Return the square root of the covariance matrix"""
-        return self._sqrt
-
-    def _SoftAbs(self, x: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-        """SoftAbs metric,  smooth absolute value of the eigenvalues at 1 / `alpha`
-
-        Args:
-            x: A symmetric matrix
-
-        Returns
-            w: Eigenvalues
-            v: Eigenvectors
-        """
-        x += x.T
-        x /= 2
-        w, v = np.linalg.eigh(x)
-
-        # soft absolute value at the threshold 1/alpha of the eigenvalues
-        if self._alpha is not None:
-            for i in range(self._dim):
-                alpha_lambda = self._alpha * w[i]
-                if np.abs(alpha_lambda) < 1e-4:
-                    w[i] = (1.0 + (1.0 / 3.0) * alpha_lambda ** 2) / self._alpha
-                elif np.abs(alpha_lambda) > 18:
-                    w[i] = np.abs(w[i])
-                else:
-                    w[i] /= np.tanh(alpha_lambda)
-
-        return w, v
-
-    def log_pdf(self, x: np.ndarray) -> float:
-        """logarithm of the probability density function at `x`"""
-        e = (x - self._mean).squeeze()
-        return -0.5 * (self._dim * self._ln_2PI + self._ln_det + e @ self._prem @ e)
-
-    def dlog_pdf(self, x: np.ndarray) -> np.ndarray:
-        """gradient of the logarithm of the probability density function at `x`"""
-        e = (x - self._mean).squeeze()
-        return -self._prem @ e
-
-    def random(self, n: int = 1, hpd: float = None) -> np.ndarray:
-        """Generate random samples
-
-        Args:
-            n: Number of samples to generate
-
-        Returns:
-            rvs: Random samples
-        """
-        if not isinstance(n, int):
-            raise TypeError('`n` must be an integer')
-
-        if hpd is not None:
-            raise NotImplementedError
-
-        if n == 1:
-            rvs = self._mean + self._sqrt @ np.random.randn(self._dim)
-        else:
-            rvs = self._mean[:, np.newaxis] + self._sqrt @ np.random.randn(self._dim, n)
-
-        return rvs

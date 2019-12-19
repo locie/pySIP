@@ -1,24 +1,22 @@
 from dataclasses import dataclass, field
-
 from ..nodes import Par
 from ..base import GPModel
 
 
 @dataclass
 class GPSum(GPModel):
-    '''Sum of two Gaussian Process model'''
+    '''Sum of two Gaussian Process model
 
-    def __init__(self, gp1, gp2):
-        """Create a state-space model of appropriate dimensions
+    Args:
+        gp1: GPModel instance
+        gp2: GPModel instance
 
-        Args:
-            gp1, gp2: GPModel instance
+    Notes:
+        The MEASURE_DEVIATION of `gp2` is fixed because it is already defined in `gp1`.
+    '''
 
-        Notes:
-            The MEASURE_DEVIATION of `gp2` is fixed
-            because it is already defined in `gp1`.
+    def __init__(self, gp1: GPModel, gp2: GPModel):
 
-        """
         if not isinstance(gp1, GPModel):
             raise TypeError('`gp1` must be an GPModel instance')
 

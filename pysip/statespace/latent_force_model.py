@@ -8,29 +8,19 @@ from .nodes import Par
 class LatentForceModel(StateSpace):
     '''Latent Force Model (LFM)
 
-    The LFM is a combination of a physical model and a Gaussian process in
-    stochastic differential equation (SDE) representation.
+    Args:
+        rc: RCModel()
+        gp: GPModel()
+        latent_force: The name of the input considered as the latent force
+
+    Notes:
+        The MEASURE_DEVIATION of the GPModel is fixed because it is not used in the latent force
+        model. The GPModel is augmented into the RCModel, therefore, only the measurement noise
+        matrix `R` of the RCModel is used. To avoid useless computation, the MEASURE_DEVIATION
+        of the GPModel must stay fixed.
     '''
 
-    def __init__(self, rc, gp, latent_force):
-        '''Create a state-space model of appropriate dimensions
-
-        Args:
-            rc: RCModel instance
-            gp: GPModel instance
-            latent_force: String or list of strings of the RCModel inputs which
-                are considered as latent forces
-
-        Notes:
-            The MEASURE_DEVIATION of the GPModel is fixed because it is not
-            used in the latent force model. The GPModel is augmented into the
-            RCModel, therefore, only the measurement noise matrix `R` of the
-            RCModel is used. To avoid useless computation, the
-            MEASURE_DEVIATION of the GPModel must stay fixed.
-
-        TODO
-            Be careful with overrided names in jacobian dict
-        '''
+    def __init__(self, rc: RCModel, gp: GPModel, latent_force: str):
         if not isinstance(rc, RCModel):
             raise TypeError('`rc` must be an RCModel instance')
 
@@ -280,7 +270,7 @@ class R2C2_Qgh_Matern32(RCModel):
         self.dB['R2C2Qgh__Ci'][1, 1] = -1.0 / Ci ** 2
 
         self.dQ['Matern32__mscale'][3, 3] = 2.0 * 3.0 ** 0.75 / lscale ** 1.5
-        self.dQ['Matern32__lscale'][3, 3] = -3.0 ** 1.75 * mscale / lscale ** 2.5
+        self.dQ['Matern32__lscale'][3, 3] = -(3.0 ** 1.75) * mscale / lscale ** 2.5
 
         self.dP0['Matern32__mscale'][3, 3] = 3.0 ** 0.5 / lscale
-        self.dP0['Matern32__lscale'][3, 3] = -3.0 ** 0.5 * mscale / lscale ** 2
+        self.dP0['Matern32__lscale'][3, 3] = -(3.0 ** 0.5) * mscale / lscale ** 2

@@ -73,7 +73,7 @@ def test_save_version_number():
         pytest.param(Periodic() * Matern12(), 32, id="gp_product"),
         pytest.param(
             TwTiTm_RoRiRmRbAwAicv(latent_forces='Qv') <= Periodic() * Matern52() + Matern52(),
-            236,
+            237,
             id="lfm_model",
         ),
     ],

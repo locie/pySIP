@@ -1,11 +1,48 @@
 import numpy as np
+from typing import Union, Tuple, List
 from .prior import Prior
 from .parameter import Parameter
-from ..utils import random_seed
 
 
 class Parameters:
-    def __init__(self, parameters, name=''):
+    """Factory of Parameter instances
+
+    Args:
+        parameters: There is two options for instantiating Parameters: `parameters` is a list of
+            strings corresponding to the parameters names. In this case all the parameters have the
+            default settings; `parameters` is a list of dictionaries, where the arguments of
+            Parameter can be modified as key-value pairs
+        name: Name of this specific instance
+
+    Notes:
+        Multiple instances of Parameters can be added together
+        ::
+
+            >>> p_alpha = Parameters(['a', 'b', 'c'], name='alpha')
+            >>> p_beta = Parameters(['c', 'd', 'e'], name='beta')
+            >>> params = [
+                {'name': 'a', 'value': 1.0, 'transform': 'log'},
+                {'name': 'b', 'value': 2.0, 'bounds': (1.0, 3.0)},
+            ]
+            >>> p_gamma = Parameters(parameters=params, name='gamma')
+            >>> print(p_alpha + p_beta + p_gamma)
+
+            Parameters alpha__beta__gamma
+            * alpha__beta
+                * alpha
+                    name=a value=0.000e+00 transform=none bounds=(None, None) prior=None
+                    name=b value=0.000e+00 transform=none bounds=(None, None) prior=None
+                    name=c value=0.000e+00 transform=none bounds=(None, None) prior=None
+                * beta
+                    name=c value=0.000e+00 transform=none bounds=(None, None) prior=None
+                    name=d value=0.000e+00 transform=none bounds=(None, None) prior=None
+                    name=e value=0.000e+00 transform=none bounds=(None, None) prior=None
+            * gamma
+                name=a value=1.000e+00 transform=log bounds=(None, None) prior=None
+                name=b value=2.000e+00 transform=logit bounds=(1.0, 3.0) prior=None
+    """
+
+    def __init__(self, parameters: list, name: str = ''):
 
         self._name = name
 
@@ -61,6 +98,8 @@ class Parameters:
 
     @property
     def parameters(self):
+        """Returns the list of Parameter instance"""
+
         def _leafs(node):
             if isinstance(node, Parameter):
                 return [node]
@@ -69,6 +108,14 @@ class Parameters:
         return _leafs(self._parameters)
 
     def set_parameter(self, *args, **kwargs):
+        """Change settings of Parameters after instantiation
+
+        ::
+
+                p_alpha = Parameters(['a', 'b', 'c'], name='alpha')
+                p_alpha.set_parameter('a', value=1, transform='log')
+        """
+
         def _get(d, *args):
             if not d:
                 return None
@@ -88,166 +135,243 @@ class Parameters:
             _set(self._parameters, parameter, *args)
 
     @property
-    def theta(self):
-        """values of :math:`\\theta`"""
+    def theta(self) -> List:
+        """Get the constrained parameter values :math:`\\mathbf{\\theta}`"""
         return [h.theta for h in self.parameters]
 
     @theta.setter
-    def theta(self, x):
-        """set values to :math:`\\theta` and do the change in :math:`\\eta`"""
+    def theta(self, x: Union[Tuple, List, np.ndarray]):
+        """Set the constrained parameter values :math:`\\mathbf{\\theta}`
+
+        Args:
+            x: New constrained parameter values
+        """
+
+        if len(x) != len(self.parameters):
+            raise ValueError(f'theta has {len(self.parameters)} parameters but {len(x)} are given')
+
         for p, value in zip(self.parameters, x):
             p.theta = value
 
-    def theta_by_name(self, names):
-        """return ordered theta value corresponding to names"""
-        return [h.theta for n in names for h in self.parameters if h.name == n]
-
     @property
-    def theta_free(self):
-        """values of :math:`\\theta`"""
-        return [p.theta for p in self.parameters if p.free]
-
-    @property
-    def theta_scaled(self):
-        """values of :math:`\\theta`"""
-        return [p.value for p in self.parameters if p.free]
+    def theta_free(self) -> List:
+        """Get constrained parameter values :math:`\\mathbf{\\theta}` which are not fixed"""
+        return [p.theta for p in self.parameters_free]
 
     @theta_free.setter
-    def theta_free(self, x):
-        for p, value in zip([_p for _p in self.parameters if _p.free], x):
+    def theta_free(self, x: Union[Tuple, List, np.ndarray]):
+        """Set constrained parameter values :math:`\\mathbf{\\theta}` which are not fixed
+
+        Args:
+            x: New free constrained parameter values
+        """
+
+        if len(x) != self.n_par:
+            raise ValueError(f'theta has {self.n_par} free parameters but {len(x)} are given')
+
+        for p, value in zip(self.parameters_free, x):
             p.theta = value
 
     @property
-    def theta_jacobian(self):
-        """Jacobian of :math:`\\theta`
+    def theta_sd(self) -> List:
+        """Get standardized parameter values :math:`\\mathbf{\\theta_{sd}}` which are not fixed"""
+        return [p.theta_sd for p in self.parameters_free]
 
-        return only a vector because the jacobian matrix,
-        :math:`J = \\frac{\\partial \\theta}{\\partial \\eta}` is diagonal.
+    @theta_sd.setter
+    def theta_sd(self, x: Union[Tuple, List, np.ndarray]):
+        """Set standardized parameter values :math:`\\mathbf{\\theta_{sd}}` which are not fixed
 
-        Chain rules and Jacobian adjustment are used to transform the gradient
-        of the constrained space in the unconstrained space e.g.
-        ..math:: \\frac{\\partial \\ln p(\\eta|y)}{\\partial \\eta} =
-                 \\frac{\\partial \\ln p(\\theta|y)}{\\partial \\theta} J
-                 + \\frac{\\partial \\ln |\\det(J)|}{\\partial \\eta}
+        Args:
+            x: New free standardized parameter values
         """
-        return [p._inv_transform_jacobian() for p in self.parameters if p.free]
+
+        if len(x) != self.n_par:
+            raise ValueError(f'theta_sd has {self.n_par} free parameters but {len(x)} are given')
+
+        for p, value in zip(self.parameters_free, x):
+            p.theta_sd = value
 
     @property
-    def theta_log_jacobian(self):
-        """logarithm of the determinant of the jacobian matrix:
-            :math:`\\ln |\\det(J)|`
+    def theta_jacobian(self) -> List:
+        """Inverse transform jacobian :math:`\\partial \\theta \\,/\\, \\partial \\eta`
+
+        .. math::
+
+            \\frac{\\partial \\pi(\\eta \\mid y)}{\\partial \\eta} =
+            \\frac{\\partial \\pi(\\theta \\mid y)}{\\partial \\theta}
+            \\frac{\\partial \\theta}{\\partial \\eta}
+
+
+        where :math:`\\pi(\\theta \\mid y) = \\log p(\\theta \\mid y)` is the logarithm
+        of the posterior distribution in the constrained parameter space and,
+        :math:`\\theta = f^{-1}(\\eta)` is the inverse bijective transformation.
+
+        Notes:
+            Only univariate change of variables are supported.
+        """
+        return [p._inv_transform_jacobian() for p in self.parameters_free]
+
+    @property
+    def theta_log_jacobian(self) -> List:
+        """Logarithm of the jacobian adjustment
+        :math:`\\log \\left| \\partial \\theta \\,/\\, \\partial \\eta \\right|`
+
+        .. math::
+
+            \\pi(\\eta \\mid y) = \\pi(\\theta \\mid y) +
+            \\log \\left| \\frac{\\partial \\theta}{\\partial \\eta} \\right|
+
+
+        where :math:`\\pi(\\theta \\mid y) = \\log p(\\theta \\mid y)` is the logarithm
+        of the posterior distribution in the constrained parameter space and,
+        :math:`\\theta = f^{-1}(\\eta)` is the inverse bijective transformation.
+
+        Notes:
+            The jacobian adjustment is required if a prior distribution is used. This formula is
+            works for univariate change of variables only. For multivariate case, the absolute
+            value of the determinant of the jacobian matrix must be used.
         """
         return np.sum(np.log(np.abs(self.theta_jacobian)))
 
     @property
-    def theta_dlog_jacobian(self):
-        """partial derivative of the logarithm of jacobian matrix
+    def theta_dlog_jacobian(self) -> List:
+        """Partial derivative of the logarithm of the jacobian adjustment
+        :math:`\\partial \\log \\left| \\partial \\theta \\,/\\, \\partial \\eta \\right| \\,/\\, \\partial \\eta`
 
-        :math:`\\frac{\\partial \\ln |\\det(J)|}{\\partial \\eta}`
+
+        .. math::
+
+            \\frac{\\partial \\pi(\\eta \\mid y)}{\\partial \\eta} =
+            \\frac{\\partial \\pi(\\theta \\mid y)}{\\partial \\theta}
+            \\frac{\\partial \\theta}{\\partial \\eta} +
+            \\frac{\\partial}{\\partial \\eta}
+            \\log \\left|\\frac{\\partial \\theta}{\\partial \\eta}\\right|
+
+
+        where :math:`\\pi(\\theta \\mid y) = \\log p(\\theta \\mid y)` is the logarithm
+        of the posterior distribution in the constrained parameter space and,
+        :math:`\\theta = f^{-1}(\\eta)` is the inverse bijective transformation.
+
+        Notes:
+            The jacobian adjustment is required if a prior distribution is used. This formula is
+            works for univariate change of variables only. For multivariate case, the absolute
+            value of the determinant of the jacobian matrix must be used.
         """
-        return [p._inv_transform_dlog_jacobian() for p in self.parameters if p.free]
+        return [p._inv_transform_dlog_jacobian() for p in self.parameters_free]
 
     @property
-    def eta(self):
-        """values of :math:`\\eta`"""
+    def eta(self) -> np.ndarray:
+        """Get the unconstrained parameter values :math:`\\mathbf{\\eta}`"""
         return np.array([p.eta for p in self.parameters])
 
     @eta.setter
-    def eta(self, x):
-        """set values to :math:`\\eta` and do the change in :math:`\\theta`
-        values can be set to :math:`\\eta` only if the corresponding parameters
-        are not fixed"""
-        for p, value in zip([_p for _p in self.parameters if _p.free], x):
+    def eta(self, x: np.ndarray):
+        """Set the unconstrained parameter values :math:`\\mathbf{\\eta}` which are not fixed
+
+        Args:
+            x: New free unconstrained parameter values
+        """
+
+        if len(x) != self.n_par:
+            raise ValueError(f'eta has {self.n_par} free parameters but {len(x)} are given')
+
+        for p, value in zip(self.parameters_free, x):
             p.eta = value
 
     @property
-    def eta_free(self):
-        """values of free unconstrained parameters :math:`\\eta`"""
+    def eta_free(self) -> np.ndarray:
+        """Get the unconstrained parameter values :math:`\\mathbf{\\eta}` which are not fixed"""
         return self.eta[self.free]
 
     @property
-    def eta_jacobian(self):
-        """Jacobian of :math:`\\eta`
+    def eta_jacobian(self) -> List:
+        """Transform jacobian :math:`\\partial \\eta \\,/\\, \\partial \\theta`
 
-        return only a vector because the jacobian matrix,
-        :math:`J = \\frac{\\partial \\eta}{\\partial \\theta}` is diagonal.
+        .. math::
 
-        Chain rules and Jacobian adjustment are used to transform the gradient
-        of the unconstrained space in the constrained space e.g.
+            \\frac{\\partial \\pi(\\theta \\mid y)}{\\partial \\theta} =
+            \\frac{\\partial \\pi(\\eta \\mid y)}{\\partial \\eta}
+            \\frac{\\partial \\eta}{\\partial \\theta}
 
-        ..math:: \\frac{\\partial \\ln p(\\theta|y)}{\\partial \\theta} =
-                 \\frac{\\partial \\ln p(\\eta|y)}{\\partial \\eta} J
-                 + \\frac{\\partial \\ln |\\det(J)|}{\\partial \\theta}
+
+        where :math:`\\pi(\\theta \\mid y) = \\log p(\\theta \\mid y)` is the logarithm
+        of the posterior distribution in the constrained parameter space and,
+        :math:`\\eta = f(\\theta)` is the bijective transformation.
+
+        Notes:
+            Only univariate change of variables are supported.
         """
-        return [p._transform_jacobian() for p in self.parameters if p.free]
+        return [p._transform_jacobian() for p in self.parameters_free]
 
     @property
-    def prior(self):
-        """Evaluate the logarithm of the prior probability density function
-
-        :math:`\\ln p(\\theta)`
-        """
+    def prior(self) -> float:
+        """Get the logarithm of the prior distribution :math:`\\log p(\\theta)`"""
         return np.sum(
-            [
-                p.prior.log_pdf(p.value) if p.prior is not None else 0.0
-                for p in self.parameters
-                if p.free
-            ]
+            [p.prior.log_pdf(p.value) for p in self.parameters_free if p.prior is not None]
         )
 
     @property
-    def d_prior(self):
-        """Evaluate the partial derivative of the logarithm of the prior
-        probability density function
-
-        :math:`\\frac{\\partial \\ln p(\\theta)}{\\partial \\theta}`
-        """
+    def d_prior(self) -> List:
+        """Get the partial derivative of logarithm of the prior distribution :math:`\\partial \\log p(\\theta) \\,/\\, \\partial \\theta`"""
         return [
-            p.prior.dlog_pdf(p.value) if p.prior is not None else 0.0
-            for p in self.parameters
-            if p.free
+            p.prior.dlog_pdf(p.value) if p.prior is not None else 0.0 for p in self.parameters_free
         ]
 
     @property
-    def free(self):
-        """return a boolean list of free parameters"""
+    def free(self) -> List[bool]:
+        """Return the list of free parameters"""
         return [p.free for p in self.parameters]
 
     @property
-    def names(self):
-        """return parameter names"""
+    def names(self) -> List[str]:
+        """Return the list of parameter names"""
         return [p.name for p in self.parameters]
 
     @property
-    def names_free(self):
-        """return parameter names"""
-        return [p.name for p in self.parameters if p.free]
+    def names_free(self) -> List[str]:
+        """Return the list of free parameter names"""
+        return [p.name for p in self.parameters_free]
 
     @property
-    def penalty(self, scaling=1e-4):
-        """penalty function"""
-        return scaling * np.sum([p._penalty() for p in self.parameters if p.free])
+    def penalty(self, scaling: float = 1e-4) -> float:
+        """penalty function
+
+        Args:
+            scaling: Scaling coefficient of the penalty function
+        """
+        return scaling * np.sum([p._penalty() for p in self.parameters_free])
 
     @property
-    def d_penalty(self, scaling=1e-4):
-        """derivative of the penalty function"""
-        return [scaling * p._d_penalty() for p in self.parameters if p.free]
+    def d_penalty(self, scaling: float = 1e-4) -> List:
+        """Partial derivative of the penalty function
 
-    def prior_init(self, hpd=None, seed='random'):
-        """Draw random samples from the prior distributions"""
+        Args:
+            scaling: Scaling coefficient of the penalty function
+        """
+        return [scaling * p._d_penalty() for p in self.parameters_free]
 
-        if seed != 'random' and not isinstance(seed, int):
-            raise TypeError('`seed` must be "random" or an interger')
+    def prior_init(self, hpd=None):
+        """Draw a random sample from the prior distribution, :math:`\\theta \sim p(\\theta)`
 
-        if seed == 'random':
-            seed = random_seed()
-            np.random.seed(seed)
+        Args:
+            hpd: Highest Prior Density to draw sample from (True for unimodal distribution)
+        """
 
         for p in self.parameters:
             if p.prior is not None:
-                p.theta = p.scale * p.prior.random(hpd=hpd)[0]
+                p.theta_sd = p.prior.random(hpd=hpd)[0]
 
     @property
-    def scale(self):
-        """Scale of the constrained parameters"""
-        return [p.scale for p in self.parameters if p.free]
+    def scale(self) -> List:
+        """Scales of the constrained parameters :math:`\\theta`"""
+        return [p.scale for p in self.parameters_free]
+
+    @property
+    def n_par(self) -> int:
+        """Number of free parameters"""
+        return np.sum(self.free)
+
+    @property
+    def parameters_free(self) -> List:
+        """Returns the Parameter instances which are not fixed"""
+        return [p for p in self.parameters if p.free]

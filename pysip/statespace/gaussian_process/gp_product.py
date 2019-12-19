@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
 from itertools import product
 import numpy as np
-
 from ..base import GPModel
 from ..nodes import Par
 from .periodic import Periodic
@@ -9,19 +8,18 @@ from .periodic import Periodic
 
 @dataclass
 class GPProduct(GPModel):
-    '''Product of two Gaussian Process Covariance'''
+    '''Product of two Gaussian Process Covariance
 
-    def __init__(self, gp1, gp2):
-        """Create a state-space model of appropriate dimensions
+    Args:
+        gp1: GPModel instance
+        gp2: GPModel instance
 
-        Args:
-            gp1, gp2: GPModel instance
+    Notes:
+        The MEASURE_DEVIATION and MAGNITUDE_SCALE of the `gp2` are fixed
+        because they are already defined in `gp1`.
+    '''
 
-        Notes:
-            The MEASURE_DEVIATION and MAGNITUDE_SCALE of the `gp2` are fixed
-            because they are already defined in `gp1`.
-
-        """
+    def __init__(self, gp1: GPModel, gp2: GPModel):
         if not isinstance(gp1, GPModel):
             raise TypeError('`gp1` must be an GPModel instance')
 

@@ -1,5 +1,5 @@
 """Frequentist regressor"""
-from typing import Tuple
+from typing import Tuple, Union
 import numpy as np
 import pandas as pd
 from scipy.optimize import minimize
@@ -11,11 +11,11 @@ from ..utils.statistics import ttest
 
 
 class FreqRegressor(BaseRegressor):
-    """Frequentist Regressor inference and prediction
+    """Frequentist Regressor
 
     Args:
-        ss: StateSpace instance
-        bayesian_filter: BayesianFilter instance
+        ss: StateSpace()
+        bayesian_filter: BayesianFilter()
         time_scale: Time series frequency, e.g. 's': seconds, 'D': days, etc.
             Works only for pandas.DataFrame with DateTime index
     """
@@ -26,25 +26,37 @@ class FreqRegressor(BaseRegressor):
         super().__init__(ss, bayesian_filter, time_scale, False, True)
 
     def fit(
-        self, df: pd.DataFrame, outputs: list, inputs: list = None, options: dict = None
-    ) -> None:
+        self,
+        df: pd.DataFrame,
+        outputs: Union[str, list],
+        inputs: [str, list] = None,
+        options: dict = None,
+    ) -> Union[pd.DataFrame, pd.DataFrame, dict]:
         """Fit the model
 
         Args:
             df: Training data
-            outputs: Outputs names
-            inputs: Inputs names
-            options: Options for scipy.minimmize('BFGS') and
+            outputs: Outputs name(s)
+            inputs: Inputs name(s)
+            options:
+                - scipy.minimmize options
                 - **init** (str, default=`unconstrained`):
-                    `unconstrained`: Uniform draws in the unconstrained space between [-2, 2]
-                    `prior`: Uniform draws from the prior distribution
-                    `fixed`: Use values set in position.theta
-                - **prior_mass** (float, default=0.95):
-                    Use **prior_mass** highest prior density for **init**=`prior`
+                    - unconstrained: Uniform draw between [-1, 1] in the uncsontrained space
+                    - prior: Uniform draw from the prior distribution
+                    - zero: Set the unconstrained parameters to 0
+                    - fixed: The current parameter values are used
+                    - value: Uniform draw between the parameter value +/- 25%
+                    - prior_mass (float, default=0.95):
+                - **hpd**: (float, default=0.95)
+                    Highest Prior Density to draw sample from the prior (True if unimodal)
 
         Returns:
-            FreqFit object (TODO)
+            3-elements tuple containing
+                - **df**: Fit summary
+                - **df_corr**: Correlation matrix
+                - **results**: Scipy optimize summary
         """
+
         if options is None:
             options = {}
         else:
@@ -56,13 +68,12 @@ class FreqRegressor(BaseRegressor):
         init = options.pop('init', 'fixed')
         hpd = options.pop('hpd', 0.95)
         self.ss.parameters.eta = self._init_parameters(1, init, hpd)
-
-        data = self._prepare_data(df, inputs, outputs, None, self.time_scale)
+        data = self._prepare_data(df, inputs, outputs, None)[:-1]
 
         results = minimize(
             fun=self._eval_dlog_posterior,
             x0=self.ss.parameters.eta_free,
-            args=data[:-1],
+            args=data,
             method='BFGS',
             jac=True,
             options=options,
@@ -106,17 +117,17 @@ class FreqRegressor(BaseRegressor):
     def eval_residuals(
         self,
         df: pd.DataFrame,
-        outputs: list,
-        inputs: list = None,
+        outputs: Union[str, list],
+        inputs: Union[str, list] = None,
         x0: np.ndarray = None,
         P0: np.ndarray = None,
-    ) -> Tuple[np.ndarray]:
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """Compute the standardized residuals
 
         Args:
             df: Data
-            inputs: Inputs names
-            outputs: Outputs names
+            outputs: Outputs name(s)
+            inputs: Inputs name(s)
             x0: Initial state mean
             P0: Initial state deviation
 
@@ -125,7 +136,8 @@ class FreqRegressor(BaseRegressor):
                 - **res**: Standardized residuals
                 - **res_std**: Residuals deviations
         """
-        dt, u, u1, y, *_ = self._prepare_data(df, inputs, outputs, None, self.time_scale)
+
+        dt, u, u1, y, *_ = self._prepare_data(df, inputs, outputs, None)
         ssm, index = self.ss.get_discrete_ssm(dt)
         res, res_std = self.filter.filtering(ssm, index, u, u1, y)[2:]
 
@@ -139,7 +151,7 @@ class FreqRegressor(BaseRegressor):
         x0: np.ndarray = None,
         P0: np.ndarray = None,
         smooth: bool = False,
-    ) -> Tuple[np.ndarray]:
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """Estimate the state filtered/smoothed distribution
 
         Args:
@@ -155,51 +167,49 @@ class FreqRegressor(BaseRegressor):
                 - state mean
                 - state covariance
         """
-        dt, u, u1, y, *_ = self._prepare_data(df, inputs, outputs, None, self.time_scale)
+
+        dt, u, u1, y, *_ = self._prepare_data(df, inputs, outputs, None)
         return self._estimate_states(dt, u, u1, y, x0, P0, smooth)
 
     def eval_log_likelihood(
         self,
         df: pd.DataFrame,
-        outputs: list,
-        inputs: list = None,
-        x0: np.ndarray = None,
-        P0: np.ndarray = None,
+        outputs: Union[str, list],
+        inputs: Union[str, list] = None,
         pointwise: bool = False,
-    ) -> float:
+    ) -> Union[float, np.ndarray]:
         """Evaluate the negative log-likelihood
 
         Args:
             df: Data
-            inputs: Inputs names
-            outputs: Outputs names
-            x0: Initial state mean
-            P0: Initial state deviation
+            outputs: Outputs name(s)
+            inputs: Inputs name(s)
             pointwise: Evaluate the log-likelihood pointwise
 
         Returns:
-            Negative log-likelihood
+            Negative log-likelihood or predictive density evaluated point-wise
         """
-        dt, u, u1, y, *_ = self._prepare_data(df, inputs, outputs, None, self.time_scale)
-        return self._eval_log_likelihood(dt, u, u1, y, x0, P0, pointwise)
+
+        dt, u, u1, y, *_ = self._prepare_data(df, inputs, outputs, None)
+        return self._eval_log_likelihood(dt, u, u1, y, pointwise)
 
     def predict(
         self,
         df: pd.DataFrame,
-        outputs: list = None,
-        inputs: list = None,
-        tnew: pd.Series = None,
+        outputs: Union[str, list] = None,
+        inputs: Union[str, list] = None,
+        tnew: Union[np.ndarray, pd.Series] = None,
         x0: np.ndarray = None,
         P0: np.ndarray = None,
         smooth: bool = False,
-    ) -> Tuple[np.ndarray]:
-        """State-space model output prediction / interpolation
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """State-space model output prediction
 
         Args:
             df: Data
-            outputs: Outputs names
-            inputs: Inputs names
-            tnew: Input and output data are interpolated at the new time instants
+            outputs: Outputs name(s)
+            inputs: Inputs name(s)
+            tnew: New time instants
             x0: Initial state mean
             P0: Initial state deviation
             smooth: Use smoother
@@ -208,13 +218,12 @@ class FreqRegressor(BaseRegressor):
             2-element tuple containing
                 - **y_mean**: Output mean
                 - **y_std**: Output deviation
-        TODO
-            for multiple output
         """
+
         if self.ss.ny > 1:
             raise NotImplementedError
 
-        dt, u, u1, y, index_back = self._prepare_data(df, inputs, outputs, tnew, self.time_scale)
+        dt, u, u1, y, index_back = self._prepare_data(df, inputs, outputs, tnew)
         x, P = self._estimate_states(dt, u, u1, y, x0, P0, smooth)
 
         # keep only the part corresponding to `tnew`

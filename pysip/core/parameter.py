@@ -5,24 +5,37 @@ from .prior import Prior
 
 
 class Parameter(object):
-    """A parameter with a double representation
+    """A Parameter has a value in the constrained space :math:`\\theta` and in the
+    unconstrained space :math:`\\eta`. These two values are linked by the relation
 
-    Parameter has a value in a constrained space :math:`\\theta` and in unconstrained space
-    :math:`\\eta`. These two values are linked by one of the following bijections:
+    .. math::
+       :nowrap:
 
-    * `none`: :math:`\\theta = \\eta \\quad \\theta \\in ]-\\infty, \\infty[`
-    * `log`: :math:`\\theta = \\exp(\\eta) \\quad \\theta \\in [0, \\infty[`
-    * `lower`: :math:`\\theta = \\exp(\\eta) + a \\quad \\theta \\in [a, \\infty[`
-    * `upper`: :math:`\\theta = b - \\exp(\\eta) \\quad \\theta \\in ]-\\infty, b]`
-    * `logit`: :math:`\\theta = a + \\frac{(b - a)}{1 + \\exp(-\\eta)} \\quad \\theta \\in [a, b]`
+        \\begin{equation*}
+            \\theta = loc + f(\\eta) \\times scale
+        \\end{equation*}
 
-    with :math:`a` and :math:`b` the lower and upper bounds given as a tuple such that,
-    `bounds` = :math:`(a, b)`. If `transform` = 'fixed' the parameter is not considered as a
+
+    where :math:`\\theta_{sd} = f(\\eta)` is one of the following `transform`
+
+    * `none`: :math:`\\theta_{sd} = \\eta \\qquad \\theta_{sd} \\in ]-\\infty, \\infty[`
+    * `log`: :math:`\\theta_{sd} = \\exp(\\eta) \\qquad \\theta_{sd} \\in [0, \\infty[`
+    * `lower`: :math:`\\theta_{sd} = \\exp(\\eta) + a \\qquad \\theta_{sd} \\in [a, \\infty[`
+    * `upper`: :math:`\\theta_{sd} = b - \\exp(\\eta) \\qquad \\theta_{sd} \\in ]-\\infty, b]`
+    * `logit`: :math:`\\theta_{sd} = a+\\frac{(b-a)}{1+\\exp(-\\eta)}\\qquad\\theta_{sd}\\in [a, b]`
+
+    where :math:`a` and :math:`b` are the lower and upper bounds given as a tuple, such
+    that, `bounds` = :math:`(a, b)`. If `transform` = 'fixed' the parameter is not considered as a
     random variable.
+
+    The `prior` distribution is on the standardized constrained parameter value
+    :math:`\\theta_{sd}`. In order to put the prior on the constrained parameter
+    value :math:`\\theta`, use the default configuration, `loc` = 0 and `scale` = 1.
 
     Args:
         name: Parameter name
         value: Parameter value
+        loc: Location value
         scale: Scaling value
         transform: Bijections
         bounds: Parameters bounds
@@ -35,6 +48,7 @@ class Parameter(object):
         self,
         name: str,
         value: Real = None,
+        loc: Real = 0.0,
         scale: Real = 1.0,
         transform: str = None,
         bounds: Tuple[Real] = (None, None),
@@ -45,6 +59,10 @@ class Parameter(object):
         if not isinstance(name, str):
             raise TypeError('`name` should be a string')
         self.name = name
+
+        if not isinstance(loc, Real):
+            raise TypeError('`loc` must be a real number')
+        self.loc = loc
 
         if not isinstance(scale, Real):
             raise TypeError('`scale` must be a real number')
@@ -91,7 +109,7 @@ class Parameter(object):
         if value is not None:
             if not isinstance(value, Real):
                 raise TypeError('`value` must be a real number')
-            self.theta = float(value) * self.scale
+            self.theta = self.loc + self.scale * float(value)
         else:
             self.eta = 0.0
 
@@ -115,40 +133,53 @@ class Parameter(object):
         return (
             self.value == other.value
             and self.name == other.name
+            and self.loc == other.loc
+            and self.scale == other.scale
             and self.transform == other.transform
             and self.bounds == other.bounds
             and self.prior == other.prior
         )
 
     @property
-    def theta(self):
-        """Return constrained parameter"""
-        return self.value * self.scale
+    def theta(self) -> float:
+        """Returns constrained parameter value :math:`\\theta`"""
+        return self.loc + self.scale * self.value
 
     @theta.setter
     def theta(self, x):
-        """Set constrained parameter"""
-        self.value = x / self.scale
+        """Set constrained parameter value :math:`\\theta`"""
+        self.value = (x - self.loc) / self.scale
         self._transform()
 
     @property
-    def eta(self):
-        """Return unconstrained parameter"""
+    def theta_sd(self) -> float:
+        """Returns standardized constrained parameter value :math:`\\theta_{sd}`"""
+        return self.value
+
+    @theta_sd.setter
+    def theta_sd(self, x):
+        """Set standardized constrained parameter value :math:`\\theta_{sd}`"""
+        self.value = x
+        self._transform()
+
+    @property
+    def eta(self) -> float:
+        """Returns unconstrained parameter value :math:`\\eta`"""
         return self._eta
 
     @eta.setter
     def eta(self, x):
-        """Return unconstrained parameter"""
+        """Returns unconstrained parameter value :math:`\\eta`"""
         self._eta = x
         self._inv_transform()
 
     @property
-    def free(self):
-        """Return True if the parameter is not fixed"""
+    def free(self) -> bool:
+        """Returns True if the parameter is not fixed"""
         return not self.transform == 'fixed'
 
     def _transform(self):
-        """Get :math:`\\eta`"""
+        """Do transformation :math:`\\eta = f(\\theta_{sd})`"""
 
         if self.transform in ['none', 'fixed']:
             self._eta = self.value
@@ -166,13 +197,8 @@ class Parameter(object):
             self._eta = np.log((self.value - self.bounds[0]) / (self.bounds[1] - self.value))
 
     def _transform_jacobian(self):
-        """Get the jacobian of :math:`\\eta = f(\\theta)`
+        """Get the jacobian of :math:`\\eta = f(\\theta_{sd})`"""
 
-        The transformations are independent, therefore, instead of returning a
-        diagonal jacobian matrix we return a vector. In this case, the
-        determinant of the jacobian adjustment in the log posterior,
-        e.g. ln(|J|), can be replaced by ln(J).sum()
-        """
         if self.transform in ['none', 'fixed']:
             return 1.0
 
@@ -191,7 +217,8 @@ class Parameter(object):
             )
 
     def _inv_transform(self):
-        """Get :math:`\\theta`"""
+        """Do inverse transformation :math:`\\theta_{sd} = f^{-1}(\\eta)`"""
+
         if self.transform in ['none', 'fixed']:
             self.value = self._eta
 
@@ -209,17 +236,9 @@ class Parameter(object):
                 1 + np.exp(-self._eta)
             )
 
-    def _inv_transform_jacobian(self):
-        """Get the jacobian of :math:`\\theta = f^{-1}(\\eta)`
+    def _inv_transform_jacobian(self) -> float:
+        """Get the jacobian of :math:`\\theta_{sd} = f^{-1}(\\eta)`"""
 
-        The transformations are independent, therefore, instead of returning a
-        diagonal jacobian matrix we return a vector. In this case, the
-        determinant of the jacobian adjustment in the log posterior,
-        e.g. ln(det|J|), can be replaced by ln(J).sum()
-
-        Notes:
-            chain rule doesn't use absolute value like the jacobian adjustment
-        """
         if self.transform in ['none', 'fixed']:
             return 1.0
 
@@ -236,10 +255,10 @@ class Parameter(object):
             x = np.exp(-self._eta)
             return (self.bounds[1] - self.bounds[0]) * x / (1.0 + x) ** 2
 
-    def _inv_transform_dlog_jacobian(self):
-        """Partial derivative of the logarithm of the inverse transform
+    def _inv_transform_dlog_jacobian(self) -> float:
+        """Get the jacobian of the logarithm of the inverse transform
 
-         :math:`\\frac{\\partial \\ln(\\theta)}{\\partial \\eta}`
+         :math:`\\frac{\\partial \\ln(\\theta_{sd})}{\\partial \\eta}`
         """
         if self.transform in ['none', 'fixed']:
             return 0.0
@@ -250,9 +269,9 @@ class Parameter(object):
         elif self.transform == 'logit':
             return -np.tanh(self._eta / 2.0)
 
-    def _penalty(self):
-        """If :math:`\\theta` is a constrained parameter, the penalty function
-        increases the objective function near the bounds"""
+    def _penalty(self) -> float:
+        """Penalty function"""
+
         if self.transform in ["none", "fixed"]:
             return 0.0
 
@@ -270,9 +289,9 @@ class Parameter(object):
                 self.bounds[1]
             ) / (self.bounds[1] - self.value)
 
-    def _d_penalty(self):
-        """If :math:`\\theta` is a constrained parameter, the derivative of the
-        penalty function increases the gradient near the bounds"""
+    def _d_penalty(self) -> float:
+        """Derivative of the penalty function"""
+
         if self.transform in ["none", "fixed"]:
             return 0.0
 

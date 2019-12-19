@@ -1,14 +1,14 @@
 from dataclasses import dataclass, field
 from collections import defaultdict, namedtuple
 from functools import partial
+from typing import NamedTuple, Union, Tuple
 import numpy as np
-from scipy.linalg import expm, expm_frechet, solve_continuous_lyapunov, LinAlgError, LinAlgWarning
+from scipy.linalg import expm, expm_frechet, solve_continuous_lyapunov, LinAlgError
 from .nodes import Node
 from .meta import MetaStateSpace
 from ..core import Parameters
 from ..utils.math import nearest_cholesky
 from ..utils.draw import TikzStateSpace
-import warnings
 
 ssm = namedtuple('ssm', 'A, B0, B1, C, D, Q, R, x0, P0')
 dssm = namedtuple('dssm', 'dA, dB0, dB1, dC, dD, dQ, dR, dx0, dP0')
@@ -91,15 +91,6 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
         self.dx0 = defaultdict(partial(zeros, self.nx, 1))
         self.dP0 = defaultdict(partial(zeros, self.nx, self.nx))
 
-        # self.dA = {k: np.zeros((self.nx, self.nx)) for k in self._names}
-        # self.dB = {k: np.zeros((self.nx, self.nu)) for k in self._names}
-        # self.dC = {k: np.zeros((self.ny, self.nx)) for k in self._names}
-        # self.dD = {k: np.zeros((self.ny, self.nu)) for k in self._names}
-        # self.dQ = {k: np.zeros((self.nx, self.nx)) for k in self._names}
-        # self.dR = {k: np.zeros((self.ny, self.ny)) for k in self._names}
-        # self.dx0 = {k: np.zeros((self.nx, 1)) for k in self._names}
-        # self.dP0 = {k: np.zeros((self.nx, self.nx)) for k in self._names}
-
     def delete_continuous_dssm(self):
         """Delete the jacobians of the continuous state-space model"""
         self._delete_continuous_dssm()
@@ -112,30 +103,49 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
             delattr(self, j)
 
     def set_constant_continuous_ssm(self):
-        '''Set constant values in state-space model'''
+        """Set constant values in state-space model"""
         pass
 
     def set_constant_continuous_dssm(self):
-        '''Set constant values in jacobians'''
+        """Set constant values in jacobians"""
         pass
 
     def update_continuous_ssm(self):
-        '''Update the state-space model with the constrained parameters'''
+        """Update the state-space model with the constrained parameters"""
         pass
 
     def update_continuous_dssm(self):
-        '''Update the jacobians with the constrained parameters'''
+        """Update the jacobians with the constrained parameters"""
         pass
 
-    def get_discrete_ssm(self, dt):
-        '''Return the updated discrete state-space model'''
+    def get_discrete_ssm(self, dt: np.ndarray) -> Tuple[NamedTuple, np.ndarray]:
+        """Return the updated discrete state-space model
+
+        Args:
+            dt: Sampling time
+
+        Retuns:
+            2-elements tuple containing
+                - **ssm**: Discrete state-space model
+                - **index**: Index of unique sampling time
+        """
 
         self.update_continuous_ssm()
         index, Ad, B0d, B1d, Qd, *_ = self.discretization(dt, False)
         return ssm(Ad, B0d, B1d, self.C, self.D, Qd, self.R, self.x0, self.P0), index
 
-    def get_discrete_dssm(self, dt):
-        '''Return the updated discrete state-space model with the discrete jacobians'''
+    def get_discrete_dssm(self, dt: np.ndarray) -> Tuple[NamedTuple, NamedTuple, np.ndarray]:
+        """Return the updated discrete state-space model with the discrete jacobians
+
+        Args:
+            dt: Sampling time
+
+        Retuns:
+            3-elements tuple containing
+                - **ssm**: Discrete state-space model
+                - **dssm**: Jacobian discrete state-space model
+                - **index**: Index of unique sampling time
+        """
 
         self.update_continuous_ssm()
         self.update_continuous_dssm()
@@ -154,17 +164,20 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
             index,
         )
 
-    def _lti_disc(self, dt):
-        '''Discretization of LTI state-space model
+    def _lti_disc(self, dt: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        """Discretization of LTI state-space model
 
         Args:
             dt: sampling time
 
         Returns:
-            Ad: Discrete state matrix
-            B0d, B1d: Discrete input matrices
-            Qd: Upper Cholesky factor of the process noise covariance matrix
-        '''
+            4-elements tuple containing
+                - **Ad**: Discrete state matrix
+                - **B0d**: Discrete input matrix (zero order hold)
+                - **B1d**: Discrete input matrix (first order hold)
+                - **Qd**: Upper Cholesky factor of the process noise covariance
+        """
+
         if self.nu == 0:
             Ad = expm(self.A * dt)
             B0d = np.zeros((self.nx, self.nu))
@@ -175,12 +188,9 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
                 AA[: self.nx, : self.nx] = self.A
                 AA[: self.nx, self.nx :] = self.B
                 AAd = expm(AA * dt)
-                Ad, B0d = AAd[: self.nx, : self.nx], AAd[: self.nx, self.nx :]
-
-                if self.nu >= self.nx:
-                    B1d = AA[-self.nx :, self.nx :]
-                else:
-                    B1d = np.zeros((self.nx, self.nu))
+                Ad = AAd[: self.nx, : self.nx]
+                B0d = AAd[: self.nx, self.nx :]
+                B1d = np.zeros((self.nx, self.nu))
 
             elif self.hold_order == 1:
                 AA = np.zeros((self.nx + 2 * self.nu, self.nx + 2 * self.nu))
@@ -188,38 +198,38 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
                 AA[: self.nx, self.nx : self.nx + self.nu] = self.B
                 AA[self.nx : self.nx + self.nu, self.nx + self.nu :] = np.eye(self.nu)
                 AAd = expm(AA * dt)
-                Ad, B0d = AAd[: self.nx, : self.nx], AAd[: self.nx, self.nx : self.nx + self.nu]
+                Ad = AAd[: self.nx, : self.nx]
+                B0d = AAd[: self.nx, self.nx : self.nx + self.nu]
                 B1d = AAd[: self.nx, self.nx + self.nu :]
-
-            else:
-                pass  # prepare for second order hold
 
         if np.any(self.Q):
 
             if self.method == 'mfd':
-                try:
-                    QQd = self._disc_Q_mfd(dt, self.Q.T @ self.Q)
-                except (LinAlgError, LinAlgWarning, RuntimeError, RuntimeWarning):
-                    QQd = self._disc_Q_lyapunov(self.Q.T @ self.Q, Ad)
+                QQd = self._disc_Q_mfd(dt, self.Q.T @ self.Q)
             elif self.method == 'lyapunov':
-                try:
-                    QQd = self._disc_Q_lyapunov(self.Q.T @ self.Q, Ad)
-                except (LinAlgError, LinAlgWarning, RuntimeError, RuntimeWarning):
-                    QQd = self._disc_Q_mfd(dt, self.Q.T @ self.Q)
+                QQd = self._disc_Q_lyapunov(self.Q.T @ self.Q, Ad)
             else:
                 raise ValueError('`Invalid discretization method`')
 
-            try:
-                Qd = np.linalg.cholesky(QQd).T
-            except (LinAlgError, LinAlgWarning, RuntimeError, RuntimeWarning):
-                Qd = nearest_cholesky(QQd)
+            Qd = nearest_cholesky(QQd)
         else:
             Qd = np.zeros((self.nx, self.nx))
 
         return Ad, B0d, B1d, Qd
 
-    def _lti_jacobian_disc(self, dt, dA, dB, dQ):
-        '''Discretization of augmented LTI state-space model
+    def _lti_jacobian_disc(
+        self, dt: float, dA: np.ndarray, dB: np.ndarray, dQ: np.ndarray
+    ) -> Tuple[
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+    ]:
+        """Discretization of augmented LTI state-space model
 
         Args:
             dt: Sampling time
@@ -228,24 +238,28 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
             dQ: Jacobian Wiener process scaling matrix
 
         Returns:
-            Ad: Discrete state matrix
-            B0d, B1d: Discrete input matrix
-            Qd: Upper Cholesky factor process noise covariance
-            dAd: Derivative discrete state matrix
-            dB0d, dB1d: Derivative discrete input matrix
-            dQd: Derivative upper Cholesky factor process noise covariance matrix
-        '''
+            8-elements tuple containing
+                - **Ad**: Discrete state matrix
+                - **B0d**: Discrete input matrix (zero order hold)
+                - **B1d**: Discrete input matrix (first order hold)
+                - **Qd**: Upper Cholesky factor of the process noise covariance matrix
+                - **dAd**: Jacobian discrete state matrix
+                - **dB0d**: Jacobian discrete input matrix (zero order hold)
+                - **dB1d**: Jacobian discrete input matrix (first order hold)
+                - **dQd**: Jacobian of the upper Cholesky factor of the process noise covariance
+        """
+
         N = dA.shape[0]
 
         if self.nu == 0:
-            Ad = expm(self.A * dt)
             B0d = np.zeros((self.nx, self.nu))
             B1d = B0d
 
+            Ad = expm(self.A * dt)
             dAd = np.zeros((N, self.nx, self.nx))
             for n in range(N):
                 if np.any(dA[n]):
-                    dAd[n] = expm_frechet(self.A * dt, dA[n] * dt, 'SPS', False)
+                    dAd[n] = expm_frechet(self.A * dt, dA[n] * dt, compute_expm=False)
 
             dB0d = np.zeros((N, self.nx, self.nu))
             dB1d = dB0d
@@ -261,21 +275,17 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
                 dAA[:, : self.nx, : self.nx] = dA
                 dAA[:, : self.nx, self.nx :] = dB
 
-                AAd = expm(AA * dt)
-                dAAd = np.asarray(
-                    [expm_frechet(AA * dt, dAA[n] * dt, 'SPS', False) for n in range(N)]
-                )
+                dAAd = np.zeros_like(dAA)
+                for n in range(N):
+                    if np.any(dAA[n]):
+                        AAd, dAAd[n] = expm_frechet(AA * dt, dAA[n] * dt)
 
-                Ad, B0d = AAd[: self.nx, : self.nx], AAd[: self.nx, self.nx :]
-
-                dAd, dB0d = dAAd[:, : self.nx, : self.nx], dAAd[:, : self.nx, self.nx :]
-
-                if self.nu >= self.nx:
-                    B1d = AA[-self.nx :, self.nx :]
-                    dB1d = dAA[:, -self.nx :, self.nx :]
-                else:
-                    B1d = np.zeros((self.nx, self.nu))
-                    dB1d = np.zeros((N, self.nx, self.nu))
+                Ad = AAd[: self.nx, : self.nx]
+                B0d = AAd[: self.nx, self.nx :]
+                dAd = dAAd[:, : self.nx, : self.nx]
+                dB0d = dAAd[:, : self.nx, self.nx :]
+                B1d = np.zeros((self.nx, self.nu))
+                dB1d = np.zeros((N, self.nx, self.nu))
             else:
                 AA = np.zeros((self.nx + 2 * self.nu, self.nx + 2 * self.nu))
                 AA[: self.nx, : self.nx] = self.A
@@ -286,10 +296,10 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
                 dAA[:, : self.nx, : self.nx] = dA
                 dAA[:, : self.nx, self.nx : self.nx + self.nu] = dB
 
-                AAd = expm(AA * dt)
-                dAAd = np.asarray(
-                    [expm_frechet(AA * dt, dAA[n] * dt, 'SPS', False) for n in range(N)]
-                )
+                dAAd = np.zeros_like(dAA)
+                for n in range(N):
+                    if np.any(dAA[n]):
+                        AAd, dAAd[n] = expm_frechet(AA * dt, dAA[n] * dt)
 
                 Ad = AAd[: self.nx, : self.nx]
                 B0d = AAd[: self.nx, self.nx : self.nx + self.nu]
@@ -306,26 +316,16 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
             dQQ = dQ.swapaxes(1, 2) @ self.Q + self.Q.T @ dQ
 
             if self.method == 'mfd':
-                try:
-                    QQd, dQQd = self._disc_dQ_mfd(dt, QQ, dA, dQQ)
-                except (LinAlgError, LinAlgWarning, RuntimeError, RuntimeWarning):
-                    QQd, dQQd = self._disc_dQ_lyapunov(dt, QQ, dA, dQQ, Ad, dAd)
+                QQd, dQQd = self._disc_dQ_mfd(dt, QQ, dA, dQQ)
             elif self.method == 'lyapunov':
-                try:
-                    QQd, dQQd = self._disc_dQ_lyapunov(dt, QQ, dA, dQQ, Ad, dAd)
-                except (LinAlgError, LinAlgWarning, RuntimeError, RuntimeWarning):
-                    QQd, dQQd = self._disc_dQ_mfd(dt, QQ, dA, dQQ)
+                QQd, dQQd = self._disc_dQ_lyapunov(dt, QQ, dA, dQQ, Ad, dAd)
             else:
                 raise ValueError('`Invalid discretization method`')
 
-            try:
-                Qd = np.linalg.cholesky(QQd).T
-            except (LinAlgError, LinAlgWarning, RuntimeError, RuntimeWarning):
-                Qd = nearest_cholesky(QQd)
-
+            Qd = nearest_cholesky(QQd)
             try:
                 tmp = np.linalg.solve(Qd.T, np.linalg.solve(Qd.T, dQQd).swapaxes(1, 2))
-            except (LinAlgError, LinAlgWarning, RuntimeError, RuntimeWarning):
+            except (LinAlgError, RuntimeError):
                 inv_Qd = np.linalg.pinv(Qd)
                 tmp = inv_Qd.T @ dQQd @ inv_Qd
 
@@ -336,8 +336,16 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
 
         return Ad, B0d, B1d, Qd, dAd, dB0d, dB1d, dQd
 
-    def _disc_Q_mfd(self, dt, QQ):
-        """Discretization diffusion matrix by Matrix Fraction Decomposition (MFD)"""
+    def _disc_Q_mfd(self, dt: float, QQ: np.ndarray) -> np.ndarray:
+        """Discretization diffusion matrix by Matrix Fraction Decomposition
+
+        Args:
+            dt: Sampling time
+            QQ: Diffusion matrix
+
+        Returns:
+            Process noise covariance matrix
+        """
 
         AA = np.zeros((2 * self.nx, 2 * self.nx))
         AA[: self.nx, : self.nx] = self.A
@@ -347,13 +355,35 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
 
         return AAd[: self.nx, self.nx :] @ AAd[: self.nx, : self.nx].T
 
-    def _disc_Q_lyapunov(self, QQ, Ad):
-        """Discretization diffusion matrix by Lyapunov equation"""
+    def _disc_Q_lyapunov(self, QQ: np.ndarray, Ad: np.ndarray) -> np.ndarray:
+        """Discretization diffusion matrix by Lyapunov equation
+
+        Args:
+            QQ: Diffusion matrix
+            Ad: Discrete state matrix
+
+        Returns:
+            Process noise covariance matrix
+        """
 
         return solve_continuous_lyapunov(self.A, -QQ + Ad @ QQ @ Ad.T)
 
-    def _disc_dQ_mfd(self, dt, QQ, dA, dQQ):
-        """Discretization partial derivative of the diffusion matrix by MFD"""
+    def _disc_dQ_mfd(
+        self, dt: np.ndarray, QQ: np.ndarray, dA: np.ndarray, dQQ: np.ndarray
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """Discretization partial derivative of the diffusion matrix by MFD
+
+        Args:
+            dt: Sampling time
+            QQ: Diffusion matrix
+            dA: Jacobian state matrix
+            dQQ: Jacobian diffusion matrix
+
+        Returns:
+            2-elements tuple containing
+                - **QQd**: Process noise covariance matrix
+                - **dQQd**: Jacobian process noise covariance matrix
+        """
 
         N = dA.shape[0]
 
@@ -367,19 +397,43 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
         dAA[:, : self.nx, self.nx :] = dQQ
         dAA[:, self.nx :, self.nx :] = -dA.swapaxes(1, 2)
 
-        AAd = expm(AA * dt)
-        dAAd = np.asarray([expm_frechet(AA * dt, dAA[n] * dt, 'SPS', False) for n in range(N)])
+        dAAd = np.zeros_like(dAA)
+        for n in range(N):
+            if np.any(dAA[n]):
+                AAd, dAAd[n] = expm_frechet(AA * dt, dAA[n] * dt)
 
-        Ad = AAd[: self.nx, : self.nx]
-        QQd = AAd[: self.nx, self.nx :] @ Ad.T
+        AdT = AAd[: self.nx, : self.nx].T
+        QQd = AAd[: self.nx, self.nx :] @ AdT
 
         dAd = dAAd[:, : self.nx, : self.nx]
-        dQQd = dAAd[:, : self.nx, self.nx :] @ Ad.T + AAd[: self.nx, self.nx :] @ dAd.swapaxes(1, 2)
+        dQQd = dAAd[:, : self.nx, self.nx :] @ AdT + AAd[: self.nx, self.nx :] @ dAd.swapaxes(1, 2)
 
         return QQd, dQQd
 
-    def _disc_dQ_lyapunov(self, dt, QQ, dA, dQQ, Ad, dAd):
-        """Discretization partial derivative of the diffusion matrix by MFD"""
+    def _disc_dQ_lyapunov(
+        self,
+        dt: np.ndarray,
+        QQ: np.ndarray,
+        dA: np.ndarray,
+        dQQ: np.ndarray,
+        Ad: np.ndarray,
+        dAd: np.ndarray,
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """Discretization partial derivative of the diffusion matrix with the Lyapunov equation
+
+        Args:
+            dt: Sampling time
+            QQ: Diffusion matrix
+            dA: Jacobian state matrix
+            dQQ: Jacobian diffusion matrix
+            Ad: Discrete state matrix
+            dAd: Jacobian discrete state matrix
+
+        Returns:
+            2-elements tuple containing
+                - **QQd**: Process noise covariance matrix
+                - **dQQd**: Jacobian process noise covariance matrix
+        """
 
         N = dA.shape[0]
 
@@ -396,19 +450,28 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
 
         return QQd, dQQd
 
-    def discretization(self, dt: np.ndarray, jacobian: bool = False):
-        '''Discretization of LTI state-space model
+    def discretization(
+        self, dt: np.ndarray, jacobian: bool = False
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, Tuple]:
+        """Discretization of LTI state-space model
 
         Args:
-            dt: sampling time array
-            jacobian: If set to True, the jacobian are discretized
+            dt: Sampling time
+            jacobian: Discretize the jacobian if True
 
         Returns:
-            idx: Index of unique time intervals
-            Ad, B0d, B1d, Qd: Discrete state space matrices
-            dAd, dB0d, dB1d, dQd: Derivative of discrete state space matrices
-                if `jacobian` is True
-        '''
+            6-elements tuple containing
+                - **idx**: Index of unique time intervals
+                - **Ad**: Discrete state matrix
+                - **B0d**: Discrete input matrix (zero order hold)
+                - **B1d**: Discrete input matrix (first order hold)
+                - **Qd**: Upper Cholesky factor of the process noise covariance matrix
+                - **d**: Tuple of the discrete jacobian matrices if `jacobian` = True
+                    - **dAd**: Jacobian discrete state matrix
+                    - **dB0d**: Jacobian discrete input matrix (zero order hold)
+                    - **dB1d**: Jacobian discrete input matrix (first order hold)
+                    - **dQd**: Jacobian of the upper Cholesky factor of the process noise covariance
+        """
         # Different sampling time up to the nanosecond
         dt, _, idx = np.unique(np.round(dt, 9), True, True)
         N = len(dt)
@@ -456,7 +519,7 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
 
 @dataclass
 class RCModel(StateSpace):
-    '''Dynamic thermal model'''
+    """Dynamic thermal model"""
 
     latent_forces: str = field(default='')
 
@@ -467,7 +530,7 @@ class RCModel(StateSpace):
         return f"\n{self.__class__.__name__}" + "-" * len(self.__class__.__name__)
 
     def __le__(self, gp):
-        '''Create a Latent Force Model'''
+        """Create a Latent Force Model"""
         from .latent_force_model import LatentForceModel
 
         return LatentForceModel(self, gp, self.latent_forces)
@@ -475,7 +538,7 @@ class RCModel(StateSpace):
 
 @dataclass
 class GPModel(StateSpace):
-    '''Gaussian Process'''
+    """Gaussian Process"""
 
     def __post_init__(self):
         if hasattr(self, 'J'):
@@ -486,14 +549,14 @@ class GPModel(StateSpace):
         return f"\n{self.__class__.__name__}" + "-" * len(self.__class__.__name__)
 
     def __mul__(self, gp):
-        '''Product of two Gaussian Process model
+        """Product of two Gaussian Process model
 
         Args:
             gp: GPModel instance
 
         Returns:
             product of the two GP model
-        '''
+        """
         if not isinstance(gp, GPModel):
             raise TypeError('`gp` must be an GPModel instance')
 
@@ -502,14 +565,14 @@ class GPModel(StateSpace):
         return GPProduct(self, gp)
 
     def __add__(self, gp):
-        '''Sum of two Gaussian Process model
+        """Sum of two Gaussian Process model
 
         Args:
             gp: GPModel instance
 
         Returns:
             sum of the two GP model
-        '''
+        """
         if not isinstance(gp, GPModel):
             raise TypeError('`gp` must be an GPModel instance')
 

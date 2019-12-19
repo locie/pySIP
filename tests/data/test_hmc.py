@@ -30,7 +30,7 @@ def test_mvn_dhmc(mvn_data):
     q0 = rng.normal(size=(n_dim, n_chains))
 
     chains, stats, options = dHMC.sample(
-        q=q0, n_chains=4, n_draws=2500, n_warmup=1000, options={'cpu': 1}
+        q=q0, n_chains=4, n_draws=2500, n_warmup=1000, options={'n_cpu': 1}
     )
     fit = Fit_Bayes(chains=chains, stats=stats, options=options, n_warmup=1000)
     df = fit.diagnostic
@@ -39,5 +39,5 @@ def test_mvn_dhmc(mvn_data):
     assert mean_rmse < 5e-2
     assert np.all(df['ebfmi'] > 0.8)
     assert np.all(df['mean accept_prob'] > 0.7)
-    assert np.sum(df['sum divergent']) == 0
+    assert np.sum(df['sum diverging']) == 0
     assert np.sum(df['sum max_tree_depth']) == 0

@@ -1,14 +1,19 @@
-"""Square-Root Kalman Filter with QR decomposition"""
-from typing import Tuple, Union
+from typing import Tuple, Union, NamedTuple
 import numpy as np
 from .base import BayesianFilter
-from collections import namedtuple
 from copy import deepcopy
-from scipy.linalg import LinAlgWarning, LinAlgError
+from scipy.linalg import LinAlgError
 
 
 class Kalman_QR(BayesianFilter):
-    """Square-root Kalman filter"""
+    """Square-root Kalman filter and sensitivity equations
+
+    References:
+        Maria V. Kulikova, Julia Tsyganova,
+        A unified square-root approach for the score and Fisher information matrix computation in
+        linear dynamic systems.
+        Mathematics and Computers in Simulation 119: 128-141 (2016)
+    """
 
     def predict(
         self,
@@ -20,23 +25,23 @@ class Kalman_QR(BayesianFilter):
         P: np.ndarray,
         u: np.ndarray,
         u1: np.ndarray,
-    ) -> Tuple[np.ndarray]:
-        """State predictive distribution from time t to t+1
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """State prediction
 
         Args:
             Ad: State matrix
-            B0d: Input matrix
-            B1d: First order approximation input matrix
+            B0d: Input matrix (zero order hold)
+            B1d: Input matrix (first order hold)
             Qd: Process noise covariance matrix
             x: State mean
             P: State deviation
             u: Input data
-            u1: First order approximation data
+            u1: Forward finite difference of the input data
 
         Returns:
             2-element tuple containing
-                - **x**: Prior state mean at time t+1
-                - **P**: Prior state deviation at time t+1
+                - **x**: Prior state mean
+                - **P**: Prior state deviation
         """
         nx = Ad.shape[0]
         Arrp = np.zeros((2 * nx, nx))
@@ -63,32 +68,33 @@ class Kalman_QR(BayesianFilter):
         dP: np.ndarray,
         u: np.ndarray,
         u1: np.ndarray,
-    ) -> Tuple[np.ndarray]:
-        """Derivative state predictive distribution from time t to t+1
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        """Derivative state prediction
 
         Args:
             Ad: State matrix
-            dAd: Derivative state matrix
-            B0d: Input matrix
-            B1d: First order approximation input matrix
-            dB0d: Derivative input matrix
-            dB1d: Derivative first order approximation input matrix
+            dAd: Jacobian state matrix
+            B0d: Input matrix (zero order hold)
+            dB0d: Jacobian input matrix (zero order hold)
+            B1d: Input matrix (first order hold)
+            dB1d: Jacobian input matrix (first order hold)
             Qd: Process noise covariance matrix
-            dQd: Derivative process noise covariance matrix
+            dQd: Jacobian process noise covariance matrix
             x: State mean
-            dx: Derivative state mean
+            dx: Jacobian state mean
             P: State deviation
-            dP: Derivative state deviation
+            dP: Jacobian state deviation
             u: Input data
-            u1: First order approximation data
+            u1: Forward finite difference of the input data
 
         Returns:
             4-element tuple containing
-                - **x**: Prior state mean at time t+1
-                - **dx**: Derivative prior state mean at time t+1
-                - **P**: Prior state deviation at time t+1
-                - **dP**: Derivative prior state deviation at time t+1
+                - **x**: Prior state mean
+                - **dx**: Derivative prior state mean
+                - **P**: Prior state deviation
+                - **dP**: Derivative prior state deviation
         """
+
         npar, nx, _ = dAd.shape
         Arrp = np.zeros((2 * nx, nx))
         dArrp = np.zeros((npar, 2 * nx, nx))
@@ -102,7 +108,7 @@ class Kalman_QR(BayesianFilter):
         Q, P = np.linalg.qr(Arrp)
         try:
             tmp = np.linalg.solve(P.T, dArrp.swapaxes(1, 2) @ Q).swapaxes(1, 2)
-        except (LinAlgError, LinAlgWarning, RuntimeError, RuntimeWarning):
+        except (LinAlgError, RuntimeError):
             tmp = Q.T @ dArrp @ np.linalg.pinv(P)
         dP = (np.swapaxes(np.tril(tmp, -1), 1, 2) + np.triu(tmp)) @ P
 
@@ -120,8 +126,8 @@ class Kalman_QR(BayesianFilter):
         P: np.ndarray,
         u: np.ndarray,
         y: np.ndarray,
-    ) -> Tuple[np.ndarray]:
-        """Filtered state distribution at time t
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        """State update
 
         Args:
             C: Output matrix
@@ -151,7 +157,7 @@ class Kalman_QR(BayesianFilter):
         if ny > 1:
             try:
                 e = np.linalg.solve(S, y - C @ x - D @ u)
-            except (LinAlgError, LinAlgWarning, RuntimeError, RuntimeWarning):
+            except (LinAlgError, RuntimeError):
                 e = np.linalg.pinv(S) @ (y - C @ x - D @ u)
         else:
             e = (y - C @ x - D @ u) / S
@@ -175,20 +181,29 @@ class Kalman_QR(BayesianFilter):
         dP: np.ndarray,
         u: np.ndarray,
         y: np.ndarray,
-    ) -> Tuple[np.ndarray]:
-        """Derivative filtered state distribution at time t
+    ) -> Tuple[
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+    ]:
+        """Derivative state update
 
         Args:
             C: Output matrix
-            dC: Derivative output matrix
+            dC: Jacobian output matrix
             D: Feedthrough matrix
-            dD: Derivative feedthrough matrix
+            dD: Jacobian feedthrough matrix
             R: Measurement deviation matrix
-            dR: Derivative measurement deviation matrix
+            dR: Jacobian measurement deviation matrix
             x: State mean
-            dx: Derivative state mean
+            dx: Jacobian state mean
             P: State deviation
-            dP: Derivative state deviation
+            dP: Jacobian state deviation
             u: Input data
             y: Output data
 
@@ -218,7 +233,7 @@ class Kalman_QR(BayesianFilter):
         Q, Post = np.linalg.qr(Arru)
         try:
             tmp = np.linalg.solve(Post.T, dArru.swapaxes(1, 2) @ Q).swapaxes(1, 2)
-        except (LinAlgError, LinAlgWarning, RuntimeError, RuntimeWarning):
+        except (LinAlgError, RuntimeError):
             tmp = Q.T @ dArru @ np.linalg.pinv(Post)
         dPost = (np.swapaxes(np.tril(tmp, -1), 1, 2) + np.triu(tmp)) @ Post
 
@@ -230,7 +245,7 @@ class Kalman_QR(BayesianFilter):
             try:
                 e = np.linalg.solve(S, y - C @ x - D @ u)
                 de = np.linalg.solve(-S, dS @ e + dC @ x + C @ dx + dD @ u)
-            except (LinAlgError, LinAlgWarning, RuntimeError, RuntimeWarning):
+            except (LinAlgError, RuntimeError):
                 invS = np.linalg.pinv(S)
                 e = invS @ (y - C @ x - D @ u)
                 de = -invS @ (dS @ e + dC @ x + C @ dx + dD @ u)
@@ -247,13 +262,11 @@ class Kalman_QR(BayesianFilter):
 
     def log_likelihood(
         self,
-        ssm: namedtuple,
-        index: np.array,
+        ssm: NamedTuple,
+        index: np.ndarray,
         u: np.ndarray,
         u1: np.ndarray,
         y: np.ndarray,
-        x0: np.ndarray = None,
-        P0: np.ndarray = None,
         point_wise: bool = False,
     ) -> float:
         """Evaluate the negative log-likelihood
@@ -262,11 +275,9 @@ class Kalman_QR(BayesianFilter):
             ssm: Discrete state-space model
             index: Index of unique time steps
             u: Input data
-            u1: First order approximation data
+            u1: Forward finite difference of the input data
             y: Output data
-            point_wise: If True, return the log-likelihood evaluated point-wise
-            x0: Inital state mean different from `ssm`
-            P0: Inital state deviation different from `ssm`
+            point_wise: Return the log-likelihood evaluated point-wise
 
         Returns:
             loglik: Negative log-likelihood
@@ -274,20 +285,8 @@ class Kalman_QR(BayesianFilter):
         T = y.shape[1]
         ny, nx = ssm.C.shape
         loglik = np.full(T, 0.5 * ny * np.log(2.0 * np.pi))
-
-        if x0 is None:
-            x = deepcopy(ssm.x0)
-        else:
-            if x0.shape != (nx, 1):
-                raise ValueError(f'the dimensions of `x0` must be {(nx, 1)}')
-            x = x0
-
-        if P0 is None:
-            P = deepcopy(ssm.P0)
-        else:
-            if P0.shape != (nx, nx):
-                raise ValueError(f'the dimensions of `P0` must be {(nx, nx)}')
-            P = P0
+        x = deepcopy(ssm.x0)
+        P = deepcopy(ssm.P0)
 
         do_update = ~np.isnan(y).any(axis=0)
         for t in range(T):
@@ -311,9 +310,9 @@ class Kalman_QR(BayesianFilter):
 
     def dlog_likelihood(
         self,
-        ssm: namedtuple,
-        dssm: namedtuple,
-        index: np.array,
+        ssm: NamedTuple,
+        dssm: NamedTuple,
+        index: np.ndarray,
         u: np.ndarray,
         u1: np.ndarray,
         y: np.ndarray,
@@ -325,7 +324,7 @@ class Kalman_QR(BayesianFilter):
             dssm: Discrete jacobian state-space model
             index: Index of unique time steps
             u: Input data
-            u1: First order approximation input data
+            u1: Forward finite difference of the input data
             y: Output data
 
         Returns:
@@ -390,21 +389,21 @@ class Kalman_QR(BayesianFilter):
 
     def filtering(
         self,
-        ssm: namedtuple,
-        index: np.array,
+        ssm: NamedTuple,
+        index: np.ndarray,
         u: np.ndarray,
         u1: np.ndarray,
         y: np.ndarray,
         x0: np.ndarray = None,
         P0: np.ndarray = None,
-    ) -> Tuple[np.ndarray]:
-        """Compute the filtered state distribution with the Kalman filter
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        """Compute the filtered state distribution
 
         Args:
             ssm: Discrete state-space model
             index: Index of unique time steps
             u: Input data
-            u1: First order approximation input data
+            u1: Forward finite difference of the input data
             y: Output data
             x0: Inital state mean different from `ssm`
             P0: Inital state deviation different from `ssm`
@@ -456,21 +455,21 @@ class Kalman_QR(BayesianFilter):
 
     def smoothing(
         self,
-        ssm: namedtuple,
+        ssm: NamedTuple,
         index: np.array,
         u: np.ndarray,
         u1: np.ndarray,
         y: np.ndarray,
         x0: np.ndarray = None,
         P0: np.ndarray = None,
-    ) -> Tuple[np.ndarray]:
+    ) -> Tuple[np.ndarray, np.ndarray]:
         """Compute the smoothed state distribution Rauch-Tung-Striebel smoother
 
         Args:
             ssm: Discrete state-space model
             index: Index of unique time steps
             u: Input data
-            u1: First order approximation input data
+            u1: Forward finite difference of the input data
             y: Output data
             x0: Inital state mean different from `ssm`
             P0: Inital state deviation different from `ssm`
@@ -525,7 +524,7 @@ class Kalman_QR(BayesianFilter):
             # smoother gain (note: Pp and Ps are symmetric)
             try:
                 G = np.linalg.solve(Pp[t + 1, :, :], ssm.A[index[t], :, :] @ Ps[t, :, :]).T
-            except (LinAlgError, LinAlgWarning, RuntimeError, RuntimeWarning):
+            except (LinAlgError, RuntimeError):
                 G = Ps[t, :, :] @ ssm.A[index[t], :, :].T @ np.linalg.pinv(Pp[t + 1, :, :])
 
             # smoothed state mean and covariance
@@ -535,7 +534,12 @@ class Kalman_QR(BayesianFilter):
         return xs, Ps
 
     def simulate(
-        self, ssm: namedtuple, index: np.array, u: np.ndarray, u1: np.ndarray, x0: np.ndarray = None
+        self,
+        ssm: NamedTuple,
+        index: np.ndarray,
+        u: np.ndarray,
+        u1: np.ndarray,
+        x0: np.ndarray = None,
     ) -> np.ndarray:
         """Stochastic output simulation
 
@@ -543,15 +547,14 @@ class Kalman_QR(BayesianFilter):
             ssm: Discrete state-space model
             index: Index of unique time steps
             u: Input data
-            u1: First order approximation input data
+            u1: Forward finite difference of the input data
             x0: Inital state mean different from `ssm`
 
         Returns:
-            Simulated output
+            y: Simulated output
 
-        Notes:
-            The random initialization of the state vector is done in the
-            regressor, such that x0 ~ Normal(0, P0)
+        TODO:
+            Random initialization of the state vector, such that x0 ~ Normal(0, P0)
         """
         T = u.shape[1]
         ny, nx = ssm.C.shape
@@ -576,3 +579,63 @@ class Kalman_QR(BayesianFilter):
         y += ssm.R @ np.random.randn(T, ny, 1)
 
         return y[:, :, 0]
+
+    def simulate_output(
+        self,
+        ssm: NamedTuple,
+        index: np.ndarray,
+        u: np.ndarray,
+        u1: np.ndarray,
+        y: np.ndarray,
+        x0: np.ndarray = None,
+        P0: np.ndarray = None,
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """Compute the filtered output distribution with the Kalman filter
+
+        Args:
+            ssm: Discrete state-space model
+            index: Index of unique time steps
+            u: Input data
+            u1: Forward finite difference of the input data
+            y: Output data
+            x0: Inital state mean different from `ssm`
+            P0: Inital state deviation different from `ssm`
+
+        Returns:
+            2-element tuple containing
+                - **ym**: Filtered output mean
+                - **ysd**: Filtered output standard deviation
+        """
+        T = y.shape[1]
+        ny, nx = ssm.C.shape
+        ym = np.empty((T, ny, 1))
+        ysd = np.empty((T, ny, ny))
+        do_update = ~np.isnan(y).any(axis=0)
+
+        if x0 is None:
+            x = deepcopy(ssm.x0)
+        else:
+            if x0.shape != (nx, 1):
+                raise ValueError(f'the dimensions of `x0` must be {(nx, 1)}')
+            x = x0
+
+        if P0 is None:
+            P = deepcopy(ssm.P0)
+        else:
+            if P0.shape != (nx, nx):
+                raise ValueError(f'the dimensions of `P0` must be {(nx, nx)}')
+            P = P0
+
+        for t in range(T):
+            if do_update[t]:
+                x, P, *_ = self.update(ssm.C, ssm.D, ssm.R, x, P, u[:, t : t + 1], y[:, t])
+
+            ym[t, :, :] = ssm.C @ x
+            ysd[t, :, :] = np.sqrt(ssm.C @ P.T @ P @ ssm.C.T) + ssm.R
+
+            i = index[t]
+            x, P = self.predict(
+                ssm.A[i], ssm.B0[i], ssm.B1[i], ssm.Q[i], x, P, u[:, t : t + 1], u1[:, t : t + 1]
+            )
+
+        return ym, ysd
