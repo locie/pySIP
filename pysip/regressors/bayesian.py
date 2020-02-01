@@ -102,8 +102,10 @@ class BayesRegressor(BaseRegressor):
 
         # An additional initial position is required for the adaptation
         q0 = self._init_parameters(n_chains, init, hpd)
-        V = lambda q: self._eval_log_posterior(q, dt, u, u1, y)
-        dV = lambda q: self._eval_dlog_posterior(q, dt, u, u1, y)
+        def V(q):
+            return self._eval_log_posterior(q, dt, u, u1, y)
+        def dV(q):
+            return self._eval_dlog_posterior(q, dt, u, u1, y)
         M = np.eye(len(self.ss.parameters.eta_free))
 
         dhmc = DynamicHMC(EuclideanHamiltonian(V=V, dV=dV, M=M))

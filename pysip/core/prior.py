@@ -138,8 +138,10 @@ class Normal(Prior):
         return -(x - self._m) / self._s2
 
     def random(self, n=1, hpd=None):
-        f_rvs = lambda n: stats.norm.rvs(loc=self._m, scale=self._s, size=n)
-        f_ppf = lambda u: stats.norm.ppf(u, loc=self._m, scale=self._s)
+        def f_rvs(n):
+            return stats.norm.rvs(loc=self._m, scale=self._s, size=n)
+        def f_ppf(u):
+            return stats.norm.ppf(u, loc=self._m, scale=self._s)
         return self._random(n, hpd, f_rvs, f_ppf)
 
     def find_hyperparameters(
@@ -232,8 +234,10 @@ class Gamma(Prior):
         return (self._a - 1.0) / x - self._b
 
     def random(self, n=1, hpd=None):
-        f_rvs = lambda n: stats.gamma.rvs(a=self._a, scale=1.0 / self._b, size=n)
-        f_ppf = lambda u: stats.gamma.ppf(u, a=self._a, scale=1.0 / self._b)
+        def f_rvs(n):
+            return stats.gamma.rvs(a=self._a, scale=1.0 / self._b, size=n)
+        def f_ppf(u):
+            return stats.gamma.ppf(u, a=self._a, scale=1.0 / self._b)
         return self._random(n, hpd, f_rvs, f_ppf)
 
 
@@ -286,8 +290,10 @@ class Beta(Prior):
         return (self._a - 1.0) / x + (1.0 - self._b) / (1.0 - x)
 
     def random(self, n=1, hpd=None):
-        f_rvs = lambda n: stats.beta.rvs(a=self._a, b=self._b, size=n)
-        f_ppf = lambda u: stats.beta.ppf(u, a=self._a, b=self._b)
+        def f_rvs(n):
+            return stats.beta.rvs(a=self._a, b=self._b, size=n)
+        def f_ppf(u):
+            return stats.beta.ppf(u, a=self._a, b=self._b)
         return self._random(n, hpd, f_rvs, f_ppf)
 
 
@@ -346,8 +352,10 @@ class InverseGamma(Prior):
         return -(self._a + 1.0) / x + self._b / x ** 2
 
     def random(self, n=1, hpd=None):
-        f_rvs = lambda n: stats.invgamma.rvs(a=self._a, scale=self._b, size=n)
-        f_ppf = lambda u: stats.invgamma.ppf(u, a=self._a, scale=self._b)
+        def f_rvs(n):
+            return stats.invgamma.rvs(a=self._a, scale=self._b, size=n)
+        def f_ppf(u):
+            return stats.invgamma.ppf(u, a=self._a, scale=self._b)
         return self._random(n, hpd, f_rvs, f_ppf)
 
     def find_hyperparameters(self, lb, ub, lb_prob=0.01, ub_prob=0.01):
@@ -442,6 +450,8 @@ class LogNormal(Prior):
         return -((np.log(x) - self._m) / self._s2 + 1.0) / x
 
     def random(self, n=1, hpd=None):
-        f_rvs = lambda n: stats.lognorm.rvs(loc=self._m, s=self._s, size=n)
-        f_ppf = lambda u: stats.lognorm.ppf(u, s=self._s, loc=self._m)
+        def f_rvs(n):
+            return stats.lognorm.rvs(loc=self._m, s=self._s, size=n)
+        def f_ppf(u):
+            return stats.lognorm.ppf(u, s=self._s, loc=self._m)
         return self._random(n, hpd, f_rvs, f_ppf)
