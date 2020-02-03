@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from joblib import Parallel, delayed
 from tqdm import tqdm
+from functools import partial
 
 from .base import BaseRegressor
 from ..state_estimator import BayesianFilter, Kalman_QR
@@ -102,10 +103,8 @@ class BayesRegressor(BaseRegressor):
 
         # An additional initial position is required for the adaptation
         q0 = self._init_parameters(n_chains, init, hpd)
-        def V(q):
-            return self._eval_log_posterior(q, dt, u, u1, y)
-        def dV(q):
-            return self._eval_dlog_posterior(q, dt, u, u1, y)
+        V = partial(self._eval_log_posterior, dt=dt, u=u, u1=u1, y=y)
+        dV = partial(self._eval_dlog_posterior, dt=dt, u=u, u1=u1, y=y)
         M = np.eye(len(self.ss.parameters.eta_free))
 
         dhmc = DynamicHMC(EuclideanHamiltonian(V=V, dV=dV, M=M))
