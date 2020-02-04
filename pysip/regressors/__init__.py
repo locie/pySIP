@@ -1,3 +1,3 @@
-from .frequentist import FreqRegressor
-from .bayesian import BayesRegressor
 from .base import BaseRegressor
+from .bayesian import BayesRegressor
+from .frequentist import FreqRegressor

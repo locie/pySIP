@@ -1,6 +1,7 @@
-import numpy as np
 import warnings
-from scipy.linalg import solve_triangular, LinAlgError, ldl
+
+import numpy as np
+from scipy.linalg import LinAlgError, ldl, solve_triangular
 
 
 def log1p_exp(a):

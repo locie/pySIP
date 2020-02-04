@@ -1,6 +1,5 @@
-import pickle
 import os
-
+import pickle
 import warnings
 
 from pysip import __version__

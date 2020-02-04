@@ -1,7 +1,8 @@
+import itertools
+
 import numpy as np
 import pylfsr
 from pylfsr import LFSR
-import itertools
 
 
 def prbs(Tmax, Tmin, initstate='random'):

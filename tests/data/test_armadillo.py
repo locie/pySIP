@@ -1,13 +1,13 @@
-import pytest
 import numpy as np
 import pandas as pd
+import pytest
 
-from pysip.statespace.thermal_network import TwTi_RoRi
+from pysip.core import LogNormal, Normal
 from pysip.regressors import FreqRegressor as Regressor
-from pysip.core import Normal, LogNormal
+from pysip.statespace.thermal_network import TwTi_RoRi
 from pysip.utils.check import check_model
-from pysip.utils.math import fit, rmse, mae, mad, smape, ned
-from pysip.utils.statistics import aic, lrtest, check_ccf, check_cpgram, ccf, cpgram
+from pysip.utils.math import fit, mad, mae, ned, rmse, smape
+from pysip.utils.statistics import aic, ccf, check_ccf, check_cpgram, cpgram, lrtest
 
 
 @pytest.fixture

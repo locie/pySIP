@@ -1,12 +1,18 @@
-import pytest
+import numdifftools as nd
 import numpy as np
 import pandas as pd
-import numdifftools as nd
+import pytest
 
-from pysip.utils import generate_sine, ned
 from pysip.regressors import FreqRegressor as Regressor
-from pysip.statespace import Matern12, Matern32, Matern52
-from pysip.statespace import Periodic, QuasiPeriodic12, QuasiPeriodic32
+from pysip.statespace import (
+    Matern12,
+    Matern32,
+    Matern52,
+    Periodic,
+    QuasiPeriodic12,
+    QuasiPeriodic32,
+)
+from pysip.utils import generate_sine, ned
 
 
 @pytest.fixture

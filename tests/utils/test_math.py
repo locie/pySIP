@@ -1,7 +1,8 @@
 """tests for linear algebra utilities"""
-import pytest
 import numpy as np
+import pytest
 from scipy.linalg import LinAlgError
+
 from pysip.utils import nearest_cholesky
 
 

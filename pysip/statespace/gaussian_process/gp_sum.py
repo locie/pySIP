@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
-from ..nodes import Par
+
 from ..base import GPModel
+from ..nodes import Par
 
 
 @dataclass

@@ -1,6 +1,8 @@
 from dataclasses import dataclass
+
 import numpy as np
-from .base import StateSpace, GPModel, RCModel
+
+from .base import GPModel, RCModel, StateSpace
 from .nodes import Par
 
 

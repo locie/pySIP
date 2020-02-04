@@ -1,8 +1,10 @@
-from typing import Tuple, Union, NamedTuple
-import numpy as np
-from .base import BayesianFilter
 from copy import deepcopy
+from typing import NamedTuple, Tuple, Union
+
+import numpy as np
 from scipy.linalg import LinAlgError
+
+from .base import BayesianFilter
 
 
 class Kalman_QR(BayesianFilter):

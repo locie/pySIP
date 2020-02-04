@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from itertools import product
+
 import numpy as np
+
 from ..base import GPModel
 from ..nodes import Par
 from .periodic import Periodic

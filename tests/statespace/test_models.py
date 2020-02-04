@@ -1,9 +1,9 @@
 from itertools import chain
+
 import pytest
 
 from pysip.statespace import RCModel
 from pysip.statespace.meta import model_registry, statespace
-
 
 rc_models = {
     k: v for k, v in model_registry.items() if 'pysip.statespace.thermal_network' in v.__module__

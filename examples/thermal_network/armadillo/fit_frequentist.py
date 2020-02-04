@@ -1,9 +1,10 @@
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import seaborn as sns
-from pysip.statespace import TwTi_RoRi
+
 from pysip.regressors import FreqRegressor as Regressor
+from pysip.statespace import TwTi_RoRi
 
 # Load and prepare the data
 df = pd.read_csv('data/armadillo/armadillo_data_H2.csv').set_index('Time')

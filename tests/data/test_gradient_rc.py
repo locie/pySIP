@@ -1,13 +1,12 @@
+import numdifftools as nd
 import numpy as np
 import pandas as pd
-import numdifftools as nd
 import pytest
 
-from pysip.utils import generate_sine, generate_random_binary, ned
+from pysip.core import Beta, Gamma, InverseGamma, LogNormal, Normal
 from pysip.regressors import FreqRegressor as Regressor
-from pysip.core import Normal, LogNormal, InverseGamma, Gamma, Beta
 from pysip.statespace import model_registry
-
+from pysip.utils import generate_random_binary, generate_sine, ned
 
 rc_models = {
     k: v for k, v in model_registry.items() if 'pysip.statespace.thermal_network' in v.__module__

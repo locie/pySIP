@@ -1,4 +1,5 @@
 import pytest
+
 from pysip.core import Parameters
 
 

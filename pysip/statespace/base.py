@@ -1,14 +1,16 @@
-from dataclasses import dataclass, field
 from collections import defaultdict, namedtuple
+from dataclasses import dataclass, field
 from functools import partial
-from typing import NamedTuple, Union, Tuple
+from typing import NamedTuple, Tuple, Union
+
 import numpy as np
-from scipy.linalg import expm, expm_frechet, solve_continuous_lyapunov, LinAlgError
-from .nodes import Node
-from .meta import MetaStateSpace
+from scipy.linalg import LinAlgError, expm, expm_frechet, solve_continuous_lyapunov
+
 from ..core import Parameters
-from ..utils.math import nearest_cholesky
 from ..utils.draw import TikzStateSpace
+from ..utils.math import nearest_cholesky
+from .meta import MetaStateSpace
+from .nodes import Node
 
 ssm = namedtuple('ssm', 'A, B0, B1, C, D, Q, R, x0, P0')
 dssm = namedtuple('dssm', 'dA, dB0, dB1, dC, dD, dQ, dR, dx0, dP0')

@@ -78,9 +78,6 @@ sns.despine()
 plt.legend(loc='best', fancybox=True, framealpha=0.5)
 ```
 
-## Reference documentation
-
-For details about the pySIP API, see the [reference documentation](https://locie.github.io/pySIP/).
 
 ## Contributors
 

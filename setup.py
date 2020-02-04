@@ -1,4 +1,5 @@
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
+
 from pysip import __version__
 
 with open('README.md', 'r') as f:
