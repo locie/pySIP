@@ -15,6 +15,7 @@ class Par(Enum):
     """Parameter type"""
 
     THERMAL_RESISTANCE = ('Thermal resistance', '°C/W')
+    THERMAL_TRANSMITTANCE = ('Thermal transmittance', 'W/°C')
     THERMAL_CAPACITY = ('Thermal capacity', 'J/°C')
     SOLAR_APERTURE = ('Solar aperture', 'm²')
     STATE_DEVIATION = ('State deviation', 'any')
