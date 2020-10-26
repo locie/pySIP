@@ -96,7 +96,6 @@ class BayesRegressor(BaseRegressor):
         options.setdefault('n_warmup', 1000)
         options.setdefault('init', 'unconstrained')
         options.setdefault('hpd', 0.95)
-        options.setdefault('hpd', 0.95)
         options.setdefault('dense_mass_matrix', False)
         if not isinstance(options['dense_mass_matrix'], bool):
             raise TypeError('`dense_mass_matrix` must be a boolean')
@@ -215,7 +214,8 @@ class BayesRegressor(BaseRegressor):
 
         chain, draw = list(trace.values())[0].shape
         n_draws = chain * draw
-        samples = self._dict_to_array(trace, self.ss.parameters.names_free)
+        names = [n for n, f in zip(self.ss._names, self.ss.parameters.free) if f]
+        samples = self._dict_to_array(trace, names)
 
         def posterior_pd(index):
             self.ss.parameters.theta_free = samples[:, index]
@@ -256,7 +256,8 @@ class BayesRegressor(BaseRegressor):
 
         dt, u, u1, y, *_ = self._prepare_data(df, inputs, outputs, None)
         chain, draw = list(trace.values())[0].shape
-        samples = self._dict_to_array(trace, self.ss.parameters.names_free)
+        names = [n for n, f in zip(self.ss._names, self.ss.parameters.free) if f]
+        samples = self._dict_to_array(trace, names)
 
         def eval_loglik_pw(index):
             self.ss.parameters.theta_free = samples[:, index]

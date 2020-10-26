@@ -48,6 +48,7 @@ def random_parameters(statespace):
     priors = [Normal(), LogNormal(), InverseGamma(), Gamma(), Beta()]
     scale_dict = {
         'THERMAL_RESISTANCE': 1e-2,
+        'THERMAL_TRANSMITTANCE': 1e2,
         'THERMAL_CAPACITY': 1e8,
         'SOLAR_APERTURE': 1.0,
         'COEFFICIENT': 1.0,

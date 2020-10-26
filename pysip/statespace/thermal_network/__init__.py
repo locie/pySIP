@@ -12,6 +12,7 @@ from .twtitb_rorirbawaicv import TwTiTb_RoRiRbAwAicv
 from .twtitb_roriribrbbawaicv import TwTiTb_RoRiRibRbbAwAicv
 from .twtith_rorirhawai import TwTiTh_RoRiRhAwAi
 from .twtith_rorirhawaicv import TwTiTh_RoRiRhAwAicv
+from .twtith_rorirhawaicv_bis import TwTiTh_RoRiRhAwAicv_bis
 from .twtitm_roriawai import TwTiTm_RoRiAwAi
 from .twtitm_roriawaicv import TwTiTm_RoRiAwAicv
 from .twtitm_rorirbawaicv import TwTiTm_RoRiRbAwAicv

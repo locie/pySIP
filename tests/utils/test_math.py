@@ -3,25 +3,56 @@ import numpy as np
 import pytest
 from scipy.linalg import LinAlgError
 
-from pysip.utils import nearest_cholesky
+from pysip.utils.math import nearest_cholesky, diff_upper_cholesky
 
 
-def test_nearest_cholesky():
-    dim = 3
-    A = np.abs(np.random.uniform(0.1, 1, (dim, dim)))
-    A = (A + A.T) / 2.0
+@pytest.mark.parametrize('N', [5, 10, 25, 50])
+def test_nearest_upper_cholesky(N):
 
-    n = A.shape[0]
-    jitter = 1e-14
+    S = np.cov(np.random.randn(N, 2 * N))
+    S = (S + S.T) / 2.0
+    Is = np.eye(S.shape[0])
+    jitter = 1e-10
     while jitter < 1.0:
         try:
-            A += jitter * np.eye(n)
-            chol = np.linalg.cholesky(A).T
+            S += jitter * Is
+            upper_chol = np.linalg.cholesky(S).T
             break
-        except (LinAlgError, RuntimeError):
+        except LinAlgError:
             jitter *= 10.0
 
-    nchol = nearest_cholesky(A)
+    nearest_upper_chol = nearest_cholesky(S)
 
-    assert np.allclose(chol.T @ chol, A)
-    assert np.allclose(nchol.T @ nchol, A)
+    assert np.allclose(upper_chol.T @ upper_chol, S)
+    assert np.allclose(nearest_upper_chol.T @ nearest_upper_chol, S)
+
+
+@pytest.mark.parametrize('N', [5, 10, 25, 50])
+def test_diff_upper_cholesky(N):
+    S = np.cov(np.random.randn(N, 2 * N))
+    dS = np.cov(np.random.randn(N, 2 * N))
+    S = (S + S.T) / 2.0
+    Is = np.eye(S.shape[0])
+    jitter = 1e-10
+    while jitter < 1.0:
+        try:
+            S += jitter * Is
+            upper_chol = np.linalg.cholesky(S).T
+            break
+        except LinAlgError:
+            jitter *= 10.0
+
+    def fd_upper_cholesky(S, dS):
+        hh = 1e-5
+        R1 = np.linalg.cholesky(S - dS * hh / 2.0).T
+        R2 = np.linalg.cholesky(S + dS * hh / 2.0).T
+        return (R2 - R1) / hh
+
+    dR_fd = fd_upper_cholesky(S, dS)
+
+    R = nearest_cholesky(S)
+    dR = diff_upper_cholesky(R, dS)
+
+    assert np.allclose(upper_chol.T @ upper_chol, S)
+    assert np.allclose(R.T @ R, S)
+    assert np.allclose(dR, dR_fd)

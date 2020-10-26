@@ -155,7 +155,7 @@ class DynamicHMC:
         options.setdefault('t0', 10)
         options.setdefault('gamma', 0.05)
         options.setdefault('kappa', 0.75)
-        options.setdefault('mu', np.log(10.0 * stepsize))
+        options.setdefault('mu', np.log(2.0 * stepsize))
         options.setdefault('init_buffer', 75)
         options.setdefault('term_buffer', 100)
         options.setdefault('window', 25)
@@ -229,6 +229,10 @@ class DynamicHMC:
         stats = defaultdict(list)
         # stepsize = self._find_reasonable_stepsize(q, stepsize)
 
+        # This is experimental
+        tree_depth = deepcopy(self._max_tree_depth)
+        self._max_tree_depth = 8
+
         for i in pbar:
             # HMC step
             q, s = self._hmc_step(q, stepsize)
@@ -246,11 +250,12 @@ class DynamicHMC:
                     self._hamiltonian.inverse_mass_matrix = cov
                     stepsize = step_adapter.adapted_step_size
                     # stepsize = self._find_reasonable_stepsize(q, stepsize)
-                    # step_adapter.restart(mu=np.log(10.0 * stepsize))
+                    step_adapter.restart(mu=np.log(2.0 * stepsize))
 
                 # End of adaptation
                 if i == self._n_warmup - 1:
                     stepsize = step_adapter.adapted_step_size
+                    self._max_tree_depth = tree_depth
 
         return samples, stats
 

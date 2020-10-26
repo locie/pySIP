@@ -74,7 +74,7 @@ def test_armadillo_hmc(dense_mass_matrix):
 
     # Predictions tests
     assert np.mean(np.mean((df['T_int'].values - ym) ** 2, axis=1) ** 0.5) == pytest.approx(
-        8.358e-01, rel=1e-2
+        8.358e-01, rel=5e-2
     )
 
     # Point-wise log-likelihood tests
