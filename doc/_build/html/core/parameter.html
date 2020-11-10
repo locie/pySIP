@@ -1,0 +1,393 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Parameter &mdash; Stochastic state-space Inference and Prediction  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Parameters" href="parameters.html" />
+    <link rel="prev" title="Bayesian regressor" href="../regressors/bayesian.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Stochastic state-space Inference and Prediction
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guides/quickstart.html">Gettings started with pySIP</a></li>
+</ul>
+<p class="caption"><span class="caption-text">State-space models</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/base.html">Linear Time Invariant State-Space Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/rc.html">Dynamic Thermal Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/gp.html">Gaussian Processes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/lfm.html">Latent Force Model</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Regressors</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../regressors/base.html">Base regressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../regressors/frequentist.html">Frequentist regressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../regressors/bayesian.html">Bayesian regressor</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Parameters settings</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Parameter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameters.html">Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prior.html">Prior</a></li>
+</ul>
+<p class="caption"><span class="caption-text">State estimation and log-likelihood evaluation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../state_estimator/kalman_qr.html">Robust Kalman filtering and sensitivity equations</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Markov Chain Monte Carlo</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../mcmc/hmc.html">Dynamic Hamiltonian Monte Carlo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcmc/hmc.html#inference-summary">Inference summary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcmc/hmc.html#hamiltonian-system">Hamiltonian system</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/gaussian_process.html">Gaussian Process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/thermal_network.html">Armadillo</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Stochastic state-space Inference and Prediction</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Parameter</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/core/parameter.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="parameter">
+<h1>Parameter<a class="headerlink" href="#parameter" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="pysip.core.Parameter">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.core.</code><code class="sig-name descname">Parameter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">value</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">loc</span><span class="o">=</span><span class="default_value">0.0</span></em>, <em class="sig-param"><span class="n">scale</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">transform</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">bounds</span><span class="o">=</span><span class="default_value">(None, None)</span></em>, <em class="sig-param"><span class="n">prior</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/parameter.html#Parameter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.Parameter" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Parameter has a value in the constrained space <span class="math notranslate nohighlight">\(\theta\)</span> and in the
+unconstrained space <span class="math notranslate nohighlight">\(\eta\)</span>. These two values are linked by the relation</p>
+<div class="math notranslate nohighlight">
+ \begin{equation*}
+     \theta = loc + f(\eta) \times scale
+ \end{equation*}</div><p>where <span class="math notranslate nohighlight">\(\theta_{sd} = f(\eta)\)</span> is one of the following <cite>transform</cite></p>
+<ul class="simple">
+<li><p><cite>none</cite>: <span class="math notranslate nohighlight">\(\theta_{sd} = \eta \qquad \theta_{sd} \in ]-\infty, \infty[\)</span></p></li>
+<li><p><cite>log</cite>: <span class="math notranslate nohighlight">\(\theta_{sd} = \exp(\eta) \qquad \theta_{sd} \in [0, \infty[\)</span></p></li>
+<li><p><cite>lower</cite>: <span class="math notranslate nohighlight">\(\theta_{sd} = \exp(\eta) + a \qquad \theta_{sd} \in [a, \infty[\)</span></p></li>
+<li><p><cite>upper</cite>: <span class="math notranslate nohighlight">\(\theta_{sd} = b - \exp(\eta) \qquad \theta_{sd} \in ]-\infty, b]\)</span></p></li>
+<li><p><cite>logit</cite>: <span class="math notranslate nohighlight">\(\theta_{sd} = a+\frac{(b-a)}{1+\exp(-\eta)}\qquad\theta_{sd}\in [a, b]\)</span></p></li>
+</ul>
+<p>where <span class="math notranslate nohighlight">\(a\)</span> and <span class="math notranslate nohighlight">\(b\)</span> are the lower and upper bounds given as a tuple, such
+that, <cite>bounds</cite> = <span class="math notranslate nohighlight">\((a, b)\)</span>. If <cite>transform</cite> = ‘fixed’ the parameter is not considered as a
+random variable.</p>
+<p>The <cite>prior</cite> distribution is on the standardized constrained parameter value
+<span class="math notranslate nohighlight">\(\theta_{sd}\)</span>. In order to put the prior on the constrained parameter
+value <span class="math notranslate nohighlight">\(\theta\)</span>, use the default configuration, <cite>loc</cite> = 0 and <cite>scale</cite> = 1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Parameter name</p></li>
+<li><p><strong>value</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Real</span></code>]) – Parameter value</p></li>
+<li><p><strong>loc</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Real</span></code>) – Location value</p></li>
+<li><p><strong>scale</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">Real</span></code>) – Scaling value</p></li>
+<li><p><strong>transform</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Bijections</p></li>
+<li><p><strong>bounds</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Real</span></code>]) – Parameters bounds</p></li>
+<li><p><strong>prior</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<a class="reference internal" href="prior.html#pysip.core.prior.Prior" title="pysip.core.prior.Prior"><code class="xref py py-class docutils literal notranslate"><span class="pre">Prior</span></code></a>]) – Prior distribution</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="pysip.core.Parameter._d_penalty">
+<code class="sig-name descname">_d_penalty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/parameter.html#Parameter._d_penalty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.Parameter._d_penalty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Derivative of the penalty function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.Parameter._inv_transform">
+<code class="sig-name descname">_inv_transform</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/parameter.html#Parameter._inv_transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.Parameter._inv_transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do inverse transformation <span class="math notranslate nohighlight">\(\theta_{sd} = f^{-1}(\eta)\)</span></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.Parameter._inv_transform_dlog_jacobian">
+<code class="sig-name descname">_inv_transform_dlog_jacobian</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/parameter.html#Parameter._inv_transform_dlog_jacobian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.Parameter._inv_transform_dlog_jacobian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the jacobian of the logarithm of the inverse transform</p>
+<p><span class="math notranslate nohighlight">\(\frac{\partial \ln(\theta_{sd})}{\partial \eta}\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.Parameter._inv_transform_jacobian">
+<code class="sig-name descname">_inv_transform_jacobian</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/parameter.html#Parameter._inv_transform_jacobian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.Parameter._inv_transform_jacobian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the jacobian of <span class="math notranslate nohighlight">\(\theta_{sd} = f^{-1}(\eta)\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.Parameter._penalty">
+<code class="sig-name descname">_penalty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/parameter.html#Parameter._penalty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.Parameter._penalty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Penalty function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.Parameter._transform">
+<code class="sig-name descname">_transform</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/parameter.html#Parameter._transform"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.Parameter._transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do transformation <span class="math notranslate nohighlight">\(\eta = f(\theta_{sd})\)</span></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.Parameter._transform_jacobian">
+<code class="sig-name descname">_transform_jacobian</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/parameter.html#Parameter._transform_jacobian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.Parameter._transform_jacobian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the jacobian of <span class="math notranslate nohighlight">\(\eta = f(\theta_{sd})\)</span></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.Parameter.eta">
+<em class="property">property </em><code class="sig-name descname">eta</code><a class="headerlink" href="#pysip.core.Parameter.eta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns unconstrained parameter value <span class="math notranslate nohighlight">\(\eta\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.Parameter.free">
+<em class="property">property </em><code class="sig-name descname">free</code><a class="headerlink" href="#pysip.core.Parameter.free" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if the parameter is not fixed</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.Parameter.theta">
+<em class="property">property </em><code class="sig-name descname">theta</code><a class="headerlink" href="#pysip.core.Parameter.theta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns constrained parameter value <span class="math notranslate nohighlight">\(\theta\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.Parameter.theta_sd">
+<em class="property">property </em><code class="sig-name descname">theta_sd</code><a class="headerlink" href="#pysip.core.Parameter.theta_sd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns standardized constrained parameter value <span class="math notranslate nohighlight">\(\theta_{sd}\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="parameters.html" class="btn btn-neutral float-right" title="Parameters" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../regressors/bayesian.html" class="btn btn-neutral float-left" title="Bayesian regressor" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2018, Loic Raillon, Maxime Janvier
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

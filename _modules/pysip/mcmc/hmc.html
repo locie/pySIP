@@ -1,0 +1,863 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pysip.mcmc.hmc &mdash; Stochastic state-space Inference and Prediction  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> Stochastic state-space Inference and Prediction
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../guides/quickstart.html">Gettings started with pySIP</a></li>
+</ul>
+<p class="caption"><span class="caption-text">State-space models</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../statespace/base.html">Linear Time Invariant State-Space Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../statespace/rc.html">Dynamic Thermal Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../statespace/gp.html">Gaussian Processes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../statespace/lfm.html">Latent Force Model</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Regressors</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../regressors/base.html">Base regressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../regressors/frequentist.html">Frequentist regressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../regressors/bayesian.html">Bayesian regressor</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Parameters settings</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../core/parameter.html">Parameter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../core/parameters.html">Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../core/prior.html">Prior</a></li>
+</ul>
+<p class="caption"><span class="caption-text">State estimation and log-likelihood evaluation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../state_estimator/kalman_qr.html">Robust Kalman filtering and sensitivity equations</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Markov Chain Monte Carlo</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../mcmc/hmc.html">Dynamic Hamiltonian Monte Carlo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mcmc/hmc.html#inference-summary">Inference summary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mcmc/hmc.html#hamiltonian-system">Hamiltonian system</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/gaussian_process.html">Gaussian Process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/thermal_network.html">Armadillo</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Stochastic state-space Inference and Prediction</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>pysip.mcmc.hmc</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pysip.mcmc.hmc</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Standalone file for Dynamic Hamiltonian Monte Carlo&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">namedtuple</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">numbers</span> <span class="kn">import</span> <span class="n">Real</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">tqdm.auto</span> <span class="k">as</span> <span class="nn">tqdm</span>
+<span class="kn">from</span> <span class="nn">joblib</span> <span class="kn">import</span> <span class="n">Parallel</span><span class="p">,</span> <span class="n">delayed</span>
+<span class="kn">from</span> <span class="nn">scipy.linalg</span> <span class="kn">import</span> <span class="n">LinAlgError</span>
+
+<span class="kn">from</span> <span class="nn">..utils.math</span> <span class="kn">import</span> <span class="n">cholesky_inverse</span><span class="p">,</span> <span class="n">log_sum_exp</span>
+<span class="kn">from</span> <span class="nn">.adaptation</span> <span class="kn">import</span> <span class="n">CovAdaptation</span><span class="p">,</span> <span class="n">DualAveraging</span><span class="p">,</span> <span class="n">WelfordCovEstimator</span><span class="p">,</span> <span class="n">WindowedAdaptation</span>
+<span class="kn">from</span> <span class="nn">.hamiltonian</span> <span class="kn">import</span> <span class="n">EuclideanHamiltonian</span>
+
+<span class="n">State</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;State&#39;</span><span class="p">,</span> <span class="s1">&#39;q, p V dV dK H&#39;</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">IntegrationError</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Leapfrog integration error&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span>
+
+
+<div class="viewcode-block" id="DynamicHMC"><a class="viewcode-back" href="../../../mcmc/hmc.html#pysip.mcmc.hmc.DynamicHMC">[docs]</a><span class="k">class</span> <span class="nc">DynamicHMC</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Dynamic Hamiltonian Monte Carlo Sampler with Multinomial sampling</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        hamiltonian: Hamiltonian system with Euclidean-Gaussian kinetic energies</span>
+
+<span class="sd">    References:</span>
+<span class="sd">    Betancourt, M., 2017. A conceptual introduction to Hamiltonian Monte Carlo.</span>
+<span class="sd">    arXiv preprint arXiv:1701.02434.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hamiltonian</span><span class="p">:</span> <span class="n">EuclideanHamiltonian</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_hamiltonian</span> <span class="o">=</span> <span class="n">hamiltonian</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dH_max</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_max_tree_depth</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_accp_target</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_warmup</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="DynamicHMC.sample"><a class="viewcode-back" href="../../../mcmc/hmc.html#pysip.mcmc.hmc.DynamicHMC.sample">[docs]</a>    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">q</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">n_draws</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2000</span><span class="p">,</span>
+        <span class="n">n_chains</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="n">n_warmup</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
+        <span class="n">options</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Draw samples from the target distribution</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            q: Initial position variables (e.g. initial parameters)</span>
+<span class="sd">            n_draws: Number of samples</span>
+<span class="sd">            n_chains: Number of Markov chains</span>
+<span class="sd">            n_warmup: Number of iterations to use for adapting the step size and the mass matrix</span>
+<span class="sd">            options:</span>
+<span class="sd">                - **stepsize** (float, default=0.25 / n_par**0.25)</span>
+<span class="sd">                    Step-size of the leapfrog integrator</span>
+<span class="sd">                - **dense_mass_matrix** (bool, default=False)</span>
+<span class="sd">                    Estimate the dense mass matrix during adaptation. By default, only the diagonal</span>
+<span class="sd">                    elements are estimated.</span>
+<span class="sd">                - **shrinkage** (bool, default=True)</span>
+<span class="sd">                    Shrink towards unity the diagonal elements of the estimated mass matrix</span>
+<span class="sd">                - **max_tree_depth** (int, default=10)</span>
+<span class="sd">                    Maximum tree depth</span>
+<span class="sd">                - **dH_max** (float, default=1000)</span>
+<span class="sd">                    Maximum energy change allowed in a trajectory. Larger</span>
+<span class="sd">                    deviations are considered as diverging transitions.</span>
+<span class="sd">                - **accp_target** (float, default=0.8):</span>
+<span class="sd">                    Target average acceptance probability. Valid values are between ]0, 1[</span>
+<span class="sd">                - **t0** (float, default=10.0):</span>
+<span class="sd">                    Adaptation iteration offset (primal-dual averaging algorithm parameter)</span>
+<span class="sd">                - **gamma** (float, default=0.05):</span>
+<span class="sd">                    Adaptation regularization scale (primal-dual averaging algorithm parameter)</span>
+<span class="sd">                - **kappa** (float, default=0.75):</span>
+<span class="sd">                    Adaptation relaxation exponent (primal-dual averaging algorithm parameter)</span>
+<span class="sd">                - **mu** (float, default=log(10 * stepsize)):</span>
+<span class="sd">                    Asymptotic mean of the step-size (primal-dual averaging algorithm parameter)</span>
+<span class="sd">                - **n_cpu**: (int, default=-1):</span>
+<span class="sd">                    Number of cpu to use. To use all available cpu, set the value to -1,</span>
+<span class="sd">                    otherwise valid values are between [1, +Inf[</span>
+<span class="sd">                - **init_buffer**: (int, default=75)</span>
+<span class="sd">                    Width of initial fast adaptation interval</span>
+<span class="sd">                - **term_buffer**: (int, default=100)</span>
+<span class="sd">                    Width of final fast adaptation interval</span>
+<span class="sd">                - **window**: (int, default=25)</span>
+<span class="sd">                    Initial width of slow adaptation interval</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            chains: Markov chain traces</span>
+<span class="sd">            stats: Hamiltonian transition statistics</span>
+<span class="sd">            df: Hamiltonian sampler diagnostic</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;The initial position variable `q` must be a numpy array&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">n_draws</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">n_draws</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;The number of samples `n_draws` must be an integer greater than 0&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">n_chains</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">n_chains</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;The number of chains `n_chains` must be an integer greater than 0&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">n_warmup</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;`n_warmup` must be an integer&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">options</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;`options must be a dictionary`&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">q</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">n_chains</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The position array `q` must be an 1d array&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">q</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">n_chains</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The position array `q` must have </span><span class="si">{</span><span class="n">n_chains</span><span class="si">}</span><span class="s1"> columns&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">n_warmup</span> <span class="o">&lt;</span> <span class="mi">1000</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;`n_warmup` must be at least 1000 iterations&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_warmup</span> <span class="o">=</span> <span class="n">n_warmup</span>
+
+        <span class="c1"># Check and  unpack options</span>
+        <span class="k">if</span> <span class="n">options</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">options</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">options</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">options</span><span class="p">)</span>
+
+        <span class="c1"># Set default values and return the dict of options</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;stepsize&#39;</span><span class="p">,</span> <span class="mf">0.25</span> <span class="o">/</span> <span class="n">q</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">**</span> <span class="mf">0.25</span><span class="p">)</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;dH_max&#39;</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;max_tree_depth&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;n_cpu&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">stepsize</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;stepsize&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stepsize</span><span class="p">,</span> <span class="n">Real</span><span class="p">)</span> <span class="ow">or</span> <span class="n">stepsize</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;`stepsize` must be a strictly positive real number&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dH_max</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dH_max&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dH_max</span><span class="p">,</span> <span class="n">Real</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dH_max</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;`dH_max` must be a strictly positive real number&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_max_tree_depth</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;max_tree_depth&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_max_tree_depth</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_tree_depth</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;`max_tree_depth` must a strictly positive integer&#39;</span><span class="p">)</span>
+
+        <span class="n">n_cpu</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;n_cpu&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">n_cpu</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">n_cpu</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">n_cpu</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;`n_cpu` must be a strictly positive integer or set to -1&#39;</span><span class="p">)</span>
+
+        <span class="c1"># The dictionary of options is saved in the returned fit object</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;accp_target&#39;</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">)</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;t0&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;gamma&#39;</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;kappa&#39;</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">)</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;mu&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">stepsize</span><span class="p">))</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;init_buffer&#39;</span><span class="p">,</span> <span class="mi">75</span><span class="p">)</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;term_buffer&#39;</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;window&#39;</span><span class="p">,</span> <span class="mi">25</span><span class="p">)</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;dense_mass_matrix&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;shrinkage&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_accp_target</span> <span class="o">=</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;accp_target&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Adaptation methods</span>
+        <span class="n">step_adapter</span> <span class="o">=</span> <span class="n">DualAveraging</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_accp_target</span><span class="p">,</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;t0&#39;</span><span class="p">],</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;gamma&#39;</span><span class="p">],</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;kappa&#39;</span><span class="p">],</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">estimator</span> <span class="o">=</span> <span class="n">WelfordCovEstimator</span><span class="p">(</span>
+            <span class="n">q</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;dense_mass_matrix&#39;</span><span class="p">],</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;shrinkage&#39;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">schedule</span> <span class="o">=</span> <span class="n">WindowedAdaptation</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_n_warmup</span><span class="p">,</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;init_buffer&#39;</span><span class="p">],</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;term_buffer&#39;</span><span class="p">],</span> <span class="n">options</span><span class="p">[</span><span class="s1">&#39;window&#39;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">cov_adapter</span> <span class="o">=</span> <span class="n">CovAdaptation</span><span class="p">(</span><span class="n">estimator</span><span class="p">,</span> <span class="n">schedule</span><span class="p">)</span>
+
+        <span class="c1"># Sampling</span>
+        <span class="k">if</span> <span class="n">n_chains</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">pbar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="o">.</span><span class="n">trange</span><span class="p">(</span><span class="n">n_draws</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Sampling&#39;</span><span class="p">,</span> <span class="n">dynamic_ncols</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">samples</span><span class="p">,</span> <span class="n">_stats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_chain</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">pbar</span><span class="p">,</span> <span class="n">stepsize</span><span class="p">,</span> <span class="n">step_adapter</span><span class="p">,</span> <span class="n">cov_adapter</span><span class="p">)</span>
+            <span class="c1"># The number of chains must be a dimension</span>
+            <span class="n">samples</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+            <span class="n">stats</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">v</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_stats</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pbar</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">tqdm</span><span class="o">.</span><span class="n">trange</span><span class="p">(</span><span class="n">n_draws</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Chain </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">dynamic_ncols</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_chains</span><span class="p">)</span>
+            <span class="p">]</span>
+
+            <span class="n">job</span> <span class="o">=</span> <span class="n">Parallel</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">n_cpu</span><span class="p">)(</span>
+                <span class="n">delayed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sample_chain</span><span class="p">)(</span><span class="n">q</span><span class="p">[:,</span> <span class="n">n</span><span class="p">],</span> <span class="n">pbar</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">stepsize</span><span class="p">,</span> <span class="n">step_adapter</span><span class="p">,</span> <span class="n">cov_adapter</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_chains</span><span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="c1"># unpack parallel chains</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="n">job</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+            <span class="n">stats</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_chains</span><span class="p">,</span> <span class="n">n_draws</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">}</span>
+            <span class="n">samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_chains</span><span class="p">,</span> <span class="n">q</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">n_draws</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">job</span><span class="p">):</span>
+                <span class="n">samples</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">c</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">stats</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">v</span>
+
+        <span class="k">return</span> <span class="n">samples</span><span class="p">,</span> <span class="n">stats</span><span class="p">,</span> <span class="n">options</span></div>
+
+<div class="viewcode-block" id="DynamicHMC._sample_chain"><a class="viewcode-back" href="../../../mcmc/hmc.html#pysip.mcmc.hmc.DynamicHMC._sample_chain">[docs]</a>    <span class="k">def</span> <span class="nf">_sample_chain</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">q</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">pbar</span><span class="p">:</span> <span class="n">tqdm</span><span class="o">.</span><span class="n">trange</span><span class="p">,</span>
+        <span class="n">stepsize</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">step_adapter</span><span class="p">:</span> <span class="n">DualAveraging</span><span class="p">,</span>
+        <span class="n">cov_adapter</span><span class="p">:</span> <span class="n">CovAdaptation</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Sample a chain</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            q: Initial position variables</span>
+<span class="sd">            pbar: Progress bar</span>
+<span class="sd">            stepsize: Initial step-size of the leapfrog integrator</span>
+<span class="sd">            step_adapter: Dual averaging algorithm for learning the step-size</span>
+<span class="sd">            cov_adapter: Windowed Welford covariance estimator</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            chain: Sampled chain</span>
+<span class="sd">            stats: Transition statistics</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">q</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">pbar</span><span class="o">.</span><span class="n">iterable</span><span class="p">)))</span>
+        <span class="n">stats</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="c1"># stepsize = self._find_reasonable_stepsize(q, stepsize)</span>
+
+        <span class="c1"># This is experimental</span>
+        <span class="n">tree_depth</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_max_tree_depth</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_max_tree_depth</span> <span class="o">=</span> <span class="mi">8</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">pbar</span><span class="p">:</span>
+            <span class="c1"># HMC step</span>
+            <span class="n">q</span><span class="p">,</span> <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hmc_step</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">stepsize</span><span class="p">)</span>
+
+            <span class="c1"># Save samples and statistics</span>
+            <span class="n">samples</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">q</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">stats</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+            <span class="c1"># do adaptation</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_warmup</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">stepsize</span> <span class="o">=</span> <span class="n">step_adapter</span><span class="o">.</span><span class="n">learn</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;accept_prob&#39;</span><span class="p">])</span>
+                <span class="n">update</span><span class="p">,</span> <span class="n">cov</span> <span class="o">=</span> <span class="n">cov_adapter</span><span class="o">.</span><span class="n">learn</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">update</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_hamiltonian</span><span class="o">.</span><span class="n">inverse_mass_matrix</span> <span class="o">=</span> <span class="n">cov</span>
+                    <span class="n">stepsize</span> <span class="o">=</span> <span class="n">step_adapter</span><span class="o">.</span><span class="n">adapted_step_size</span>
+                    <span class="c1"># stepsize = self._find_reasonable_stepsize(q, stepsize)</span>
+                    <span class="n">step_adapter</span><span class="o">.</span><span class="n">restart</span><span class="p">(</span><span class="n">mu</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">stepsize</span><span class="p">))</span>
+
+                <span class="c1"># End of adaptation</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_warmup</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">stepsize</span> <span class="o">=</span> <span class="n">step_adapter</span><span class="o">.</span><span class="n">adapted_step_size</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_max_tree_depth</span> <span class="o">=</span> <span class="n">tree_depth</span>
+
+        <span class="k">return</span> <span class="n">samples</span><span class="p">,</span> <span class="n">stats</span></div>
+
+<div class="viewcode-block" id="DynamicHMC._hamiltonian_state"><a class="viewcode-back" href="../../../mcmc/hmc.html#pysip.mcmc.hmc.DynamicHMC._hamiltonian_state">[docs]</a>    <span class="k">def</span> <span class="nf">_hamiltonian_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NamedTuple</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Compute Hamiltonian state at a point in phase space</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            q: Position in phase space</span>
+<span class="sd">            p: Momentum in phase space</span>
+
+<span class="sd">        Return:</span>
+<span class="sd">            Hamiltonian state</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">V</span><span class="p">,</span> <span class="n">dV</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hamiltonian</span><span class="o">.</span><span class="n">V_and_dV</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="n">H</span> <span class="o">=</span> <span class="n">V</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hamiltonian</span><span class="o">.</span><span class="n">K</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="n">dK</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hamiltonian</span><span class="o">.</span><span class="n">dK</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">State</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">dV</span><span class="p">,</span> <span class="n">dK</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DynamicHMC._hmc_step"><a class="viewcode-back" href="../../../mcmc/hmc.html#pysip.mcmc.hmc.DynamicHMC._hmc_step">[docs]</a>    <span class="k">def</span> <span class="nf">_hmc_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">stepsize</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Dynamic Hamiltonian Monte Carlo step</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            q: Position in phase space</span>
+<span class="sd">            stepsize: Step-size of the leapfrog integrator</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            state_n.q: Next position</span>
+<span class="sd">            stats: Statistic from the Hamiltonian transition</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Draw momentum</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hamiltonian</span><span class="o">.</span><span class="n">sample_p</span><span class="p">()</span>
+        <span class="c1"># Compute Hamiltonian state</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hamiltonian_state</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+
+        <span class="c1"># Hamiltonian transition</span>
+        <span class="n">state_n</span><span class="p">,</span> <span class="n">stats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transition</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">stepsize</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">state_n</span><span class="o">.</span><span class="n">q</span><span class="p">,</span> <span class="n">stats</span></div>
+
+<div class="viewcode-block" id="DynamicHMC._transition"><a class="viewcode-back" href="../../../mcmc/hmc.html#pysip.mcmc.hmc.DynamicHMC._transition">[docs]</a>    <span class="k">def</span> <span class="nf">_transition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">stepsize</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">NamedTuple</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Dynamic Hamiltonian Monte Carlo transition with multinomial sampling</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            state: Hamiltonian state at the current point in phase space</span>
+<span class="sd">            stepsize: Step-size of the leapfrog integrator</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            state_n: Next Hamiltonian state</span>
+<span class="sd">            stats: Trajectory statistics</span>
+<span class="sd">                - **accept_prob**: Average acceptance probability accross trajectory</span>
+<span class="sd">                - **leapfrog_steps**: Number of leapfrog steps</span>
+<span class="sd">                - **diverging**: Flag for diverging transition</span>
+<span class="sd">                - **energy**: Hamiltonian at the next state</span>
+<span class="sd">                - **tree_depth**: Depth of the binary tree</span>
+<span class="sd">                - **max_tree_depth**: Flag for maximum integration steps</span>
+<span class="sd">                - **stepsize**: Step-size of the leapfrog integrator</span>
+<span class="sd">                - **potential**: Potential energy (negative log-posterior)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">state_n</span><span class="p">,</span> <span class="n">state_l</span><span class="p">,</span> <span class="n">state_r</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">state</span><span class="p">),</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">state</span><span class="p">),</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+
+        <span class="n">H0</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">H</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">sum_p</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">sum_w</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">stats</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;leapfrog_steps&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s1">&#39;accept_prob&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s1">&#39;max_tree_depth&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s1">&#39;diverging&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s1">&#39;potential&#39;</span><span class="p">:</span> <span class="n">state_n</span><span class="o">.</span><span class="n">V</span><span class="p">,</span>
+            <span class="s1">&#39;stepsize&#39;</span><span class="p">:</span> <span class="n">stepsize</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">depth</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_max_tree_depth</span><span class="p">):</span>
+            <span class="n">sum_p_s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="n">sum_w_s</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">:</span>
+                <span class="n">terminate_s</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">state_r</span><span class="p">,</span> <span class="n">state_p</span><span class="p">,</span> <span class="n">sum_w_s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_tree</span><span class="p">(</span>
+                    <span class="n">depth</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">state_r</span><span class="p">,</span> <span class="n">stepsize</span><span class="p">,</span> <span class="n">H0</span><span class="p">,</span> <span class="n">sum_p_s</span><span class="p">,</span> <span class="n">sum_w_s</span><span class="p">,</span> <span class="n">stats</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">terminate_s</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">state_l</span><span class="p">,</span> <span class="n">state_p</span><span class="p">,</span> <span class="n">sum_w_s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_tree</span><span class="p">(</span>
+                    <span class="n">depth</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">state_l</span><span class="p">,</span> <span class="n">stepsize</span><span class="p">,</span> <span class="n">H0</span><span class="p">,</span> <span class="n">sum_p_s</span><span class="p">,</span> <span class="n">sum_w_s</span><span class="p">,</span> <span class="n">stats</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">terminate_s</span><span class="p">:</span>
+                <span class="k">break</span>
+
+            <span class="k">if</span> <span class="n">sum_w_s</span> <span class="o">&gt;</span> <span class="n">sum_w</span><span class="p">:</span>
+                <span class="n">state_n</span> <span class="o">=</span> <span class="n">state_p</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">sum_w_s</span> <span class="o">-</span> <span class="n">sum_w</span><span class="p">):</span>
+                    <span class="n">state_n</span> <span class="o">=</span> <span class="n">state_p</span>
+
+            <span class="n">sum_w</span> <span class="o">=</span> <span class="n">log_sum_exp</span><span class="p">(</span><span class="n">sum_w</span><span class="p">,</span> <span class="n">sum_w_s</span><span class="p">)</span>
+            <span class="n">sum_p</span> <span class="o">+=</span> <span class="n">sum_p_s</span>
+
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">state_l</span><span class="o">.</span><span class="n">dK</span><span class="p">,</span> <span class="n">sum_p</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">state_r</span><span class="o">.</span><span class="n">dK</span><span class="p">,</span> <span class="n">sum_p</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;max_tree_depth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;leapfrog_steps&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;accept_prob&#39;</span><span class="p">]</span> <span class="o">/=</span> <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;leapfrog_steps&#39;</span><span class="p">]</span>
+
+        <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;energy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">state_n</span><span class="o">.</span><span class="n">H</span>
+        <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;potential&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">state_n</span><span class="o">.</span><span class="n">V</span>
+        <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;tree_depth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">depth</span>
+
+        <span class="k">return</span> <span class="n">state_n</span><span class="p">,</span> <span class="n">stats</span></div>
+
+<div class="viewcode-block" id="DynamicHMC._build_tree"><a class="viewcode-back" href="../../../mcmc/hmc.html#pysip.mcmc.hmc.DynamicHMC._build_tree">[docs]</a>    <span class="k">def</span> <span class="nf">_build_tree</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">direction</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">state</span><span class="p">:</span> <span class="n">NamedTuple</span><span class="p">,</span>
+        <span class="n">stepsize</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">H0</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">sum_p</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">sum_w</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">stats</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Recursively build the binary tree</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            depth: Depth of the desired subtree</span>
+<span class="sd">            direction: direction in time to build subtree [-1 or 1]</span>
+<span class="sd">            state: State proposed from the subtree</span>
+<span class="sd">            stepsize: Step-size of the leapfrog integrator</span>
+<span class="sd">            H0: Hamiltonian of the initial state</span>
+<span class="sd">            sum_p: Summed momentum accross trajectory</span>
+<span class="sd">            sum_w: Summed weight accross trajectory</span>
+<span class="sd">            stats: Trajectory statistics</span>
+<span class="sd">                - **accept_prob**: Summed acceptance probability accross trajectory</span>
+<span class="sd">                - **leapfrog_steps**: Summed number of leapfrog integrations</span>
+<span class="sd">                - **diverging**: Flag for diverging transition</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            5-elements tuple with</span>
+<span class="sd">                stop: Flag indicating a divergent transition or a U-turn</span>
+<span class="sd">                state_inner: State of the inner subtree</span>
+<span class="sd">                state_outer: State of the outer subtree</span>
+<span class="sd">                state_proposed: State of the proposed subtree</span>
+<span class="sd">                sum_w: Summed weight accross trajectory</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Base case recursion</span>
+        <span class="k">if</span> <span class="n">depth</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_leapfrog_step</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">direction</span><span class="p">,</span> <span class="n">stepsize</span><span class="p">)</span>
+
+                <span class="n">dH</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">H</span> <span class="o">-</span> <span class="n">H0</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">dH</span><span class="p">):</span>
+                    <span class="n">dH</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+
+                <span class="k">if</span> <span class="n">dH</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dH_max</span><span class="p">:</span>
+                    <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;diverging&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="n">state</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="n">terminate</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">sum_p</span> <span class="o">+=</span> <span class="n">state</span><span class="o">.</span><span class="n">p</span>
+                    <span class="n">sum_w</span> <span class="o">=</span> <span class="n">log_sum_exp</span><span class="p">(</span><span class="n">sum_w</span><span class="p">,</span> <span class="o">-</span><span class="n">dH</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="o">-</span><span class="n">dH</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
+                        <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;accept_prob&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;accept_prob&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">dH</span><span class="p">)</span>
+                    <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;leapfrog_steps&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">terminate</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="k">except</span> <span class="p">(</span><span class="n">LinAlgError</span><span class="p">,</span> <span class="ne">RuntimeError</span><span class="p">):</span>
+                <span class="n">terminate</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="k">return</span> <span class="n">terminate</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">sum_w</span>
+
+        <span class="c1"># build the inner subtree</span>
+        <span class="n">sum_p_i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">sum_w_i</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+
+        <span class="n">terminate_i</span><span class="p">,</span> <span class="n">state_i</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">state_pi</span><span class="p">,</span> <span class="n">sum_w_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_tree</span><span class="p">(</span>
+            <span class="n">depth</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">direction</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">stepsize</span><span class="p">,</span> <span class="n">H0</span><span class="p">,</span> <span class="n">sum_p_i</span><span class="p">,</span> <span class="n">sum_w_i</span><span class="p">,</span> <span class="n">stats</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">terminate_i</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+        <span class="c1"># build the outer subtree</span>
+        <span class="n">sum_p_o</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">sum_w_o</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+
+        <span class="n">terminate_o</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">state_o</span><span class="p">,</span> <span class="n">state_po</span><span class="p">,</span> <span class="n">sum_w_o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_tree</span><span class="p">(</span>
+            <span class="n">depth</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">direction</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">stepsize</span><span class="p">,</span> <span class="n">H0</span><span class="p">,</span> <span class="n">sum_p_o</span><span class="p">,</span> <span class="n">sum_w_o</span><span class="p">,</span> <span class="n">stats</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">terminate_o</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+        <span class="c1"># Sample from combined inner and outer subtree</span>
+        <span class="n">sum_w_s</span> <span class="o">=</span> <span class="n">log_sum_exp</span><span class="p">(</span><span class="n">sum_w_i</span><span class="p">,</span> <span class="n">sum_w_o</span><span class="p">)</span>
+        <span class="n">sum_w</span> <span class="o">=</span> <span class="n">log_sum_exp</span><span class="p">(</span><span class="n">sum_w</span><span class="p">,</span> <span class="n">sum_w_s</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">sum_w_o</span> <span class="o">&gt;</span> <span class="n">sum_w_s</span><span class="p">:</span>
+            <span class="n">state_p</span> <span class="o">=</span> <span class="n">state_po</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">sum_w_o</span> <span class="o">-</span> <span class="n">sum_w_s</span><span class="p">):</span>
+                <span class="n">state_p</span> <span class="o">=</span> <span class="n">state_po</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">state_p</span> <span class="o">=</span> <span class="n">state_pi</span>
+
+        <span class="n">sum_p_s</span> <span class="o">=</span> <span class="n">sum_p_i</span> <span class="o">+</span> <span class="n">sum_p_o</span>
+        <span class="n">sum_p</span> <span class="o">+=</span> <span class="n">sum_p_s</span>
+
+        <span class="n">stop_s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">state_i</span><span class="o">.</span><span class="n">dK</span><span class="p">,</span> <span class="n">sum_p_s</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">state_o</span><span class="o">.</span><span class="n">dK</span><span class="p">,</span> <span class="n">sum_p_s</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span>
+
+        <span class="k">return</span> <span class="n">stop_s</span><span class="p">,</span> <span class="n">state_i</span><span class="p">,</span> <span class="n">state_o</span><span class="p">,</span> <span class="n">state_p</span><span class="p">,</span> <span class="n">sum_w</span></div>
+
+<div class="viewcode-block" id="DynamicHMC._leapfrog_step"><a class="viewcode-back" href="../../../mcmc/hmc.html#pysip.mcmc.hmc.DynamicHMC._leapfrog_step">[docs]</a>    <span class="k">def</span> <span class="nf">_leapfrog_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">direction</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">stepsize</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NamedTuple</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Explicit leapfrog integrator for separable Hamiltonian systems</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            state: State of the Hamiltonian at the current point in phase space</span>
+<span class="sd">            direction: Time direction for integration, e.g forward=1, backward=-1</span>
+<span class="sd">            stepsize: Step-size of the leapfrog integrator</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            State of the Hamiltonian a step further in the trajectory</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">q</span><span class="p">)</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+
+        <span class="n">dt</span> <span class="o">=</span> <span class="n">direction</span> <span class="o">*</span> <span class="n">stepsize</span>
+        <span class="n">p</span> <span class="o">-=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">state</span><span class="o">.</span><span class="n">dV</span>
+        <span class="n">q</span> <span class="o">+=</span> <span class="n">dt</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hamiltonian</span><span class="o">.</span><span class="n">dK</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="n">V</span><span class="p">,</span> <span class="n">dV</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hamiltonian</span><span class="o">.</span><span class="n">V_and_dV</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="n">p</span> <span class="o">-=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">dV</span>
+
+        <span class="c1"># Required for u-turn criterion and building the binary tree</span>
+        <span class="n">dK</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hamiltonian</span><span class="o">.</span><span class="n">dK</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="n">H</span> <span class="o">=</span> <span class="n">V</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hamiltonian</span><span class="o">.</span><span class="n">K</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">State</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">V</span><span class="p">,</span> <span class="n">dV</span><span class="p">,</span> <span class="n">dK</span><span class="p">,</span> <span class="n">H</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Fit_Bayes"><a class="viewcode-back" href="../../../mcmc/hmc.html#pysip.mcmc.hmc.Fit_Bayes">[docs]</a><span class="k">class</span> <span class="nc">Fit_Bayes</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Fit summary returned by DynamicHMC</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        chains: Markov Chains Traces</span>
+<span class="sd">        stats: Hamiltonian transition statistics</span>
+<span class="sd">        options: Sampler options</span>
+<span class="sd">        n_warmup: Number of iterations used as warmup</span>
+<span class="sd">        model: Model name</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chains</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">stats</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">n_warmup</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">chains</span><span class="p">,</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;`chains` must be a dictionary or a numpy array&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">chains</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">chains</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;`chains` must be 3-d numpy array&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_chains</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">):</span> <span class="n">chains</span><span class="p">[:,</span> <span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">chains</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_chains</span> <span class="o">=</span> <span class="n">chains</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;`stats` must be a dictionary&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;`options` must be a dictionary&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;`model` must be a string&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span> <span class="o">=</span> <span class="n">stats</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_options</span> <span class="o">=</span> <span class="n">options</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_warmup</span> <span class="o">=</span> <span class="n">n_warmup</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_chains</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_draws</span> <span class="o">=</span> <span class="n">stats</span><span class="p">[</span><span class="s1">&#39;tree_depth&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_chains</span><span class="p">[</span><span class="s1">&#39;lp_&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;potential&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_datetime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_model</span> <span class="o">=</span> <span class="s1">&#39;unknown&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_model</span> <span class="o">=</span> <span class="n">model</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return information of the fitting&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">model: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_model</span><span class="si">}</span><span class="se">\n</span><span class="s1">number of chains: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_chains</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">f</span><span class="s1">&#39;number of draws: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_draws</span><span class="si">}</span><span class="se">\n</span><span class="s1">number of draws for warm-up: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_warmup</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">date: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_datetime</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">/%m/%Y&quot;</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="sa">f</span><span class="s1">&#39;time: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_datetime</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%H:%M:%S&quot;</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n_warmup</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Number of iterations used as warmup&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_warmup</span>
+
+    <span class="nd">@n_warmup</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">n_warmup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set the number of iterations for the warm-up&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;`n_warmup` must be a strictly positive integer&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_n_warmup</span> <span class="o">=</span> <span class="n">x</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">posterior</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&#39;&#39;&#39;Return the Markov chain traces with without warm-up&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_warmup</span> <span class="p">:]</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chains</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&#39;&#39;&#39;Return the Markov chain traces with without warm-up&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_warmup</span> <span class="p">:]</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+<div class="viewcode-block" id="Fit_Bayes.get_options"><a class="viewcode-back" href="../../../mcmc/hmc.html#pysip.mcmc.hmc.Fit_Bayes.get_options">[docs]</a>    <span class="k">def</span> <span class="nf">get_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keys</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the dictionary of options or only the options given in `keys`</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keys: List of options (keys)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            d: Dictionary of options</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">keys</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">str</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;`keys` must be a string or a list of strings&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">keys</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">keys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{k}</span><span class="s1"> is not an available option&#39;</span><span class="p">)</span>
+                <span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">d</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">diagnostic</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Sampler diagnostic</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            df: Sampler diagnostic</span>
+
+<span class="sd">        Notes:</span>
+<span class="sd">            EBFMI (Energy Bayesian Fraction of Missing Information) values below 0.3 indicates</span>
+<span class="sd">            that momentum resampling will ineffciently explore the energy level sets.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Chain &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_n_chains</span><span class="p">)],</span>
+            <span class="n">data</span><span class="o">=</span><span class="p">{</span>
+                <span class="s1">&#39;ebfmi&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;energy&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;energy&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                <span class="s1">&#39;mean accept_prob&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;accept_prob&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                <span class="s1">&#39;mean tree_depth&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;tree_depth&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                <span class="s1">&#39;mean leapfrog_steps&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;leapfrog_steps&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                <span class="s1">&#39;sum diverging&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;diverging&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">),</span>
+                <span class="s1">&#39;sum max_tree_depth&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;max_tree_depth&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">),</span>
+                <span class="s1">&#39;stepsize&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;stepsize&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">df</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2018, Loic Raillon, Maxime Janvier
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,577 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Parameters &mdash; Stochastic state-space Inference and Prediction  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Prior" href="prior.html" />
+    <link rel="prev" title="Parameter" href="parameter.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Stochastic state-space Inference and Prediction
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guides/quickstart.html">Gettings started with pySIP</a></li>
+</ul>
+<p class="caption"><span class="caption-text">State-space models</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/base.html">Linear Time Invariant State-Space Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/rc.html">Dynamic Thermal Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/gp.html">Gaussian Processes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/lfm.html">Latent Force Model</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Regressors</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../regressors/base.html">Base regressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../regressors/frequentist.html">Frequentist regressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../regressors/bayesian.html">Bayesian regressor</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Parameters settings</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="parameter.html">Parameter</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prior.html">Prior</a></li>
+</ul>
+<p class="caption"><span class="caption-text">State estimation and log-likelihood evaluation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../state_estimator/kalman_qr.html">Robust Kalman filtering and sensitivity equations</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Markov Chain Monte Carlo</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../mcmc/hmc.html">Dynamic Hamiltonian Monte Carlo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcmc/hmc.html#inference-summary">Inference summary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcmc/hmc.html#hamiltonian-system">Hamiltonian system</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/gaussian_process.html">Gaussian Process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/thermal_network.html">Armadillo</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Stochastic state-space Inference and Prediction</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Parameters</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/core/parameters.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="parameters">
+<h1>Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="pysip.core.Parameters">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.core.</code><code class="sig-name descname">Parameters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/parameters.html#Parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.Parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Factory of Parameter instances</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>parameters</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>) – There is two options for instantiating Parameters: <cite>parameters</cite> is a list of
+strings corresponding to the parameters names. In this case all the parameters have the
+default settings; <cite>parameters</cite> is a list of dictionaries, where the arguments of
+Parameter can be modified as key-value pairs</p></li>
+<li><p><strong>name</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Name of this specific instance</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Multiple instances of Parameters can be added together</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p_alpha</span> <span class="o">=</span> <span class="n">Parameters</span><span class="p">([</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;alpha&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p_beta</span> <span class="o">=</span> <span class="n">Parameters</span><span class="p">([</span><span class="s1">&#39;c&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;e&#39;</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;beta&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">params</span> <span class="o">=</span> <span class="p">[</span>
+<span class="go">    {&#39;name&#39;: &#39;a&#39;, &#39;value&#39;: 1.0, &#39;transform&#39;: &#39;log&#39;},</span>
+<span class="go">    {&#39;name&#39;: &#39;b&#39;, &#39;value&#39;: 2.0, &#39;bounds&#39;: (1.0, 3.0)},</span>
+<span class="go">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p_gamma</span> <span class="o">=</span> <span class="n">Parameters</span><span class="p">(</span><span class="n">parameters</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;gamma&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">p_alpha</span> <span class="o">+</span> <span class="n">p_beta</span> <span class="o">+</span> <span class="n">p_gamma</span><span class="p">)</span>
+
+<span class="go">Parameters alpha__beta__gamma</span>
+<span class="go">* alpha__beta</span>
+<span class="go">    * alpha</span>
+<span class="go">        name=a value=0.000e+00 transform=none bounds=(None, None) prior=None</span>
+<span class="go">        name=b value=0.000e+00 transform=none bounds=(None, None) prior=None</span>
+<span class="go">        name=c value=0.000e+00 transform=none bounds=(None, None) prior=None</span>
+<span class="go">    * beta</span>
+<span class="go">        name=c value=0.000e+00 transform=none bounds=(None, None) prior=None</span>
+<span class="go">        name=d value=0.000e+00 transform=none bounds=(None, None) prior=None</span>
+<span class="go">        name=e value=0.000e+00 transform=none bounds=(None, None) prior=None</span>
+<span class="go">* gamma</span>
+<span class="go">    name=a value=1.000e+00 transform=log bounds=(None, None) prior=None</span>
+<span class="go">    name=b value=2.000e+00 transform=logit bounds=(1.0, 3.0) prior=None</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="pysip.core.Parameters.d_penalty">
+<em class="property">property </em><code class="sig-name descname">d_penalty</code><a class="headerlink" href="#pysip.core.Parameters.d_penalty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Partial derivative of the penalty function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>scaling</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Scaling coefficient of the penalty function</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.Parameters.d_prior">
+<em class="property">property </em><code class="sig-name descname">d_prior</code><a class="headerlink" href="#pysip.core.Parameters.d_prior" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the partial derivative of logarithm of the prior distribution <span class="math notranslate nohighlight">\(\partial \log p(\theta) \,/\, \partial \theta\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.Parameters.eta">
+<em class="property">property </em><code class="sig-name descname">eta</code><a class="headerlink" href="#pysip.core.Parameters.eta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the unconstrained parameter values <span class="math notranslate nohighlight">\(\mathbf{\eta}\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.Parameters.eta_free">
+<em class="property">property </em><code class="sig-name descname">eta_free</code><a class="headerlink" href="#pysip.core.Parameters.eta_free" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the unconstrained parameter values <span class="math notranslate nohighlight">\(\mathbf{\eta}\)</span> which are not fixed</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.Parameters.eta_jacobian">
+<em class="property">property </em><code class="sig-name descname">eta_jacobian</code><a class="headerlink" href="#pysip.core.Parameters.eta_jacobian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform jacobian <span class="math notranslate nohighlight">\(\partial \eta \,/\, \partial \theta\)</span></p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial \pi(\theta \mid y)}{\partial \theta} =
+\frac{\partial \pi(\eta \mid y)}{\partial \eta}
+\frac{\partial \eta}{\partial \theta}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\pi(\theta \mid y) = \log p(\theta \mid y)\)</span> is the logarithm
+of the posterior distribution in the constrained parameter space and,
+<span class="math notranslate nohighlight">\(\eta = f(\theta)\)</span> is the bijective transformation.</p>
+<p class="rubric">Notes</p>
+<p>Only univariate change of variables are supported.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.Parameters.free">
+<em class="property">property </em><code class="sig-name descname">free</code><a class="headerlink" href="#pysip.core.Parameters.free" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the list of free parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.Parameters.n_par">
+<em class="property">property </em><code class="sig-name descname">n_par</code><a class="headerlink" href="#pysip.core.Parameters.n_par" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of free parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.Parameters.names">
+<em class="property">property </em><code class="sig-name descname">names</code><a class="headerlink" href="#pysip.core.Parameters.names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the list of parameter names</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.Parameters.names_free">
+<em class="property">property </em><code class="sig-name descname">names_free</code><a class="headerlink" href="#pysip.core.Parameters.names_free" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the list of free parameter names</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.Parameters.parameters">
+<em class="property">property </em><code class="sig-name descname">parameters</code><a class="headerlink" href="#pysip.core.Parameters.parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the list of Parameter instance</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.Parameters.parameters_free">
+<em class="property">property </em><code class="sig-name descname">parameters_free</code><a class="headerlink" href="#pysip.core.Parameters.parameters_free" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the Parameter instances which are not fixed</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.Parameters.penalty">
+<em class="property">property </em><code class="sig-name descname">penalty</code><a class="headerlink" href="#pysip.core.Parameters.penalty" title="Permalink to this definition">¶</a></dt>
+<dd><p>penalty function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>scaling</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Scaling coefficient of the penalty function</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.Parameters.prior">
+<em class="property">property </em><code class="sig-name descname">prior</code><a class="headerlink" href="#pysip.core.Parameters.prior" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the logarithm of the prior distribution <span class="math notranslate nohighlight">\(\log p(\theta)\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.Parameters.prior_init">
+<code class="sig-name descname">prior_init</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">hpd</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/parameters.html#Parameters.prior_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.Parameters.prior_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw a random sample from the prior distribution, <span class="math notranslate nohighlight">\(\theta \sim p(\theta)\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>hpd</strong> – Highest Prior Density to draw sample from (True for unimodal distribution)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.Parameters.scale">
+<em class="property">property </em><code class="sig-name descname">scale</code><a class="headerlink" href="#pysip.core.Parameters.scale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scales of the constrained parameters <span class="math notranslate nohighlight">\(\theta\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.Parameters.set_parameter">
+<code class="sig-name descname">set_parameter</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/parameters.html#Parameters.set_parameter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.Parameters.set_parameter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change settings of Parameters after instantiation</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">p_alpha</span> <span class="o">=</span> <span class="n">Parameters</span><span class="p">([</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;alpha&#39;</span><span class="p">)</span>
+<span class="n">p_alpha</span><span class="o">.</span><span class="n">set_parameter</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.Parameters.theta">
+<em class="property">property </em><code class="sig-name descname">theta</code><a class="headerlink" href="#pysip.core.Parameters.theta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the constrained parameter values <span class="math notranslate nohighlight">\(\mathbf{\theta}\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.Parameters.theta_dlog_jacobian">
+<em class="property">property </em><code class="sig-name descname">theta_dlog_jacobian</code><a class="headerlink" href="#pysip.core.Parameters.theta_dlog_jacobian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Partial derivative of the logarithm of the jacobian adjustment
+<span class="math notranslate nohighlight">\(\partial \log \left| \partial \theta \,/\, \partial \eta \right| \,/\, \partial \eta\)</span></p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial \pi(\eta \mid y)}{\partial \eta} =
+\frac{\partial \pi(\theta \mid y)}{\partial \theta}
+\frac{\partial \theta}{\partial \eta} +
+\frac{\partial}{\partial \eta}
+\log \left|\frac{\partial \theta}{\partial \eta}\right|\]</div>
+<p>where <span class="math notranslate nohighlight">\(\pi(\theta \mid y) = \log p(\theta \mid y)\)</span> is the logarithm
+of the posterior distribution in the constrained parameter space and,
+<span class="math notranslate nohighlight">\(\theta = f^{-1}(\eta)\)</span> is the inverse bijective transformation.</p>
+<p class="rubric">Notes</p>
+<p>The jacobian adjustment is required if a prior distribution is used. This formula is
+works for univariate change of variables only. For multivariate case, the absolute
+value of the determinant of the jacobian matrix must be used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.Parameters.theta_free">
+<em class="property">property </em><code class="sig-name descname">theta_free</code><a class="headerlink" href="#pysip.core.Parameters.theta_free" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get constrained parameter values <span class="math notranslate nohighlight">\(\mathbf{\theta}\)</span> which are not fixed</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.Parameters.theta_jacobian">
+<em class="property">property </em><code class="sig-name descname">theta_jacobian</code><a class="headerlink" href="#pysip.core.Parameters.theta_jacobian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inverse transform jacobian <span class="math notranslate nohighlight">\(\partial \theta \,/\, \partial \eta\)</span></p>
+<div class="math notranslate nohighlight">
+\[\frac{\partial \pi(\eta \mid y)}{\partial \eta} =
+\frac{\partial \pi(\theta \mid y)}{\partial \theta}
+\frac{\partial \theta}{\partial \eta}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\pi(\theta \mid y) = \log p(\theta \mid y)\)</span> is the logarithm
+of the posterior distribution in the constrained parameter space and,
+<span class="math notranslate nohighlight">\(\theta = f^{-1}(\eta)\)</span> is the inverse bijective transformation.</p>
+<p class="rubric">Notes</p>
+<p>Only univariate change of variables are supported.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.Parameters.theta_log_jacobian">
+<em class="property">property </em><code class="sig-name descname">theta_log_jacobian</code><a class="headerlink" href="#pysip.core.Parameters.theta_log_jacobian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logarithm of the jacobian adjustment
+<span class="math notranslate nohighlight">\(\log \left| \partial \theta \,/\, \partial \eta \right|\)</span></p>
+<div class="math notranslate nohighlight">
+\[\pi(\eta \mid y) = \pi(\theta \mid y) +
+\log \left| \frac{\partial \theta}{\partial \eta} \right|\]</div>
+<p>where <span class="math notranslate nohighlight">\(\pi(\theta \mid y) = \log p(\theta \mid y)\)</span> is the logarithm
+of the posterior distribution in the constrained parameter space and,
+<span class="math notranslate nohighlight">\(\theta = f^{-1}(\eta)\)</span> is the inverse bijective transformation.</p>
+<p class="rubric">Notes</p>
+<p>The jacobian adjustment is required if a prior distribution is used. This formula is
+works for univariate change of variables only. For multivariate case, the absolute
+value of the determinant of the jacobian matrix must be used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.Parameters.theta_sd">
+<em class="property">property </em><code class="sig-name descname">theta_sd</code><a class="headerlink" href="#pysip.core.Parameters.theta_sd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get standardized parameter values <span class="math notranslate nohighlight">\(\mathbf{\theta_{sd}}\)</span> which are not fixed</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="prior.html" class="btn btn-neutral float-right" title="Prior" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="parameter.html" class="btn btn-neutral float-left" title="Parameter" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2018, Loic Raillon, Maxime Janvier
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

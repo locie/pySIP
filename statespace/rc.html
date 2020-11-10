@@ -1,0 +1,2736 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Dynamic Thermal Models &mdash; Stochastic state-space Inference and Prediction  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Gaussian Processes" href="gp.html" />
+    <link rel="prev" title="Linear Time Invariant State-Space Model" href="base.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Stochastic state-space Inference and Prediction
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guides/quickstart.html">Gettings started with pySIP</a></li>
+</ul>
+<p class="caption"><span class="caption-text">State-space models</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="base.html">Linear Time Invariant State-Space Model</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Dynamic Thermal Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#first-order-models">First Order Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ti-ra">Ti_Ra</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ti-racv">Ti_Racv</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#second-order-models">Second Order Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#twti-rori">TwTi_RoRi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#titm-rwrmai">TiTm_RwRmAi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tith-rwrhai">TiTh_RwRhAi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#twti-roriawai">TwTi_RoRiAwAi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#twti-roriawaicv">TwTi_RoRiAwAicv</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#twti-rorirbawai">TwTi_RoRiRbAwAi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#twti-rorirbawaicv">TwTi_RoRiRbAwAicv</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#third-order-models">Third Order Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#twtitb-rorirbawaicv">TwTiTb_RoRiRbAwAicv</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#twtitb-roriribrbbawaicv">TwTiTb_RoRiRibRbbAwAicv</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#twtith-rorirhawai">TwTiTh_RoRiRhAwAi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#twtith-rorirhawaicv">TwTiTh_RoRiRhAwAicv</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#twtitm-roriawai">TwTiTm_RoRiAwAi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#twtitm-roriawaicv">TwTiTm_RoRiAwAicv</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#twtitm-rorirmawai">TwTiTm_RoRiRmAwAi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#twtitm-rorirmawaiam">TwTiTm_RoRiRmAwAiAm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#twtitm-rorirmawaicv">TwTiTm_RoRiRmAwAicv</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#twtitm-rorirbawaicv">TwTiTm_RoRiRbAwAicv</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#twtitm-rorirmrbawai">TwTiTm_RoRiRmRbAwAi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#twtitm-rorirmrbawaicv">TwTiTm_RoRiRmRbAwAicv</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gp.html">Gaussian Processes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lfm.html">Latent Force Model</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Regressors</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../regressors/base.html">Base regressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../regressors/frequentist.html">Frequentist regressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../regressors/bayesian.html">Bayesian regressor</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Parameters settings</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../core/parameter.html">Parameter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../core/parameters.html">Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../core/prior.html">Prior</a></li>
+</ul>
+<p class="caption"><span class="caption-text">State estimation and log-likelihood evaluation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../state_estimator/kalman_qr.html">Robust Kalman filtering and sensitivity equations</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Markov Chain Monte Carlo</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../mcmc/hmc.html">Dynamic Hamiltonian Monte Carlo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcmc/hmc.html#inference-summary">Inference summary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcmc/hmc.html#hamiltonian-system">Hamiltonian system</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/gaussian_process.html">Gaussian Process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/thermal_network.html">Armadillo</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Stochastic state-space Inference and Prediction</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Dynamic Thermal Models</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/statespace/rc.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="dynamic-thermal-models">
+<h1>Dynamic Thermal Models<a class="headerlink" href="#dynamic-thermal-models" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="first-order-models">
+<h2>First Order Models<a class="headerlink" href="#first-order-models" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="ti-ra">
+<h3>Ti_Ra<a class="headerlink" href="#ti-ra" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="pysip.statespace.thermal_network.ti_ra.Ti_RA">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.statespace.thermal_network.ti_ra.</code><code class="sig-name descname">Ti_RA</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hold_order</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'mfd'</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">latent_forces</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/ti_ra.html#Ti_RA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.ti_ra.Ti_RA" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Inputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">To</span></code>: outdoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qgh</span></code>: solar irradiance <cite>(W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qh</span></code>: HVAC system heat <cite>(W)</cite></p></li>
+</ul>
+</dd>
+<dt>Outputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+<dt>States</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Model parameters</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>Initial mean</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal capacity</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">C</span></code>: effective overall capacity <cite>(J/°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Measure deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigv</span></code>: of the indoor temperature measurements <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>State deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw</span></code>: of the indoor dynamic <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Initial deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal resistance</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">R</span></code>: between the outdoor and the indoor <cite>(°C/W)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Solar aperture</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">A</span></code>: effective solar aperture <cite>(m²)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.ti_ra.Ti_RA.set_constant_continuous_dssm">
+<code class="sig-name descname">set_constant_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/ti_ra.html#Ti_RA.set_constant_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.ti_ra.Ti_RA.set_constant_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in jacobians</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.ti_ra.Ti_RA.set_constant_continuous_ssm">
+<code class="sig-name descname">set_constant_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/ti_ra.html#Ti_RA.set_constant_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.ti_ra.Ti_RA.set_constant_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.ti_ra.Ti_RA.update_continuous_dssm">
+<code class="sig-name descname">update_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/ti_ra.html#Ti_RA.update_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.ti_ra.Ti_RA.update_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the jacobians with the constrained parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.ti_ra.Ti_RA.update_continuous_ssm">
+<code class="sig-name descname">update_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/ti_ra.html#Ti_RA.update_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.ti_ra.Ti_RA.update_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the state-space model with the constrained parameters</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="ti-racv">
+<h3>Ti_Racv<a class="headerlink" href="#ti-racv" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="pysip.statespace.thermal_network.ti_racv.Ti_RAcv">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.statespace.thermal_network.ti_racv.</code><code class="sig-name descname">Ti_RAcv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hold_order</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'mfd'</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">latent_forces</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/ti_racv.html#Ti_RAcv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.ti_racv.Ti_RAcv" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Inputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">To</span></code>: outdoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qgh</span></code>: solar irradiance <cite>(W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qh</span></code>: HVAC system heat <cite>(W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qv</span></code>: heat from the ventilation system <cite>(W)</cite></p></li>
+</ul>
+</dd>
+<dt>Outputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+<dt>States</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Model parameters</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>Coefficient</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">cv</span></code>: scaling of the heat from the ventilation <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Initial mean</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal capacity</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">C</span></code>: effective overall capacity <cite>(J/°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>State deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw</span></code>: of the indoor dynamic <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Measure deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigv</span></code>: of the indoor temperature measurements <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Initial deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal resistance</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">R</span></code>: between the outdoor and the indoor <cite>(°C/W)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Solar aperture</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">A</span></code>: effective solar aperture <cite>(m²)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.ti_racv.Ti_RAcv.set_constant_continuous_dssm">
+<code class="sig-name descname">set_constant_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/ti_racv.html#Ti_RAcv.set_constant_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.ti_racv.Ti_RAcv.set_constant_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in jacobians</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.ti_racv.Ti_RAcv.set_constant_continuous_ssm">
+<code class="sig-name descname">set_constant_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/ti_racv.html#Ti_RAcv.set_constant_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.ti_racv.Ti_RAcv.set_constant_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.ti_racv.Ti_RAcv.update_continuous_dssm">
+<code class="sig-name descname">update_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/ti_racv.html#Ti_RAcv.update_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.ti_racv.Ti_RAcv.update_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the jacobians with the constrained parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.ti_racv.Ti_RAcv.update_continuous_ssm">
+<code class="sig-name descname">update_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/ti_racv.html#Ti_RAcv.update_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.ti_racv.Ti_RAcv.update_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the state-space model with the constrained parameters</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="second-order-models">
+<h2>Second Order Models<a class="headerlink" href="#second-order-models" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="twti-rori">
+<h3>TwTi_RoRi<a class="headerlink" href="#twti-rori" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="pysip.statespace.thermal_network.twti_rori.TwTi_RoRi">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.statespace.thermal_network.twti_rori.</code><code class="sig-name descname">TwTi_RoRi</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hold_order</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'mfd'</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">latent_forces</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twti_rori.html#TwTi_RoRi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twti_rori.TwTi_RoRi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Second order RC model</p>
+<dl class="simple">
+<dt>Inputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">To</span></code>: outdoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qh</span></code>: HVAC system heat <cite>(W)</cite></p></li>
+</ul>
+</dd>
+<dt>Outputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+<dt>States</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xw</span></code>: envelope temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Model parameters</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>Initial mean</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_w</span></code>: of the envelope temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal capacity</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Cw</span></code>: of the envelope <cite>(J/°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ci</span></code>: of the indoor <cite>(J/°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Measure deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigv</span></code>: of the indoor temperature measurements <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>State deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_w</span></code>: of the envelope dynamic <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_i</span></code>: of the indoor dynamic <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Initial deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_w</span></code>: of the envelope temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal resistance</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ro</span></code>: between the outdoor and the envelope <cite>(°C/W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ri</span></code>: between the envelope and the indoor <cite>(°C/W)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twti_rori.TwTi_RoRi.set_constant_continuous_dssm">
+<code class="sig-name descname">set_constant_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twti_rori.html#TwTi_RoRi.set_constant_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twti_rori.TwTi_RoRi.set_constant_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in jacobians</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twti_rori.TwTi_RoRi.set_constant_continuous_ssm">
+<code class="sig-name descname">set_constant_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twti_rori.html#TwTi_RoRi.set_constant_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twti_rori.TwTi_RoRi.set_constant_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twti_rori.TwTi_RoRi.update_continuous_dssm">
+<code class="sig-name descname">update_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twti_rori.html#TwTi_RoRi.update_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twti_rori.TwTi_RoRi.update_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the jacobians with the constrained parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twti_rori.TwTi_RoRi.update_continuous_ssm">
+<code class="sig-name descname">update_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twti_rori.html#TwTi_RoRi.update_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twti_rori.TwTi_RoRi.update_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the state-space model with the constrained parameters</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="titm-rwrmai">
+<h3>TiTm_RwRmAi<a class="headerlink" href="#titm-rwrmai" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="pysip.statespace.thermal_network.titm_rwrmai.TiTm_RwRmAi">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.statespace.thermal_network.titm_rwrmai.</code><code class="sig-name descname">TiTm_RwRmAi</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hold_order</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'mfd'</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">latent_forces</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/titm_rwrmai.html#TiTm_RwRmAi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.titm_rwrmai.TiTm_RwRmAi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Second order RC model</p>
+<dl class="simple">
+<dt>Inputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">To</span></code>: outdoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qgh</span></code>: solar irradiance <cite>(W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qh</span></code>: HVAC system heat <cite>(W)</cite></p></li>
+</ul>
+</dd>
+<dt>Outputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+<dt>States</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xm</span></code>: internal mass temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Model parameters</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>Initial mean</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_m</span></code>: of the internal mass temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal capacity</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ci</span></code>: of the indoor <cite>(J/°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Cm</span></code>: of the internal mass <cite>(J/°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Measure deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigv</span></code>: of the indoor temperature measurements <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>State deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_i</span></code>: of the indoor dynamic <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_m</span></code>: of the internal mass dynamic <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Initial deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_m</span></code>: of the internal mass temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal resistance</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Rw</span></code>: between the outdoor and the indoor <cite>(°C/W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Rm</span></code>: between the indoor and the internal mass <cite>(°C/W)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Solar aperture</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ai</span></code>: effective solar aperture <cite>(m²)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.titm_rwrmai.TiTm_RwRmAi.set_constant_continuous_dssm">
+<code class="sig-name descname">set_constant_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/titm_rwrmai.html#TiTm_RwRmAi.set_constant_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.titm_rwrmai.TiTm_RwRmAi.set_constant_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in jacobians</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.titm_rwrmai.TiTm_RwRmAi.set_constant_continuous_ssm">
+<code class="sig-name descname">set_constant_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/titm_rwrmai.html#TiTm_RwRmAi.set_constant_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.titm_rwrmai.TiTm_RwRmAi.set_constant_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.titm_rwrmai.TiTm_RwRmAi.update_continuous_dssm">
+<code class="sig-name descname">update_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/titm_rwrmai.html#TiTm_RwRmAi.update_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.titm_rwrmai.TiTm_RwRmAi.update_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the jacobians with the constrained parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.titm_rwrmai.TiTm_RwRmAi.update_continuous_ssm">
+<code class="sig-name descname">update_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/titm_rwrmai.html#TiTm_RwRmAi.update_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.titm_rwrmai.TiTm_RwRmAi.update_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the state-space model with the constrained parameters</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="tith-rwrhai">
+<h3>TiTh_RwRhAi<a class="headerlink" href="#tith-rwrhai" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="pysip.statespace.thermal_network.tith_rwrhai.TiTh_RwRhAi">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.statespace.thermal_network.tith_rwrhai.</code><code class="sig-name descname">TiTh_RwRhAi</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hold_order</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'mfd'</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">latent_forces</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/tith_rwrhai.html#TiTh_RwRhAi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.tith_rwrhai.TiTh_RwRhAi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Second order RC model</p>
+<dl class="simple">
+<dt>Inputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">To</span></code>: outdoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qgh</span></code>: solar irradiance <cite>(W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qh</span></code>: HVAC system heat <cite>(W)</cite></p></li>
+</ul>
+</dd>
+<dt>Outputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+<dt>States</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xh</span></code>: heater temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Model parameters</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>Initial mean</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_h</span></code>: of the heater temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal capacity</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ci</span></code>: of the indoor <cite>(J/°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ch</span></code>: of the heater <cite>(J/°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Measure deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigv</span></code>: of the indoor temperature measurements <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>State deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_i</span></code>: of the indoor dynamic <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_h</span></code>: of the heater dynamic <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Initial deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_h</span></code>: of the heater temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal resistance</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Rw</span></code>: between the outdoor and the indoor <cite>(°C/W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Rh</span></code>: between the indoor and the heater <cite>(°C/W)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Solar aperture</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ai</span></code>: effective solar aperture <cite>(m²)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.tith_rwrhai.TiTh_RwRhAi.set_constant_continuous_dssm">
+<code class="sig-name descname">set_constant_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/tith_rwrhai.html#TiTh_RwRhAi.set_constant_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.tith_rwrhai.TiTh_RwRhAi.set_constant_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in jacobians</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.tith_rwrhai.TiTh_RwRhAi.set_constant_continuous_ssm">
+<code class="sig-name descname">set_constant_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/tith_rwrhai.html#TiTh_RwRhAi.set_constant_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.tith_rwrhai.TiTh_RwRhAi.set_constant_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.tith_rwrhai.TiTh_RwRhAi.update_continuous_dssm">
+<code class="sig-name descname">update_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/tith_rwrhai.html#TiTh_RwRhAi.update_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.tith_rwrhai.TiTh_RwRhAi.update_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the jacobians with the constrained parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.tith_rwrhai.TiTh_RwRhAi.update_continuous_ssm">
+<code class="sig-name descname">update_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/tith_rwrhai.html#TiTh_RwRhAi.update_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.tith_rwrhai.TiTh_RwRhAi.update_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the state-space model with the constrained parameters</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="twti-roriawai">
+<h3>TwTi_RoRiAwAi<a class="headerlink" href="#twti-roriawai" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="pysip.statespace.thermal_network.twti_roriawai.TwTi_RoRiAwAi">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.statespace.thermal_network.twti_roriawai.</code><code class="sig-name descname">TwTi_RoRiAwAi</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hold_order</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'mfd'</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">latent_forces</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twti_roriawai.html#TwTi_RoRiAwAi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twti_roriawai.TwTi_RoRiAwAi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Second order RC model</p>
+<dl class="simple">
+<dt>Inputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">To</span></code>: outdoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qgh</span></code>: solar irradiance <cite>(W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qh</span></code>: HVAC system heat <cite>(W)</cite></p></li>
+</ul>
+</dd>
+<dt>Outputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+<dt>States</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xw</span></code>: envelope temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Model parameters</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>Initial mean</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_w</span></code>: of the envelope temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal capacity</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Cw</span></code>: of the envelope <cite>(J/°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ci</span></code>: of the indoor <cite>(J/°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Measure deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigv</span></code>: of the indoor temperature measurements <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>State deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_w</span></code>: of the envelope dynamic <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_i</span></code>: of the indoor dynamic <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Initial deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_w</span></code>: of the envelope temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal resistance</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ro</span></code>: between the outdoor and the envelope <cite>(°C/W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ri</span></code>: between the envelope and the indoor <cite>(°C/W)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Solar aperture</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Aw</span></code>: of the envelope <cite>(m²)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ai</span></code>: of the windows <cite>(m²)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twti_roriawai.TwTi_RoRiAwAi.set_constant_continuous_dssm">
+<code class="sig-name descname">set_constant_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twti_roriawai.html#TwTi_RoRiAwAi.set_constant_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twti_roriawai.TwTi_RoRiAwAi.set_constant_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in jacobians</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twti_roriawai.TwTi_RoRiAwAi.set_constant_continuous_ssm">
+<code class="sig-name descname">set_constant_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twti_roriawai.html#TwTi_RoRiAwAi.set_constant_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twti_roriawai.TwTi_RoRiAwAi.set_constant_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twti_roriawai.TwTi_RoRiAwAi.update_continuous_dssm">
+<code class="sig-name descname">update_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twti_roriawai.html#TwTi_RoRiAwAi.update_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twti_roriawai.TwTi_RoRiAwAi.update_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the jacobians with the constrained parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twti_roriawai.TwTi_RoRiAwAi.update_continuous_ssm">
+<code class="sig-name descname">update_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twti_roriawai.html#TwTi_RoRiAwAi.update_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twti_roriawai.TwTi_RoRiAwAi.update_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the state-space model with the constrained parameters</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="twti-roriawaicv">
+<h3>TwTi_RoRiAwAicv<a class="headerlink" href="#twti-roriawaicv" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="pysip.statespace.thermal_network.twti_roriawaicv.TwTi_RoRiAwAicv">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.statespace.thermal_network.twti_roriawaicv.</code><code class="sig-name descname">TwTi_RoRiAwAicv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hold_order</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'mfd'</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">latent_forces</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twti_roriawaicv.html#TwTi_RoRiAwAicv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twti_roriawaicv.TwTi_RoRiAwAicv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Second order RC model</p>
+<dl class="simple">
+<dt>Inputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">To</span></code>: outdoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qgh</span></code>: solar irradiance <cite>(W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qh</span></code>: HVAC system heat <cite>(W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qv</span></code>: heat from the ventilation system <cite>(W)</cite></p></li>
+</ul>
+</dd>
+<dt>Outputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+<dt>States</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xw</span></code>: envelope temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Model parameters</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>Coefficient</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">cv</span></code>: scaling of the heat from the ventilation <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Initial mean</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_w</span></code>: of the envelope temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal capacity</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Cw</span></code>: of the envelope <cite>(J/°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ci</span></code>: of the indoor <cite>(J/°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>State deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_w</span></code>: of the envelope dynamic <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_i</span></code>: of the indoor dynamic <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Measure deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigv</span></code>: of the indoor temperature measurements <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Initial deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_w</span></code>: of the envelope temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal resistance</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ro</span></code>: between the outdoor and the envelope <cite>(°C/W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ri</span></code>: between the envelope and the indoor <cite>(°C/W)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Solar aperture</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Aw</span></code>: of the envelope <cite>(m²)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ai</span></code>: of the windows <cite>(m²)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twti_roriawaicv.TwTi_RoRiAwAicv.set_constant_continuous_dssm">
+<code class="sig-name descname">set_constant_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twti_roriawaicv.html#TwTi_RoRiAwAicv.set_constant_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twti_roriawaicv.TwTi_RoRiAwAicv.set_constant_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in jacobians</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twti_roriawaicv.TwTi_RoRiAwAicv.set_constant_continuous_ssm">
+<code class="sig-name descname">set_constant_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twti_roriawaicv.html#TwTi_RoRiAwAicv.set_constant_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twti_roriawaicv.TwTi_RoRiAwAicv.set_constant_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twti_roriawaicv.TwTi_RoRiAwAicv.update_continuous_dssm">
+<code class="sig-name descname">update_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twti_roriawaicv.html#TwTi_RoRiAwAicv.update_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twti_roriawaicv.TwTi_RoRiAwAicv.update_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the jacobians with the constrained parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twti_roriawaicv.TwTi_RoRiAwAicv.update_continuous_ssm">
+<code class="sig-name descname">update_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twti_roriawaicv.html#TwTi_RoRiAwAicv.update_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twti_roriawaicv.TwTi_RoRiAwAicv.update_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the state-space model with the constrained parameters</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="twti-rorirbawai">
+<h3>TwTi_RoRiRbAwAi<a class="headerlink" href="#twti-rorirbawai" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="pysip.statespace.thermal_network.twti_rorirbawai.TwTi_RoRiRbAwAi">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.statespace.thermal_network.twti_rorirbawai.</code><code class="sig-name descname">TwTi_RoRiRbAwAi</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hold_order</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'mfd'</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">latent_forces</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twti_rorirbawai.html#TwTi_RoRiRbAwAi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twti_rorirbawai.TwTi_RoRiRbAwAi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Second order RC model</p>
+<dl class="simple">
+<dt>Inputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">To</span></code>: outdoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Tb</span></code>: boundary temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qgh</span></code>: solar irradiance <cite>(W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qh</span></code>: HVAC system heat <cite>(W)</cite></p></li>
+</ul>
+</dd>
+<dt>Outputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+<dt>States</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xw</span></code>: envelope temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Model parameters</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>Initial mean</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_w</span></code>: of the envelope temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal capacity</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Cw</span></code>: of the envelope <cite>(J/°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ci</span></code>: of the indoor <cite>(J/°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Measure deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigv</span></code>: of the indoor temperature measurements <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>State deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_w</span></code>: of the envelope dynamic <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_i</span></code>: of the indoor dynamic <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Initial deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_w</span></code>: of the envelope temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal resistance</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ro</span></code>: between the outdoor and the envelope <cite>(°C/W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ri</span></code>: between the envelope and the indoor <cite>(°C/W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Rb</span></code>: between the indoor and the boundary space <cite>(°C/W)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Solar aperture</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Aw</span></code>: of the envelope <cite>(m²)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ai</span></code>: of the windows <cite>(m²)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twti_rorirbawai.TwTi_RoRiRbAwAi.set_constant_continuous_dssm">
+<code class="sig-name descname">set_constant_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twti_rorirbawai.html#TwTi_RoRiRbAwAi.set_constant_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twti_rorirbawai.TwTi_RoRiRbAwAi.set_constant_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in jacobians</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twti_rorirbawai.TwTi_RoRiRbAwAi.set_constant_continuous_ssm">
+<code class="sig-name descname">set_constant_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twti_rorirbawai.html#TwTi_RoRiRbAwAi.set_constant_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twti_rorirbawai.TwTi_RoRiRbAwAi.set_constant_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twti_rorirbawai.TwTi_RoRiRbAwAi.update_continuous_dssm">
+<code class="sig-name descname">update_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twti_rorirbawai.html#TwTi_RoRiRbAwAi.update_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twti_rorirbawai.TwTi_RoRiRbAwAi.update_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the jacobians with the constrained parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twti_rorirbawai.TwTi_RoRiRbAwAi.update_continuous_ssm">
+<code class="sig-name descname">update_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twti_rorirbawai.html#TwTi_RoRiRbAwAi.update_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twti_rorirbawai.TwTi_RoRiRbAwAi.update_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the state-space model with the constrained parameters</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="twti-rorirbawaicv">
+<h3>TwTi_RoRiRbAwAicv<a class="headerlink" href="#twti-rorirbawaicv" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="pysip.statespace.thermal_network.twti_rorirbawaicv.TwTi_RoRiRbAwAicv">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.statespace.thermal_network.twti_rorirbawaicv.</code><code class="sig-name descname">TwTi_RoRiRbAwAicv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hold_order</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'mfd'</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">latent_forces</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twti_rorirbawaicv.html#TwTi_RoRiRbAwAicv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twti_rorirbawaicv.TwTi_RoRiRbAwAicv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Second order RC model</p>
+<dl class="simple">
+<dt>Inputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">To</span></code>: outdoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Tb</span></code>: boundary temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qgh</span></code>: solar irradiance <cite>(W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qh</span></code>: HVAC system heat <cite>(W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qv</span></code>: heat from the ventilation system <cite>(W)</cite></p></li>
+</ul>
+</dd>
+<dt>Outputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+<dt>States</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xw</span></code>: envelope temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Model parameters</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>Coefficient</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">cv</span></code>: scaling of the heat from the ventilation <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Initial mean</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_w</span></code>: of the envelope temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal capacity</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Cw</span></code>: of the envelope <cite>(J/°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ci</span></code>: of the indoor <cite>(J/°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>State deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_w</span></code>: of the envelope dynamic <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_i</span></code>: of the indoor dynamic <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Measure deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigv</span></code>: of the indoor temperature measurements <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Initial deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_w</span></code>: of the envelope temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal resistance</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ro</span></code>: between the outdoor and the envelope <cite>(°C/W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ri</span></code>: between the envelope and the indoor <cite>(°C/W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Rb</span></code>: between the indoor and the boundary space <cite>(°C/W)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Solar aperture</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Aw</span></code>: of the envelope <cite>(m²)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ai</span></code>: of the windows <cite>(m²)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twti_rorirbawaicv.TwTi_RoRiRbAwAicv.set_constant_continuous_dssm">
+<code class="sig-name descname">set_constant_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twti_rorirbawaicv.html#TwTi_RoRiRbAwAicv.set_constant_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twti_rorirbawaicv.TwTi_RoRiRbAwAicv.set_constant_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in jacobians</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twti_rorirbawaicv.TwTi_RoRiRbAwAicv.set_constant_continuous_ssm">
+<code class="sig-name descname">set_constant_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twti_rorirbawaicv.html#TwTi_RoRiRbAwAicv.set_constant_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twti_rorirbawaicv.TwTi_RoRiRbAwAicv.set_constant_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twti_rorirbawaicv.TwTi_RoRiRbAwAicv.update_continuous_dssm">
+<code class="sig-name descname">update_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twti_rorirbawaicv.html#TwTi_RoRiRbAwAicv.update_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twti_rorirbawaicv.TwTi_RoRiRbAwAicv.update_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the jacobians with the constrained parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twti_rorirbawaicv.TwTi_RoRiRbAwAicv.update_continuous_ssm">
+<code class="sig-name descname">update_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twti_rorirbawaicv.html#TwTi_RoRiRbAwAicv.update_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twti_rorirbawaicv.TwTi_RoRiRbAwAicv.update_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the state-space model with the constrained parameters</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="third-order-models">
+<h2>Third Order Models<a class="headerlink" href="#third-order-models" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="twtitb-rorirbawaicv">
+<h3>TwTiTb_RoRiRbAwAicv<a class="headerlink" href="#twtitb-rorirbawaicv" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="pysip.statespace.thermal_network.twtitb_rorirbawaicv.TwTiTb_RoRiRbAwAicv">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.statespace.thermal_network.twtitb_rorirbawaicv.</code><code class="sig-name descname">TwTiTb_RoRiRbAwAicv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hold_order</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'mfd'</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">latent_forces</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitb_rorirbawaicv.html#TwTiTb_RoRiRbAwAicv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitb_rorirbawaicv.TwTiTb_RoRiRbAwAicv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Third order RC model</p>
+<dl class="simple">
+<dt>Inputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">To</span></code>: outdoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Tb</span></code>: boundary temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qgh</span></code>: solar irradiance <cite>(W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qh</span></code>: HVAC system heat <cite>(W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qv</span></code>: heat from the ventilation system <cite>(W)</cite></p></li>
+</ul>
+</dd>
+<dt>Outputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+<dt>States</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xw</span></code>: envelope temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xb</span></code>: boundary wall temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Model parameters</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>Coefficient</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">cv</span></code>: scaling of the heat from the ventilation <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Initial mean</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_w</span></code>: of the envelope temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_b</span></code>: of the boundary wall temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal capacity</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Cw</span></code>: of the envelope <cite>(J/°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ci</span></code>: of the indoor <cite>(J/°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Cb</span></code>: of the wall between the indoor and the boundary <cite>(J/°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>State deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_w</span></code>: of the envelope dynamic <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_i</span></code>: of the indoor dynamic <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_b</span></code>: of the boundary wall dynamic <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Measure deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigv</span></code>: of the indoor temperature measurements <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Initial deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_w</span></code>: of the envelope temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_b</span></code>: of the boundary wall temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal resistance</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ro</span></code>: between the outdoor and the envelope <cite>(°C/W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ri</span></code>: between the envelope and the indoor <cite>(°C/W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Rb</span></code>: between the indoor and the boundary <cite>(°C/W)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Solar aperture</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Aw</span></code>: of the envelope <cite>(m²)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ai</span></code>: of the windows <cite>(m²)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitb_rorirbawaicv.TwTiTb_RoRiRbAwAicv.set_constant_continuous_dssm">
+<code class="sig-name descname">set_constant_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitb_rorirbawaicv.html#TwTiTb_RoRiRbAwAicv.set_constant_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitb_rorirbawaicv.TwTiTb_RoRiRbAwAicv.set_constant_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in jacobians</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitb_rorirbawaicv.TwTiTb_RoRiRbAwAicv.set_constant_continuous_ssm">
+<code class="sig-name descname">set_constant_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitb_rorirbawaicv.html#TwTiTb_RoRiRbAwAicv.set_constant_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitb_rorirbawaicv.TwTiTb_RoRiRbAwAicv.set_constant_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitb_rorirbawaicv.TwTiTb_RoRiRbAwAicv.update_continuous_dssm">
+<code class="sig-name descname">update_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitb_rorirbawaicv.html#TwTiTb_RoRiRbAwAicv.update_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitb_rorirbawaicv.TwTiTb_RoRiRbAwAicv.update_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the jacobians with the constrained parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitb_rorirbawaicv.TwTiTb_RoRiRbAwAicv.update_continuous_ssm">
+<code class="sig-name descname">update_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitb_rorirbawaicv.html#TwTiTb_RoRiRbAwAicv.update_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitb_rorirbawaicv.TwTiTb_RoRiRbAwAicv.update_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the state-space model with the constrained parameters</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="twtitb-roriribrbbawaicv">
+<h3>TwTiTb_RoRiRibRbbAwAicv<a class="headerlink" href="#twtitb-roriribrbbawaicv" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="pysip.statespace.thermal_network.twtitb_roriribrbbawaicv.TwTiTb_RoRiRibRbbAwAicv">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.statespace.thermal_network.twtitb_roriribrbbawaicv.</code><code class="sig-name descname">TwTiTb_RoRiRibRbbAwAicv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hold_order</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'mfd'</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">latent_forces</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitb_roriribrbbawaicv.html#TwTiTb_RoRiRibRbbAwAicv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitb_roriribrbbawaicv.TwTiTb_RoRiRibRbbAwAicv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Third order RC model</p>
+<dl class="simple">
+<dt>Inputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">To</span></code>: outdoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Tb</span></code>: boundary temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qgh</span></code>: solar irradiance <cite>(W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qh</span></code>: HVAC system heat <cite>(W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qv</span></code>: heat from the ventilation system <cite>(W)</cite></p></li>
+</ul>
+</dd>
+<dt>Outputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+<dt>States</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xw</span></code>: envelope temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xb</span></code>: boundary wall temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Model parameters</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>Coefficient</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">cv</span></code>: scaling of the heat from the ventilation <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Initial mean</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_w</span></code>: of the envelope temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_b</span></code>: of the boundary wall temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal capacity</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Cw</span></code>: of the envelope <cite>(J/°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ci</span></code>: of the indoor <cite>(J/°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Cb</span></code>: of the wall between the indoor and the boundary <cite>(J/°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>State deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_w</span></code>: of the envelope dynamic <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_i</span></code>: of the indoor dynamic <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_b</span></code>: of the boundary wall dynamic <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Measure deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigv</span></code>: of the indoor temperature measurements <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Initial deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_w</span></code>: of the envelope temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_b</span></code>: of the boundary wall temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal resistance</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ro</span></code>: between the outdoor and the envelope <cite>(°C/W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ri</span></code>: between the envelope and the indoor <cite>(°C/W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Rib</span></code>: between the indoor and the boundary wall <cite>(°C/W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Rbb</span></code>: between the boundary wall and the boundary space <cite>(°C/W)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Solar aperture</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Aw</span></code>: of the envelope <cite>(m²)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ai</span></code>: of the windows <cite>(m²)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitb_roriribrbbawaicv.TwTiTb_RoRiRibRbbAwAicv.set_constant_continuous_dssm">
+<code class="sig-name descname">set_constant_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitb_roriribrbbawaicv.html#TwTiTb_RoRiRibRbbAwAicv.set_constant_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitb_roriribrbbawaicv.TwTiTb_RoRiRibRbbAwAicv.set_constant_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in jacobians</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitb_roriribrbbawaicv.TwTiTb_RoRiRibRbbAwAicv.set_constant_continuous_ssm">
+<code class="sig-name descname">set_constant_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitb_roriribrbbawaicv.html#TwTiTb_RoRiRibRbbAwAicv.set_constant_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitb_roriribrbbawaicv.TwTiTb_RoRiRibRbbAwAicv.set_constant_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitb_roriribrbbawaicv.TwTiTb_RoRiRibRbbAwAicv.update_continuous_dssm">
+<code class="sig-name descname">update_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitb_roriribrbbawaicv.html#TwTiTb_RoRiRibRbbAwAicv.update_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitb_roriribrbbawaicv.TwTiTb_RoRiRibRbbAwAicv.update_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the jacobians with the constrained parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitb_roriribrbbawaicv.TwTiTb_RoRiRibRbbAwAicv.update_continuous_ssm">
+<code class="sig-name descname">update_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitb_roriribrbbawaicv.html#TwTiTb_RoRiRibRbbAwAicv.update_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitb_roriribrbbawaicv.TwTiTb_RoRiRibRbbAwAicv.update_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the state-space model with the constrained parameters</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="twtith-rorirhawai">
+<h3>TwTiTh_RoRiRhAwAi<a class="headerlink" href="#twtith-rorirhawai" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="pysip.statespace.thermal_network.twtith_rorirhawai.TwTiTh_RoRiRhAwAi">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.statespace.thermal_network.twtith_rorirhawai.</code><code class="sig-name descname">TwTiTh_RoRiRhAwAi</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hold_order</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'mfd'</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">latent_forces</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtith_rorirhawai.html#TwTiTh_RoRiRhAwAi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtith_rorirhawai.TwTiTh_RoRiRhAwAi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Third order RC model</p>
+<dl class="simple">
+<dt>Inputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">To</span></code>: outdoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qgh</span></code>: solar irradiance <cite>(W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qh</span></code>: HVAC system heat <cite>(W)</cite></p></li>
+</ul>
+</dd>
+<dt>Outputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+<dt>States</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xw</span></code>: envelope temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xh</span></code>: heaters temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Model parameters</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>Initial mean</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_w</span></code>: of the envelope temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_h</span></code>: of the heater temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal capacity</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Cw</span></code>: of the envelope <cite>(J/°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ci</span></code>: of the indoor <cite>(J/°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ch</span></code>: of the heaters <cite>(J/°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Measure deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigv</span></code>: of the indoor temperature measurements <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>State deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_w</span></code>: of the envelope dynamic <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_i</span></code>: of the indoor dynamic <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_h</span></code>: of the heaters dynamic <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Initial deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_w</span></code>: of the envelope temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_h</span></code>: of the heater temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal resistance</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ro</span></code>: between the outdoor and the envelope <cite>(°C/W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ri</span></code>: between the envelope and the indoor <cite>(°C/W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Rh</span></code>: between the heaters and the indoor <cite>(°C/W)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Solar aperture</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Aw</span></code>: of the envelope <cite>(m²)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ai</span></code>: of the windows <cite>(m²)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtith_rorirhawai.TwTiTh_RoRiRhAwAi.set_constant_continuous_dssm">
+<code class="sig-name descname">set_constant_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtith_rorirhawai.html#TwTiTh_RoRiRhAwAi.set_constant_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtith_rorirhawai.TwTiTh_RoRiRhAwAi.set_constant_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in jacobians</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtith_rorirhawai.TwTiTh_RoRiRhAwAi.set_constant_continuous_ssm">
+<code class="sig-name descname">set_constant_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtith_rorirhawai.html#TwTiTh_RoRiRhAwAi.set_constant_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtith_rorirhawai.TwTiTh_RoRiRhAwAi.set_constant_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtith_rorirhawai.TwTiTh_RoRiRhAwAi.update_continuous_dssm">
+<code class="sig-name descname">update_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtith_rorirhawai.html#TwTiTh_RoRiRhAwAi.update_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtith_rorirhawai.TwTiTh_RoRiRhAwAi.update_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the jacobians with the constrained parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtith_rorirhawai.TwTiTh_RoRiRhAwAi.update_continuous_ssm">
+<code class="sig-name descname">update_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtith_rorirhawai.html#TwTiTh_RoRiRhAwAi.update_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtith_rorirhawai.TwTiTh_RoRiRhAwAi.update_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the state-space model with the constrained parameters</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="twtith-rorirhawaicv">
+<h3>TwTiTh_RoRiRhAwAicv<a class="headerlink" href="#twtith-rorirhawaicv" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="pysip.statespace.thermal_network.twtith_rorirhawaicv.TwTiTh_RoRiRhAwAicv">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.statespace.thermal_network.twtith_rorirhawaicv.</code><code class="sig-name descname">TwTiTh_RoRiRhAwAicv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hold_order</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'mfd'</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">latent_forces</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtith_rorirhawaicv.html#TwTiTh_RoRiRhAwAicv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtith_rorirhawaicv.TwTiTh_RoRiRhAwAicv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Third order RC model</p>
+<dl class="simple">
+<dt>Inputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">To</span></code>: outdoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qgh</span></code>: solar irradiance <cite>(W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qh</span></code>: HVAC system heat <cite>(W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qv</span></code>: heat from the ventilation system <cite>(W)</cite></p></li>
+</ul>
+</dd>
+<dt>Outputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+<dt>States</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xw</span></code>: envelope temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xh</span></code>: heaters temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Model parameters</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>Coefficient</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">cv</span></code>: scaling of the heat from the ventilation <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Initial mean</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_w</span></code>: of the envelope temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_h</span></code>: of the heater temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal capacity</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Cw</span></code>: of the envelope <cite>(J/°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ci</span></code>: of the indoor <cite>(J/°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ch</span></code>: of the heaters <cite>(J/°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>State deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_w</span></code>: of the envelope dynamic <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_i</span></code>: of the indoor dynamic <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_h</span></code>: of the heaters dynamic <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Measure deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigv</span></code>: of the indoor temperature measurements <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Initial deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_w</span></code>: of the envelope temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_h</span></code>: of the heater temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal resistance</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ro</span></code>: between the outdoor and the envelope <cite>(°C/W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ri</span></code>: between the envelope and the indoor <cite>(°C/W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Rh</span></code>: between the heaters and the indoor <cite>(°C/W)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Solar aperture</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Aw</span></code>: of the envelope <cite>(m²)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ai</span></code>: of the windows <cite>(m²)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtith_rorirhawaicv.TwTiTh_RoRiRhAwAicv.set_constant_continuous_dssm">
+<code class="sig-name descname">set_constant_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtith_rorirhawaicv.html#TwTiTh_RoRiRhAwAicv.set_constant_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtith_rorirhawaicv.TwTiTh_RoRiRhAwAicv.set_constant_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in jacobians</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtith_rorirhawaicv.TwTiTh_RoRiRhAwAicv.set_constant_continuous_ssm">
+<code class="sig-name descname">set_constant_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtith_rorirhawaicv.html#TwTiTh_RoRiRhAwAicv.set_constant_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtith_rorirhawaicv.TwTiTh_RoRiRhAwAicv.set_constant_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtith_rorirhawaicv.TwTiTh_RoRiRhAwAicv.update_continuous_dssm">
+<code class="sig-name descname">update_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtith_rorirhawaicv.html#TwTiTh_RoRiRhAwAicv.update_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtith_rorirhawaicv.TwTiTh_RoRiRhAwAicv.update_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the jacobians with the constrained parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtith_rorirhawaicv.TwTiTh_RoRiRhAwAicv.update_continuous_ssm">
+<code class="sig-name descname">update_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtith_rorirhawaicv.html#TwTiTh_RoRiRhAwAicv.update_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtith_rorirhawaicv.TwTiTh_RoRiRhAwAicv.update_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the state-space model with the constrained parameters</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="twtitm-roriawai">
+<h3>TwTiTm_RoRiAwAi<a class="headerlink" href="#twtitm-roriawai" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="pysip.statespace.thermal_network.twtitm_roriawai.TwTiTm_RoRiAwAi">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.statespace.thermal_network.twtitm_roriawai.</code><code class="sig-name descname">TwTiTm_RoRiAwAi</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hold_order</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'mfd'</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">latent_forces</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_roriawai.html#TwTiTm_RoRiAwAi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_roriawai.TwTiTm_RoRiAwAi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Third order RC model</p>
+<dl class="simple">
+<dt>Inputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">To</span></code>: outdoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qgh</span></code>: solar irradiance <cite>(W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qh</span></code>: HVAC system heat <cite>(W)</cite></p></li>
+</ul>
+</dd>
+<dt>Outputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+<dt>States</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xw</span></code>: envelope temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xm</span></code>: internal mass temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Model parameters</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>Initial mean</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_w</span></code>: of the envelope temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_m</span></code>: of the internal mass temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal capacity</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Cw</span></code>: of the envelope <cite>(J/°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ci</span></code>: of the indoor <cite>(J/°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Cm</span></code>: of the internal mass <cite>(J/°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Measure deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigv</span></code>: of the indoor temperature measurements <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>State deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_w</span></code>: of the envelope dynamic <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_i</span></code>: of the indoor dynamic <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_m</span></code>: of the internal mass dynamic <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Initial deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_w</span></code>: of the envelope temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_m</span></code>: of the internal mass temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal resistance</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ro</span></code>: between the outdoor and the envelope <cite>(°C/W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ri</span></code>: between the envelope and the indoor <cite>(°C/W)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Solar aperture</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Aw</span></code>: of the envelope <cite>(m²)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ai</span></code>: of the windows <cite>(m²)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitm_roriawai.TwTiTm_RoRiAwAi.set_constant_continuous_dssm">
+<code class="sig-name descname">set_constant_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_roriawai.html#TwTiTm_RoRiAwAi.set_constant_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_roriawai.TwTiTm_RoRiAwAi.set_constant_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in jacobians</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitm_roriawai.TwTiTm_RoRiAwAi.set_constant_continuous_ssm">
+<code class="sig-name descname">set_constant_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_roriawai.html#TwTiTm_RoRiAwAi.set_constant_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_roriawai.TwTiTm_RoRiAwAi.set_constant_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitm_roriawai.TwTiTm_RoRiAwAi.update_continuous_dssm">
+<code class="sig-name descname">update_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_roriawai.html#TwTiTm_RoRiAwAi.update_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_roriawai.TwTiTm_RoRiAwAi.update_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the jacobians with the constrained parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitm_roriawai.TwTiTm_RoRiAwAi.update_continuous_ssm">
+<code class="sig-name descname">update_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_roriawai.html#TwTiTm_RoRiAwAi.update_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_roriawai.TwTiTm_RoRiAwAi.update_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the state-space model with the constrained parameters</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="twtitm-roriawaicv">
+<h3>TwTiTm_RoRiAwAicv<a class="headerlink" href="#twtitm-roriawaicv" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="pysip.statespace.thermal_network.twtitm_roriawaicv.TwTiTm_RoRiAwAicv">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.statespace.thermal_network.twtitm_roriawaicv.</code><code class="sig-name descname">TwTiTm_RoRiAwAicv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hold_order</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'mfd'</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">latent_forces</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_roriawaicv.html#TwTiTm_RoRiAwAicv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_roriawaicv.TwTiTm_RoRiAwAicv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Third order RC model</p>
+<dl class="simple">
+<dt>Inputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">To</span></code>: outdoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qgh</span></code>: solar irradiance <cite>(W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qh</span></code>: HVAC system heat <cite>(W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qv</span></code>: heat from the ventilation system <cite>(W)</cite></p></li>
+</ul>
+</dd>
+<dt>Outputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+<dt>States</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xw</span></code>: envelope temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xm</span></code>: internal mass temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Model parameters</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>Coefficient</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">cv</span></code>: scaling of the heat from the ventilation <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Initial mean</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_w</span></code>: of the envelope temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_m</span></code>: of the internal mass temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal capacity</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Cw</span></code>: of the envelope <cite>(J/°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ci</span></code>: of the indoor <cite>(J/°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Cm</span></code>: of the internal mass <cite>(J/°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>State deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_w</span></code>: of the envelope dynamic <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_i</span></code>: of the indoor dynamic <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_m</span></code>: of the internal mass dynamic <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Measure deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigv</span></code>: of the indoor temperature measurements <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Initial deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_w</span></code>: of the envelope temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_m</span></code>: of the internal mass temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal resistance</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ro</span></code>: between the outdoor and the envelope <cite>(°C/W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ri</span></code>: between the envelope and the indoor <cite>(°C/W)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Solar aperture</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Aw</span></code>: of the envelope <cite>(m²)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ai</span></code>: of the windows <cite>(m²)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitm_roriawaicv.TwTiTm_RoRiAwAicv.set_constant_continuous_dssm">
+<code class="sig-name descname">set_constant_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_roriawaicv.html#TwTiTm_RoRiAwAicv.set_constant_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_roriawaicv.TwTiTm_RoRiAwAicv.set_constant_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in jacobians</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitm_roriawaicv.TwTiTm_RoRiAwAicv.set_constant_continuous_ssm">
+<code class="sig-name descname">set_constant_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_roriawaicv.html#TwTiTm_RoRiAwAicv.set_constant_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_roriawaicv.TwTiTm_RoRiAwAicv.set_constant_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitm_roriawaicv.TwTiTm_RoRiAwAicv.update_continuous_dssm">
+<code class="sig-name descname">update_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_roriawaicv.html#TwTiTm_RoRiAwAicv.update_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_roriawaicv.TwTiTm_RoRiAwAicv.update_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the jacobians with the constrained parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitm_roriawaicv.TwTiTm_RoRiAwAicv.update_continuous_ssm">
+<code class="sig-name descname">update_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_roriawaicv.html#TwTiTm_RoRiAwAicv.update_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_roriawaicv.TwTiTm_RoRiAwAicv.update_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the state-space model with the constrained parameters</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="twtitm-rorirmawai">
+<h3>TwTiTm_RoRiRmAwAi<a class="headerlink" href="#twtitm-rorirmawai" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="pysip.statespace.thermal_network.twtitm_rorirmawai.TwTiTm_RoRiRmAwAi">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.statespace.thermal_network.twtitm_rorirmawai.</code><code class="sig-name descname">TwTiTm_RoRiRmAwAi</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hold_order</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'mfd'</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">latent_forces</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_rorirmawai.html#TwTiTm_RoRiRmAwAi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_rorirmawai.TwTiTm_RoRiRmAwAi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Third order RC model</p>
+<dl class="simple">
+<dt>Inputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">To</span></code>: outdoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qgh</span></code>: solar irradiance <cite>(W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qh</span></code>: HVAC system heat <cite>(W)</cite></p></li>
+</ul>
+</dd>
+<dt>Outputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+<dt>States</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xw</span></code>: envelope temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xm</span></code>: internal mass temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Model parameters</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>Initial mean</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_w</span></code>: of the envelope temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_m</span></code>: of the internal mass temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal capacity</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Cw</span></code>: of the envelope <cite>(J/°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ci</span></code>: of the indoor <cite>(J/°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Cm</span></code>: of the internal mass <cite>(J/°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Measure deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigv</span></code>: of the indoor temperature measurements <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>State deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_w</span></code>: of the envelope dynamic <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_i</span></code>: of the indoor dynamic <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_m</span></code>: of the internal mass dynamic <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Initial deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_w</span></code>: of the envelope temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_m</span></code>: of the internal mass temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal resistance</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ro</span></code>: between the outdoor and the envelope <cite>(°C/W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ri</span></code>: between the envelope and the indoor <cite>(°C/W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Rm</span></code>: between the indoor and the internal mass <cite>(°C/W)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Solar aperture</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Aw</span></code>: of the envelope <cite>(m²)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ai</span></code>: of the windows <cite>(m²)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitm_rorirmawai.TwTiTm_RoRiRmAwAi.set_constant_continuous_dssm">
+<code class="sig-name descname">set_constant_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_rorirmawai.html#TwTiTm_RoRiRmAwAi.set_constant_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_rorirmawai.TwTiTm_RoRiRmAwAi.set_constant_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in jacobians</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitm_rorirmawai.TwTiTm_RoRiRmAwAi.set_constant_continuous_ssm">
+<code class="sig-name descname">set_constant_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_rorirmawai.html#TwTiTm_RoRiRmAwAi.set_constant_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_rorirmawai.TwTiTm_RoRiRmAwAi.set_constant_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitm_rorirmawai.TwTiTm_RoRiRmAwAi.update_continuous_dssm">
+<code class="sig-name descname">update_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_rorirmawai.html#TwTiTm_RoRiRmAwAi.update_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_rorirmawai.TwTiTm_RoRiRmAwAi.update_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the jacobians with the constrained parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitm_rorirmawai.TwTiTm_RoRiRmAwAi.update_continuous_ssm">
+<code class="sig-name descname">update_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_rorirmawai.html#TwTiTm_RoRiRmAwAi.update_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_rorirmawai.TwTiTm_RoRiRmAwAi.update_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the state-space model with the constrained parameters</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="twtitm-rorirmawaiam">
+<h3>TwTiTm_RoRiRmAwAiAm<a class="headerlink" href="#twtitm-rorirmawaiam" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="pysip.statespace.thermal_network.twtitm_rorirmawaiam.TwTiTm_RoRiRmAwAiAm">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.statespace.thermal_network.twtitm_rorirmawaiam.</code><code class="sig-name descname">TwTiTm_RoRiRmAwAiAm</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hold_order</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'mfd'</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">latent_forces</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_rorirmawaiam.html#TwTiTm_RoRiRmAwAiAm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_rorirmawaiam.TwTiTm_RoRiRmAwAiAm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Third order RC model</p>
+<dl class="simple">
+<dt>Inputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">To</span></code>: outdoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qgh</span></code>: solar irradiance <cite>(W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qh</span></code>: HVAC system heat <cite>(W)</cite></p></li>
+</ul>
+</dd>
+<dt>Outputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+<dt>States</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xw</span></code>: envelope temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xm</span></code>: internal mass temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Model parameters</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>Initial mean</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_w</span></code>: of the envelope temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_m</span></code>: of the internal mass temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal capacity</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Cw</span></code>: of the envelope <cite>(J/°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ci</span></code>: of the indoor <cite>(J/°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Cm</span></code>: of the internal mass <cite>(J/°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Measure deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigv</span></code>: of the indoor temperature measurements <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>State deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_w</span></code>: of the envelope dynamic <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_i</span></code>: of the indoor dynamic <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_m</span></code>: of the internal mass dynamic <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Initial deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_w</span></code>: of the envelope temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_m</span></code>: of the internal mass temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal resistance</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ro</span></code>: between the outdoor and the envelope <cite>(°C/W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ri</span></code>: between the envelope and the indoor <cite>(°C/W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Rm</span></code>: between the indoor and the internal mass <cite>(°C/W)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Solar aperture</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Aw</span></code>: of the envelope <cite>(m²)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ai</span></code>: of the windows <cite>(m²)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Am</span></code>: of the internal mass <cite>(m²)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitm_rorirmawaiam.TwTiTm_RoRiRmAwAiAm.set_constant_continuous_dssm">
+<code class="sig-name descname">set_constant_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_rorirmawaiam.html#TwTiTm_RoRiRmAwAiAm.set_constant_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_rorirmawaiam.TwTiTm_RoRiRmAwAiAm.set_constant_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in jacobians</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitm_rorirmawaiam.TwTiTm_RoRiRmAwAiAm.set_constant_continuous_ssm">
+<code class="sig-name descname">set_constant_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_rorirmawaiam.html#TwTiTm_RoRiRmAwAiAm.set_constant_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_rorirmawaiam.TwTiTm_RoRiRmAwAiAm.set_constant_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitm_rorirmawaiam.TwTiTm_RoRiRmAwAiAm.update_continuous_dssm">
+<code class="sig-name descname">update_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_rorirmawaiam.html#TwTiTm_RoRiRmAwAiAm.update_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_rorirmawaiam.TwTiTm_RoRiRmAwAiAm.update_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the jacobians with the constrained parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitm_rorirmawaiam.TwTiTm_RoRiRmAwAiAm.update_continuous_ssm">
+<code class="sig-name descname">update_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_rorirmawaiam.html#TwTiTm_RoRiRmAwAiAm.update_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_rorirmawaiam.TwTiTm_RoRiRmAwAiAm.update_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the state-space model with the constrained parameters</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="twtitm-rorirmawaicv">
+<h3>TwTiTm_RoRiRmAwAicv<a class="headerlink" href="#twtitm-rorirmawaicv" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="pysip.statespace.thermal_network.twtitm_rorirmawaicv.TwTiTm_RoRiRmAwAicv">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.statespace.thermal_network.twtitm_rorirmawaicv.</code><code class="sig-name descname">TwTiTm_RoRiRmAwAicv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hold_order</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'mfd'</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">latent_forces</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_rorirmawaicv.html#TwTiTm_RoRiRmAwAicv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_rorirmawaicv.TwTiTm_RoRiRmAwAicv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Third order RC model</p>
+<dl class="simple">
+<dt>Inputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">To</span></code>: outdoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qgh</span></code>: solar irradiance <cite>(W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qh</span></code>: HVAC system heat <cite>(W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qv</span></code>: heat from the ventilation system <cite>(W)</cite></p></li>
+</ul>
+</dd>
+<dt>Outputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+<dt>States</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xw</span></code>: envelope temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xm</span></code>: internal mass temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Model parameters</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>Coefficient</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">cv</span></code>: scaling the heat from the ventilation <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Initial mean</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_w</span></code>: of the envelope temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_m</span></code>: of the internal mass temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal capacity</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Cw</span></code>: of the envelope <cite>(J/°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ci</span></code>: of the indoor <cite>(J/°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Cm</span></code>: of the internal mass <cite>(J/°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>State deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_w</span></code>: of the envelope dynamic <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_i</span></code>: of the indoor dynamic <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_m</span></code>: of the internal mass dynamic <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Measure deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigv</span></code>: of the indoor temperature measurements <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Initial deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_w</span></code>: of the envelope temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_m</span></code>: of the internal mass temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal resistance</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ro</span></code>: between the outdoor and the envelope <cite>(°C/W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ri</span></code>: between the envelope and the indoor <cite>(°C/W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Rm</span></code>: between the indoor and the internal mass <cite>(°C/W)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Solar aperture</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Aw</span></code>: of the envelope <cite>(m²)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ai</span></code>: of the windows <cite>(m²)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitm_rorirmawaicv.TwTiTm_RoRiRmAwAicv.set_constant_continuous_dssm">
+<code class="sig-name descname">set_constant_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_rorirmawaicv.html#TwTiTm_RoRiRmAwAicv.set_constant_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_rorirmawaicv.TwTiTm_RoRiRmAwAicv.set_constant_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in jacobians</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitm_rorirmawaicv.TwTiTm_RoRiRmAwAicv.set_constant_continuous_ssm">
+<code class="sig-name descname">set_constant_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_rorirmawaicv.html#TwTiTm_RoRiRmAwAicv.set_constant_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_rorirmawaicv.TwTiTm_RoRiRmAwAicv.set_constant_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitm_rorirmawaicv.TwTiTm_RoRiRmAwAicv.update_continuous_dssm">
+<code class="sig-name descname">update_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_rorirmawaicv.html#TwTiTm_RoRiRmAwAicv.update_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_rorirmawaicv.TwTiTm_RoRiRmAwAicv.update_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the jacobians with the constrained parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitm_rorirmawaicv.TwTiTm_RoRiRmAwAicv.update_continuous_ssm">
+<code class="sig-name descname">update_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_rorirmawaicv.html#TwTiTm_RoRiRmAwAicv.update_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_rorirmawaicv.TwTiTm_RoRiRmAwAicv.update_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the state-space model with the constrained parameters</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="twtitm-rorirbawaicv">
+<h3>TwTiTm_RoRiRbAwAicv<a class="headerlink" href="#twtitm-rorirbawaicv" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="pysip.statespace.thermal_network.twtitm_rorirbawaicv.TwTiTm_RoRiRbAwAicv">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.statespace.thermal_network.twtitm_rorirbawaicv.</code><code class="sig-name descname">TwTiTm_RoRiRbAwAicv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hold_order</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'mfd'</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">latent_forces</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_rorirbawaicv.html#TwTiTm_RoRiRbAwAicv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_rorirbawaicv.TwTiTm_RoRiRbAwAicv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Third order RC model</p>
+<dl class="simple">
+<dt>Inputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">To</span></code>: outdoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Tb</span></code>: boundary temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qgh</span></code>: solar irradiance <cite>(W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qh</span></code>: HVAC system heat <cite>(W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qv</span></code>: heat from the ventilation system <cite>(W)</cite></p></li>
+</ul>
+</dd>
+<dt>Outputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+<dt>States</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xw</span></code>: envelope temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xm</span></code>: internal mass temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Model parameters</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>Coefficient</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">cv</span></code>: scaling of the heat from the ventilation <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Initial mean</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_w</span></code>: of the envelope temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_m</span></code>: of the internal mass temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal capacity</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Cw</span></code>: of the envelope <cite>(J/°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ci</span></code>: of the indoor <cite>(J/°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Cm</span></code>: of the internal mass <cite>(J/°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>State deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_w</span></code>: of the envelope dynamic <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_i</span></code>: of the indoor dynamic <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_m</span></code>: of the internal mass dynamic <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Measure deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigv</span></code>: of the indoor temperature measurements <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Initial deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_w</span></code>: of the envelope temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_m</span></code>: of the internal mass temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal resistance</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ro</span></code>: between the outdoor and the envelope <cite>(°C/W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ri</span></code>: between the envelope and the indoor <cite>(°C/W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Rb</span></code>: between the indoor and the adjacent space <cite>(°C/W)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Solar aperture</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Aw</span></code>: of the envelope <cite>(m²)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ai</span></code>: of the windows <cite>(m²)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitm_rorirbawaicv.TwTiTm_RoRiRbAwAicv.set_constant_continuous_dssm">
+<code class="sig-name descname">set_constant_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_rorirbawaicv.html#TwTiTm_RoRiRbAwAicv.set_constant_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_rorirbawaicv.TwTiTm_RoRiRbAwAicv.set_constant_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in jacobians</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitm_rorirbawaicv.TwTiTm_RoRiRbAwAicv.set_constant_continuous_ssm">
+<code class="sig-name descname">set_constant_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_rorirbawaicv.html#TwTiTm_RoRiRbAwAicv.set_constant_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_rorirbawaicv.TwTiTm_RoRiRbAwAicv.set_constant_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitm_rorirbawaicv.TwTiTm_RoRiRbAwAicv.update_continuous_dssm">
+<code class="sig-name descname">update_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_rorirbawaicv.html#TwTiTm_RoRiRbAwAicv.update_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_rorirbawaicv.TwTiTm_RoRiRbAwAicv.update_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the jacobians with the constrained parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitm_rorirbawaicv.TwTiTm_RoRiRbAwAicv.update_continuous_ssm">
+<code class="sig-name descname">update_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_rorirbawaicv.html#TwTiTm_RoRiRbAwAicv.update_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_rorirbawaicv.TwTiTm_RoRiRbAwAicv.update_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the state-space model with the constrained parameters</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="twtitm-rorirmrbawai">
+<h3>TwTiTm_RoRiRmRbAwAi<a class="headerlink" href="#twtitm-rorirmrbawai" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="pysip.statespace.thermal_network.twtitm_rorirmrbawai.TwTiTm_RoRiRmRbAwAi">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.statespace.thermal_network.twtitm_rorirmrbawai.</code><code class="sig-name descname">TwTiTm_RoRiRmRbAwAi</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hold_order</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'mfd'</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">latent_forces</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_rorirmrbawai.html#TwTiTm_RoRiRmRbAwAi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_rorirmrbawai.TwTiTm_RoRiRmRbAwAi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Third order RC model</p>
+<dl class="simple">
+<dt>Inputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">To</span></code>: outdoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Tb</span></code>: boundary temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qgh</span></code>: solar irradiance <cite>(W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qh</span></code>: HVAC system heat <cite>(W)</cite></p></li>
+</ul>
+</dd>
+<dt>Outputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+<dt>States</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xw</span></code>: envelope temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xm</span></code>: internal mass temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Model parameters</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>Initial mean</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_w</span></code>: of the envelope temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_m</span></code>: of the internal mass temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal capacity</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Cw</span></code>: of the envelope <cite>(J/°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ci</span></code>: of the indoor <cite>(J/°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Cm</span></code>: of the internal mass <cite>(J/°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Measure deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigv</span></code>: of the indoor temperature measurements <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>State deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_w</span></code>: of the envelope dynamic <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_i</span></code>: of the indoor dynamic <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_m</span></code>: of the internal mass dynamic <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Initial deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_w</span></code>: of the envelope temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_m</span></code>: of the internal mass temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal resistance</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ro</span></code>: between the outdoor and the envelope <cite>(°C/W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ri</span></code>: between the envelope and the indoor <cite>(°C/W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Rm</span></code>: between the indoor and the internal mass <cite>(°C/W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Rb</span></code>: between the indoor and the adjacent space <cite>(°C/W)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Solar aperture</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Aw</span></code>: of the envelope <cite>(m²)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ai</span></code>: of the windows <cite>(m²)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitm_rorirmrbawai.TwTiTm_RoRiRmRbAwAi.set_constant_continuous_dssm">
+<code class="sig-name descname">set_constant_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_rorirmrbawai.html#TwTiTm_RoRiRmRbAwAi.set_constant_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_rorirmrbawai.TwTiTm_RoRiRmRbAwAi.set_constant_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in jacobians</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitm_rorirmrbawai.TwTiTm_RoRiRmRbAwAi.set_constant_continuous_ssm">
+<code class="sig-name descname">set_constant_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_rorirmrbawai.html#TwTiTm_RoRiRmRbAwAi.set_constant_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_rorirmrbawai.TwTiTm_RoRiRmRbAwAi.set_constant_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitm_rorirmrbawai.TwTiTm_RoRiRmRbAwAi.update_continuous_dssm">
+<code class="sig-name descname">update_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_rorirmrbawai.html#TwTiTm_RoRiRmRbAwAi.update_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_rorirmrbawai.TwTiTm_RoRiRmRbAwAi.update_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the jacobians with the constrained parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitm_rorirmrbawai.TwTiTm_RoRiRmRbAwAi.update_continuous_ssm">
+<code class="sig-name descname">update_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_rorirmrbawai.html#TwTiTm_RoRiRmRbAwAi.update_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_rorirmrbawai.TwTiTm_RoRiRmRbAwAi.update_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the state-space model with the constrained parameters</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="twtitm-rorirmrbawaicv">
+<h3>TwTiTm_RoRiRmRbAwAicv<a class="headerlink" href="#twtitm-rorirmrbawaicv" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="pysip.statespace.thermal_network.twtitm_rorirmrbawaicv.TwTiTm_RoRiRmRbAwAicv">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.statespace.thermal_network.twtitm_rorirmrbawaicv.</code><code class="sig-name descname">TwTiTm_RoRiRmRbAwAicv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hold_order</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'mfd'</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">latent_forces</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_rorirmrbawaicv.html#TwTiTm_RoRiRmRbAwAicv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_rorirmrbawaicv.TwTiTm_RoRiRmRbAwAicv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Third order RC model</p>
+<dl class="simple">
+<dt>Inputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">To</span></code>: outdoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Tb</span></code>: boundary temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qgh</span></code>: solar irradiance <cite>(W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qh</span></code>: HVAC system heat <cite>(W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Qv</span></code>: heat from the ventilation system <cite>(W)</cite></p></li>
+</ul>
+</dd>
+<dt>Outputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+<dt>States</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">xw</span></code>: envelope temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xi</span></code>: indoor temperature <cite>(°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">xm</span></code>: internal mass temperature <cite>(°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Model parameters</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>Coefficient</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">cv</span></code>: scaling of the heat from the ventilation <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Initial mean</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_w</span></code>: of the envelope temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">x0_m</span></code>: of the internal mass temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal capacity</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Cw</span></code>: of the envelope <cite>(J/°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ci</span></code>: of the indoor <cite>(J/°C)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Cm</span></code>: of the internal mass <cite>(J/°C)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>State deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_w</span></code>: of the envelope dynamic <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_i</span></code>: of the indoor dynamic <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigw_m</span></code>: of the internal mass dynamic <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Measure deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigv</span></code>: of the indoor temperature measurements <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Initial deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_w</span></code>: of the envelope temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_i</span></code>: of the infoor temperature <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigx0_m</span></code>: of the internal mass temperature <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Thermal resistance</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ro</span></code>: between the outdoor and the envelope <cite>(°C/W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ri</span></code>: between the envelope and the indoor <cite>(°C/W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Rm</span></code>: between the indoor and the internal mass <cite>(°C/W)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Rb</span></code>: between the indoor and the adjacent space <cite>(°C/W)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Solar aperture</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">Aw</span></code>: of the envelope <cite>(m²)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Ai</span></code>: of the windows <cite>(m²)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitm_rorirmrbawaicv.TwTiTm_RoRiRmRbAwAicv.set_constant_continuous_dssm">
+<code class="sig-name descname">set_constant_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_rorirmrbawaicv.html#TwTiTm_RoRiRmRbAwAicv.set_constant_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_rorirmrbawaicv.TwTiTm_RoRiRmRbAwAicv.set_constant_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in jacobians</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitm_rorirmrbawaicv.TwTiTm_RoRiRmRbAwAicv.set_constant_continuous_ssm">
+<code class="sig-name descname">set_constant_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_rorirmrbawaicv.html#TwTiTm_RoRiRmRbAwAicv.set_constant_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_rorirmrbawaicv.TwTiTm_RoRiRmRbAwAicv.set_constant_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitm_rorirmrbawaicv.TwTiTm_RoRiRmRbAwAicv.update_continuous_dssm">
+<code class="sig-name descname">update_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_rorirmrbawaicv.html#TwTiTm_RoRiRmRbAwAicv.update_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_rorirmrbawaicv.TwTiTm_RoRiRmRbAwAicv.update_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the jacobians with the constrained parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.thermal_network.twtitm_rorirmrbawaicv.TwTiTm_RoRiRmRbAwAicv.update_continuous_ssm">
+<code class="sig-name descname">update_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/thermal_network/twtitm_rorirmrbawaicv.html#TwTiTm_RoRiRmRbAwAicv.update_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.thermal_network.twtitm_rorirmrbawaicv.TwTiTm_RoRiRmRbAwAicv.update_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the state-space model with the constrained parameters</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="gp.html" class="btn btn-neutral float-right" title="Gaussian Processes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="base.html" class="btn btn-neutral float-left" title="Linear Time Invariant State-Space Model" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2018, Loic Raillon, Maxime Janvier
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

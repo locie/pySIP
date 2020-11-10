@@ -1,0 +1,587 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Robust Kalman filtering and sensitivity equations &mdash; Stochastic state-space Inference and Prediction  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Dynamic Hamiltonian Monte Carlo" href="../mcmc/hmc.html" />
+    <link rel="prev" title="Prior" href="../core/prior.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Stochastic state-space Inference and Prediction
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guides/quickstart.html">Gettings started with pySIP</a></li>
+</ul>
+<p class="caption"><span class="caption-text">State-space models</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/base.html">Linear Time Invariant State-Space Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/rc.html">Dynamic Thermal Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/gp.html">Gaussian Processes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/lfm.html">Latent Force Model</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Regressors</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../regressors/base.html">Base regressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../regressors/frequentist.html">Frequentist regressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../regressors/bayesian.html">Bayesian regressor</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Parameters settings</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../core/parameter.html">Parameter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../core/parameters.html">Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../core/prior.html">Prior</a></li>
+</ul>
+<p class="caption"><span class="caption-text">State estimation and log-likelihood evaluation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Robust Kalman filtering and sensitivity equations</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Markov Chain Monte Carlo</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../mcmc/hmc.html">Dynamic Hamiltonian Monte Carlo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcmc/hmc.html#inference-summary">Inference summary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcmc/hmc.html#hamiltonian-system">Hamiltonian system</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/gaussian_process.html">Gaussian Process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/thermal_network.html">Armadillo</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Stochastic state-space Inference and Prediction</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Robust Kalman filtering and sensitivity equations</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/state_estimator/kalman_qr.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="robust-kalman-filtering-and-sensitivity-equations">
+<h1>Robust Kalman filtering and sensitivity equations<a class="headerlink" href="#robust-kalman-filtering-and-sensitivity-equations" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="pysip.state_estimator.kalman_qr.Kalman_QR">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.state_estimator.kalman_qr.</code><code class="sig-name descname">Kalman_QR</code><a class="reference internal" href="../_modules/pysip/state_estimator/kalman_qr.html#Kalman_QR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.state_estimator.kalman_qr.Kalman_QR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Square-root Kalman filter and sensitivity equations</p>
+<p class="rubric">References</p>
+<p>Maria V. Kulikova, Julia Tsyganova,
+A unified square-root approach for the score and Fisher information matrix computation in
+linear dynamic systems.
+Mathematics and Computers in Simulation 119: 128-141 (2016)</p>
+<dl class="py method">
+<dt id="pysip.state_estimator.kalman_qr.Kalman_QR.dlog_likelihood">
+<code class="sig-name descname">dlog_likelihood</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ssm</span></em>, <em class="sig-param"><span class="n">dssm</span></em>, <em class="sig-param"><span class="n">index</span></em>, <em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">u1</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/state_estimator/kalman_qr.html#Kalman_QR.dlog_likelihood"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.state_estimator.kalman_qr.Kalman_QR.dlog_likelihood" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the gradient of the negative log-likelihood</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ssm</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">NamedTuple</span></code>) – Discrete state-space model</p></li>
+<li><p><strong>dssm</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">NamedTuple</span></code>) – Discrete jacobian state-space model</p></li>
+<li><p><strong>index</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Index of unique time steps</p></li>
+<li><p><strong>u</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Input data</p></li>
+<li><p><strong>u1</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Forward finite difference of the input data</p></li>
+<li><p><strong>y</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Output data</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>2-element tuple containing</dt><dd><ul class="simple">
+<li><p><strong>loglik</strong>: Negative log-likelihood</p></li>
+<li><p><strong>gradient</strong>: Gradient of the negative log-likelihood</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.state_estimator.kalman_qr.Kalman_QR.dpredict">
+<code class="sig-name descname">dpredict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Ad</span></em>, <em class="sig-param"><span class="n">dAd</span></em>, <em class="sig-param"><span class="n">B0d</span></em>, <em class="sig-param"><span class="n">dB0d</span></em>, <em class="sig-param"><span class="n">B1d</span></em>, <em class="sig-param"><span class="n">dB1d</span></em>, <em class="sig-param"><span class="n">Qd</span></em>, <em class="sig-param"><span class="n">dQd</span></em>, <em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">dx</span></em>, <em class="sig-param"><span class="n">P</span></em>, <em class="sig-param"><span class="n">dP</span></em>, <em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">u1</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/state_estimator/kalman_qr.html#Kalman_QR.dpredict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.state_estimator.kalman_qr.Kalman_QR.dpredict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Derivative state prediction</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Ad</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – State matrix</p></li>
+<li><p><strong>dAd</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Jacobian state matrix</p></li>
+<li><p><strong>B0d</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Input matrix (zero order hold)</p></li>
+<li><p><strong>dB0d</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Jacobian input matrix (zero order hold)</p></li>
+<li><p><strong>B1d</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Input matrix (first order hold)</p></li>
+<li><p><strong>dB1d</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Jacobian input matrix (first order hold)</p></li>
+<li><p><strong>Qd</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Process noise covariance matrix</p></li>
+<li><p><strong>dQd</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Jacobian process noise covariance matrix</p></li>
+<li><p><strong>x</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – State mean</p></li>
+<li><p><strong>dx</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Jacobian state mean</p></li>
+<li><p><strong>P</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – State deviation</p></li>
+<li><p><strong>dP</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Jacobian state deviation</p></li>
+<li><p><strong>u</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Input data</p></li>
+<li><p><strong>u1</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Forward finite difference of the input data</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>4-element tuple containing</dt><dd><ul class="simple">
+<li><p><strong>x</strong>: Prior state mean</p></li>
+<li><p><strong>dx</strong>: Derivative prior state mean</p></li>
+<li><p><strong>P</strong>: Prior state deviation</p></li>
+<li><p><strong>dP</strong>: Derivative prior state deviation</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.state_estimator.kalman_qr.Kalman_QR.dupdate">
+<code class="sig-name descname">dupdate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">C</span></em>, <em class="sig-param"><span class="n">dC</span></em>, <em class="sig-param"><span class="n">D</span></em>, <em class="sig-param"><span class="n">dD</span></em>, <em class="sig-param"><span class="n">R</span></em>, <em class="sig-param"><span class="n">dR</span></em>, <em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">dx</span></em>, <em class="sig-param"><span class="n">P</span></em>, <em class="sig-param"><span class="n">dP</span></em>, <em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/state_estimator/kalman_qr.html#Kalman_QR.dupdate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.state_estimator.kalman_qr.Kalman_QR.dupdate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Derivative state update</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>C</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Output matrix</p></li>
+<li><p><strong>dC</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Jacobian output matrix</p></li>
+<li><p><strong>D</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Feedthrough matrix</p></li>
+<li><p><strong>dD</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Jacobian feedthrough matrix</p></li>
+<li><p><strong>R</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Measurement deviation matrix</p></li>
+<li><p><strong>dR</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Jacobian measurement deviation matrix</p></li>
+<li><p><strong>x</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – State mean</p></li>
+<li><p><strong>dx</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Jacobian state mean</p></li>
+<li><p><strong>P</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – State deviation</p></li>
+<li><p><strong>dP</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Jacobian state deviation</p></li>
+<li><p><strong>u</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Input data</p></li>
+<li><p><strong>y</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Output data</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>8-element tuple containing</dt><dd><ul class="simple">
+<li><p><strong>x</strong>: Filtered state mean</p></li>
+<li><p><strong>dx</strong>: Derivative filtered state mean</p></li>
+<li><p><strong>P</strong>: Filtered state deviation</p></li>
+<li><p><strong>dP</strong>: Derivative filtered state deviation</p></li>
+<li><p><strong>e</strong>: Standardized residulas</p></li>
+<li><p><strong>de</strong>: Derivative standardized residulas</p></li>
+<li><p><strong>S</strong>: Residuals deviation</p></li>
+<li><p><strong>dS</strong>: Derivative residuals deviation</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.state_estimator.kalman_qr.Kalman_QR.filtering">
+<code class="sig-name descname">filtering</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ssm</span></em>, <em class="sig-param"><span class="n">index</span></em>, <em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">u1</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">x0</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">P0</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/state_estimator/kalman_qr.html#Kalman_QR.filtering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.state_estimator.kalman_qr.Kalman_QR.filtering" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the filtered state distribution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ssm</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">NamedTuple</span></code>) – Discrete state-space model</p></li>
+<li><p><strong>index</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Index of unique time steps</p></li>
+<li><p><strong>u</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Input data</p></li>
+<li><p><strong>u1</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Forward finite difference of the input data</p></li>
+<li><p><strong>y</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Output data</p></li>
+<li><p><strong>x0</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – Inital state mean different from <cite>ssm</cite></p></li>
+<li><p><strong>P0</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – Inital state deviation different from <cite>ssm</cite></p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>4-element tuple containing</dt><dd><ul class="simple">
+<li><p><strong>xf</strong>: Filtered state mean</p></li>
+<li><p><strong>Pf</strong>: Filtered state covariance</p></li>
+<li><p><strong>res</strong>: Standardized residuals</p></li>
+<li><p><strong>dev_res</strong>: Residuals deviation</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.state_estimator.kalman_qr.Kalman_QR.log_likelihood">
+<code class="sig-name descname">log_likelihood</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ssm</span></em>, <em class="sig-param"><span class="n">index</span></em>, <em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">u1</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">point_wise</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/state_estimator/kalman_qr.html#Kalman_QR.log_likelihood"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.state_estimator.kalman_qr.Kalman_QR.log_likelihood" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the negative log-likelihood</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ssm</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">NamedTuple</span></code>) – Discrete state-space model</p></li>
+<li><p><strong>index</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Index of unique time steps</p></li>
+<li><p><strong>u</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Input data</p></li>
+<li><p><strong>u1</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Forward finite difference of the input data</p></li>
+<li><p><strong>y</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Output data</p></li>
+<li><p><strong>point_wise</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Return the log-likelihood evaluated point-wise</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Negative log-likelihood</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>loglik</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.state_estimator.kalman_qr.Kalman_QR.predict">
+<code class="sig-name descname">predict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">Ad</span></em>, <em class="sig-param"><span class="n">B0d</span></em>, <em class="sig-param"><span class="n">B1d</span></em>, <em class="sig-param"><span class="n">Qd</span></em>, <em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">P</span></em>, <em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">u1</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/state_estimator/kalman_qr.html#Kalman_QR.predict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.state_estimator.kalman_qr.Kalman_QR.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>State prediction</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>Ad</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – State matrix</p></li>
+<li><p><strong>B0d</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Input matrix (zero order hold)</p></li>
+<li><p><strong>B1d</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Input matrix (first order hold)</p></li>
+<li><p><strong>Qd</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Process noise covariance matrix</p></li>
+<li><p><strong>x</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – State mean</p></li>
+<li><p><strong>P</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – State deviation</p></li>
+<li><p><strong>u</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Input data</p></li>
+<li><p><strong>u1</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Forward finite difference of the input data</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>2-element tuple containing</dt><dd><ul class="simple">
+<li><p><strong>x</strong>: Prior state mean</p></li>
+<li><p><strong>P</strong>: Prior state deviation</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.state_estimator.kalman_qr.Kalman_QR.simulate">
+<code class="sig-name descname">simulate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ssm</span></em>, <em class="sig-param"><span class="n">index</span></em>, <em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">u1</span></em>, <em class="sig-param"><span class="n">x0</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/state_estimator/kalman_qr.html#Kalman_QR.simulate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.state_estimator.kalman_qr.Kalman_QR.simulate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stochastic output simulation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ssm</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">NamedTuple</span></code>) – Discrete state-space model</p></li>
+<li><p><strong>index</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Index of unique time steps</p></li>
+<li><p><strong>u</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Input data</p></li>
+<li><p><strong>u1</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Forward finite difference of the input data</p></li>
+<li><p><strong>x0</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – Inital state mean different from <cite>ssm</cite></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Simulated output</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>y</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.state_estimator.kalman_qr.Kalman_QR.simulate_output">
+<code class="sig-name descname">simulate_output</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ssm</span></em>, <em class="sig-param"><span class="n">index</span></em>, <em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">u1</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">x0</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">P0</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/state_estimator/kalman_qr.html#Kalman_QR.simulate_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.state_estimator.kalman_qr.Kalman_QR.simulate_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the filtered output distribution with the Kalman filter</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ssm</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">NamedTuple</span></code>) – Discrete state-space model</p></li>
+<li><p><strong>index</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Index of unique time steps</p></li>
+<li><p><strong>u</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Input data</p></li>
+<li><p><strong>u1</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Forward finite difference of the input data</p></li>
+<li><p><strong>y</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Output data</p></li>
+<li><p><strong>x0</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – Inital state mean different from <cite>ssm</cite></p></li>
+<li><p><strong>P0</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – Inital state deviation different from <cite>ssm</cite></p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>2-element tuple containing</dt><dd><ul class="simple">
+<li><p><strong>ym</strong>: Filtered output mean</p></li>
+<li><p><strong>ysd</strong>: Filtered output standard deviation</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.state_estimator.kalman_qr.Kalman_QR.smoothing">
+<code class="sig-name descname">smoothing</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ssm</span></em>, <em class="sig-param"><span class="n">index</span></em>, <em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">u1</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">x0</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">P0</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/state_estimator/kalman_qr.html#Kalman_QR.smoothing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.state_estimator.kalman_qr.Kalman_QR.smoothing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the smoothed state distribution Rauch-Tung-Striebel smoother</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ssm</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">NamedTuple</span></code>) – Discrete state-space model</p></li>
+<li><p><strong>index</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>) – Index of unique time steps</p></li>
+<li><p><strong>u</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Input data</p></li>
+<li><p><strong>u1</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Forward finite difference of the input data</p></li>
+<li><p><strong>y</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Output data</p></li>
+<li><p><strong>x0</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – Inital state mean different from <cite>ssm</cite></p></li>
+<li><p><strong>P0</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – Inital state deviation different from <cite>ssm</cite></p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>2-element tuple containing</dt><dd><ul class="simple">
+<li><p><strong>xs</strong>: Smoothed state mean</p></li>
+<li><p><strong>Ps</strong>: Smoothed state covariance</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.state_estimator.kalman_qr.Kalman_QR.update">
+<code class="sig-name descname">update</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">C</span></em>, <em class="sig-param"><span class="n">D</span></em>, <em class="sig-param"><span class="n">R</span></em>, <em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">P</span></em>, <em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/state_estimator/kalman_qr.html#Kalman_QR.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.state_estimator.kalman_qr.Kalman_QR.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>State update</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>C</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Output matrix</p></li>
+<li><p><strong>D</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Feedthrough matrix</p></li>
+<li><p><strong>R</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Measurement deviation matrix</p></li>
+<li><p><strong>x</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – State mean</p></li>
+<li><p><strong>P</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – State deviation</p></li>
+<li><p><strong>u</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Input data</p></li>
+<li><p><strong>y</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Output data</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>4-element tuple containing</dt><dd><ul class="simple">
+<li><p><strong>x</strong>: Filtered state mean</p></li>
+<li><p><strong>P</strong>: Filtered state deviation</p></li>
+<li><p><strong>e</strong>: Standardized residulas</p></li>
+<li><p><strong>S</strong>: Residuals deviation</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../mcmc/hmc.html" class="btn btn-neutral float-right" title="Dynamic Hamiltonian Monte Carlo" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../core/prior.html" class="btn btn-neutral float-left" title="Prior" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2018, Loic Raillon, Maxime Janvier
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

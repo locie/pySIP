@@ -1,0 +1,380 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Armadillo &mdash; Stochastic state-space Inference and Prediction  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Gaussian Process" href="gaussian_process.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Stochastic state-space Inference and Prediction
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guides/quickstart.html">Gettings started with pySIP</a></li>
+</ul>
+<p class="caption"><span class="caption-text">State-space models</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/base.html">Linear Time Invariant State-Space Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/rc.html">Dynamic Thermal Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/gp.html">Gaussian Processes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/lfm.html">Latent Force Model</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Regressors</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../regressors/base.html">Base regressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../regressors/frequentist.html">Frequentist regressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../regressors/bayesian.html">Bayesian regressor</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Parameters settings</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../core/parameter.html">Parameter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../core/parameters.html">Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../core/prior.html">Prior</a></li>
+</ul>
+<p class="caption"><span class="caption-text">State estimation and log-likelihood evaluation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../state_estimator/kalman_qr.html">Robust Kalman filtering and sensitivity equations</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Markov Chain Monte Carlo</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../mcmc/hmc.html">Dynamic Hamiltonian Monte Carlo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcmc/hmc.html#inference-summary">Inference summary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcmc/hmc.html#hamiltonian-system">Hamiltonian system</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="gaussian_process.html">Gaussian Process</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Armadillo</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#frequentist-inference">Frequentist inference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#bayesian-inference">Bayesian inference</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Stochastic state-space Inference and Prediction</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Armadillo</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/examples/thermal_network.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="armadillo">
+<h1>Armadillo<a class="headerlink" href="#armadillo" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="frequentist-inference">
+<h2>Frequentist inference<a class="headerlink" href="#frequentist-inference" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+
+<span class="kn">from</span> <span class="nn">pysip.regressors</span> <span class="kn">import</span> <span class="n">FreqRegressor</span> <span class="k">as</span> <span class="n">Regressor</span>
+<span class="kn">from</span> <span class="nn">pysip.statespace</span> <span class="kn">import</span> <span class="n">TwTi_RoRi</span>
+
+<span class="c1"># Load and prepare the data</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/armadillo/armadillo_data_H2.csv&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;Time&#39;</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">inputs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;T_ext&#39;</span><span class="p">,</span> <span class="s1">&#39;P_hea&#39;</span><span class="p">]</span>
+<span class="n">outputs</span> <span class="o">=</span> <span class="s1">&#39;T_int&#39;</span>
+<span class="n">sT</span> <span class="o">=</span> <span class="mf">3600.0</span> <span class="o">*</span> <span class="mf">24.0</span>
+<span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">/=</span> <span class="n">sT</span>  <span class="c1"># Change time scale to days</span>
+
+<span class="c1"># Parameter settings for second order dynamic thermal model</span>
+<span class="n">parameters</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Ro&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">),</span>
+    <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Ri&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">),</span>
+    <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Cw&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1e7</span> <span class="o">/</span> <span class="n">sT</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">),</span>
+    <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Ci&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1e6</span> <span class="o">/</span> <span class="n">sT</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">),</span>
+    <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;sigw_w&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1e-3</span> <span class="o">*</span> <span class="n">sT</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">),</span>
+    <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;sigw_i&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="s1">&#39;fixed&#39;</span><span class="p">),</span>
+    <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;sigv&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">),</span>
+    <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;x0_w&#39;</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="mf">25.0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">7.0</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">),</span>
+    <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;x0_i&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mf">26.7</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="s1">&#39;fixed&#39;</span><span class="p">),</span>
+    <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;sigx0_w&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="s1">&#39;fixed&#39;</span><span class="p">),</span>
+    <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;sigx0_i&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="s1">&#39;fixed&#39;</span><span class="p">),</span>
+<span class="p">]</span>
+
+<span class="c1"># Instantiate the model and use the first order hold approximation</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">TwTi_RoRi</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">hold_order</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">reg</span> <span class="o">=</span> <span class="n">Regressor</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+<span class="n">fit_summary</span><span class="p">,</span> <span class="n">corr_matrix</span><span class="p">,</span> <span class="n">opt_summary</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="si">{</span><span class="n">fit_summary</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="c1"># Predict the indoor temperature each minute</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="mi">60</span> <span class="o">/</span> <span class="mi">3600</span>
+<span class="n">tnew</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">dt</span><span class="p">)</span>
+<span class="n">ym</span><span class="p">,</span> <span class="n">ysd</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span> <span class="n">tnew</span><span class="o">=</span><span class="n">tnew</span><span class="p">)</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">set_style</span><span class="p">(</span><span class="s1">&#39;darkgrid&#39;</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;T_int&#39;</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;darkred&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;data&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tnew</span><span class="p">,</span> <span class="n">ym</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;navy&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">tnew</span><span class="p">,</span> <span class="n">ym</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">ysd</span><span class="p">,</span> <span class="n">ym</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">ysd</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;darkblue&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;95% CI&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;time [days]&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;temperature [°C]&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">despine</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;best&#39;</span><span class="p">,</span> <span class="n">fancybox</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">framealpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="bayesian-inference">
+<h2>Bayesian inference<a class="headerlink" href="#bayesian-inference" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="sd">&quot;&quot;&quot;Warning !!!</span>
+<span class="sd">The algorithm may fail because of the random initialization, try to re-run the example.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">arviz</span> <span class="k">as</span> <span class="nn">az</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+
+<span class="kn">from</span> <span class="nn">pysip.core</span> <span class="kn">import</span> <span class="n">Gamma</span><span class="p">,</span> <span class="n">Normal</span>
+<span class="kn">from</span> <span class="nn">pysip.regressors</span> <span class="kn">import</span> <span class="n">BayesRegressor</span> <span class="k">as</span> <span class="n">Regressor</span>
+<span class="kn">from</span> <span class="nn">pysip.statespace</span> <span class="kn">import</span> <span class="n">TwTi_RoRi</span>
+<span class="kn">from</span> <span class="nn">pysip.utils</span> <span class="kn">import</span> <span class="n">percentile_plot</span>
+
+<span class="c1"># Load and prepare the data</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;data/armadillo/armadillo_data_H2.csv&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;Time&#39;</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">inputs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;T_ext&#39;</span><span class="p">,</span> <span class="s1">&#39;P_hea&#39;</span><span class="p">]</span>
+<span class="n">y0</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;T_int&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">sT</span> <span class="o">=</span> <span class="mf">3600.0</span> <span class="o">*</span> <span class="mf">24.0</span>
+<span class="n">df</span><span class="o">.</span><span class="n">index</span> <span class="o">/=</span> <span class="n">sT</span>
+
+<span class="c1"># Parameter settings for second order dynamic thermal model</span>
+<span class="n">parameters</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Ro&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">prior</span><span class="o">=</span><span class="n">Gamma</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)),</span>
+    <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Ri&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">prior</span><span class="o">=</span><span class="n">Gamma</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)),</span>
+    <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Cw&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1e7</span> <span class="o">/</span> <span class="n">sT</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">prior</span><span class="o">=</span><span class="n">Gamma</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)),</span>
+    <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Ci&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1e6</span> <span class="o">/</span> <span class="n">sT</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">prior</span><span class="o">=</span><span class="n">Gamma</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)),</span>
+    <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;sigw_w&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1e-2</span> <span class="o">*</span> <span class="n">sT</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">prior</span><span class="o">=</span><span class="n">Gamma</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)),</span>
+    <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;sigw_i&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="s1">&#39;fixed&#39;</span><span class="p">),</span>
+    <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;sigv&#39;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">prior</span><span class="o">=</span><span class="n">Gamma</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)),</span>
+    <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;x0_w&#39;</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">prior</span><span class="o">=</span><span class="n">Normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span>
+    <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;x0_i&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">y0</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="s1">&#39;fixed&#39;</span><span class="p">),</span>
+    <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;sigx0_w&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="s1">&#39;fixed&#39;</span><span class="p">),</span>
+    <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;sigx0_i&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="s1">&#39;fixed&#39;</span><span class="p">),</span>
+<span class="p">]</span>
+
+<span class="c1"># Instantiate the model and use the first order hold approximation</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">TwTi_RoRi</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">hold_order</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">reg</span> <span class="o">=</span> <span class="n">Regressor</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+
+<span class="c1"># Dynamic Hamiltonian Monte Carlo with multinomial sampling</span>
+<span class="n">fit</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="o">=</span><span class="s1">&#39;T_int&#39;</span><span class="p">)</span>
+
+<span class="c1"># Compute the posterior predictive distribution</span>
+<span class="n">ym</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">posterior_predictive</span><span class="p">(</span><span class="n">trace</span><span class="o">=</span><span class="n">fit</span><span class="o">.</span><span class="n">posterior</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">set_style</span><span class="p">(</span><span class="s1">&#39;darkgrid&#39;</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">&#39;talk&#39;</span><span class="p">)</span>
+<span class="n">percentile_plot</span><span class="p">(</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+    <span class="n">ym</span><span class="p">,</span>
+    <span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">percentile_min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">percentile_max</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="n">plot_median</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">plot_mean</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="s1">&#39;darkblue&#39;</span><span class="p">,</span>
+    <span class="n">line_color</span><span class="o">=</span><span class="s1">&#39;navy&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;T_int&#39;</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;darkred&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">despine</span><span class="p">()</span>
+
+<span class="c1"># Compute Leave-one out cross validation with pareto smoothing importance sampling</span>
+<span class="n">loglik</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">pointwise_log_likelihood</span><span class="p">(</span><span class="n">trace</span><span class="o">=</span><span class="n">fit</span><span class="o">.</span><span class="n">posterior</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="o">=</span><span class="s1">&#39;T_int&#39;</span><span class="p">)</span>
+<span class="n">az_data</span> <span class="o">=</span> <span class="n">az</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">posterior</span><span class="o">=</span><span class="n">fit</span><span class="o">.</span><span class="n">posterior</span><span class="p">,</span> <span class="n">sample_stats</span><span class="o">=</span><span class="n">loglik</span><span class="p">)</span>
+<span class="n">psis</span> <span class="o">=</span> <span class="n">az</span><span class="o">.</span><span class="n">loo</span><span class="p">(</span><span class="n">az_data</span><span class="p">,</span> <span class="n">pointwise</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="gaussian_process.html" class="btn btn-neutral float-left" title="Gaussian Process" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2018, Loic Raillon, Maxime Janvier
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

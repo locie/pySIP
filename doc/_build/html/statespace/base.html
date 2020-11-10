@@ -1,0 +1,457 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Linear Time Invariant State-Space Model &mdash; Stochastic state-space Inference and Prediction  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Dynamic Thermal Models" href="rc.html" />
+    <link rel="prev" title="Gettings started with pySIP" href="../guides/quickstart.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Stochastic state-space Inference and Prediction
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guides/quickstart.html">Gettings started with pySIP</a></li>
+</ul>
+<p class="caption"><span class="caption-text">State-space models</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Linear Time Invariant State-Space Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rc.html">Dynamic Thermal Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gp.html">Gaussian Processes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lfm.html">Latent Force Model</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Regressors</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../regressors/base.html">Base regressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../regressors/frequentist.html">Frequentist regressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../regressors/bayesian.html">Bayesian regressor</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Parameters settings</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../core/parameter.html">Parameter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../core/parameters.html">Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../core/prior.html">Prior</a></li>
+</ul>
+<p class="caption"><span class="caption-text">State estimation and log-likelihood evaluation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../state_estimator/kalman_qr.html">Robust Kalman filtering and sensitivity equations</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Markov Chain Monte Carlo</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../mcmc/hmc.html">Dynamic Hamiltonian Monte Carlo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcmc/hmc.html#inference-summary">Inference summary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcmc/hmc.html#hamiltonian-system">Hamiltonian system</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/gaussian_process.html">Gaussian Process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/thermal_network.html">Armadillo</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Stochastic state-space Inference and Prediction</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Linear Time Invariant State-Space Model</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/statespace/base.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="linear-time-invariant-state-space-model">
+<h1>Linear Time Invariant State-Space Model<a class="headerlink" href="#linear-time-invariant-state-space-model" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="pysip.statespace.base.StateSpace">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.statespace.base.</code><code class="sig-name descname">StateSpace</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hold_order</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'mfd'</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/base.html#StateSpace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.base.StateSpace" title="Permalink to this definition">¶</a></dt>
+<dd><p>Linear Gaussian Continuous-Time State-Space Model</p>
+<dl class="py method">
+<dt id="pysip.statespace.base.StateSpace._delete_continuous_dssm">
+<code class="sig-name descname">_delete_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/base.html#StateSpace._delete_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.base.StateSpace._delete_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete the jacobians of the continuous state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.base.StateSpace._init_continuous_dssm">
+<code class="sig-name descname">_init_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/base.html#StateSpace._init_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.base.StateSpace._init_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the jacobians of the continuous state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.base.StateSpace._lti_disc">
+<code class="sig-name descname">_lti_disc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dt</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/base.html#StateSpace._lti_disc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.base.StateSpace._lti_disc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Discretization of LTI state-space model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dt</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – sampling time</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>4-elements tuple containing</dt><dd><ul class="simple">
+<li><p><strong>Ad</strong>: Discrete state matrix</p></li>
+<li><p><strong>B0d</strong>: Discrete input matrix (zero order hold)</p></li>
+<li><p><strong>B1d</strong>: Discrete input matrix (first order hold)</p></li>
+<li><p><strong>Qd</strong>: Upper Cholesky factor of the process noise covariance</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.base.StateSpace._lti_jacobian_disc">
+<code class="sig-name descname">_lti_jacobian_disc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dt</span></em>, <em class="sig-param"><span class="n">dA</span></em>, <em class="sig-param"><span class="n">dB</span></em>, <em class="sig-param"><span class="n">dQ</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/base.html#StateSpace._lti_jacobian_disc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.base.StateSpace._lti_jacobian_disc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Discretization of augmented LTI state-space model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dt</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Sampling time</p></li>
+<li><p><strong>dA</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Jacobian state matrix</p></li>
+<li><p><strong>dB</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Jacobian input matrix</p></li>
+<li><p><strong>dQ</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Jacobian Wiener process scaling matrix</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>8-elements tuple containing</dt><dd><ul class="simple">
+<li><p><strong>Ad</strong>: Discrete state matrix</p></li>
+<li><p><strong>B0d</strong>: Discrete input matrix (zero order hold)</p></li>
+<li><p><strong>B1d</strong>: Discrete input matrix (first order hold)</p></li>
+<li><p><strong>Qd</strong>: Upper Cholesky factor of the process noise covariance matrix</p></li>
+<li><p><strong>dAd</strong>: Jacobian discrete state matrix</p></li>
+<li><p><strong>dB0d</strong>: Jacobian discrete input matrix (zero order hold)</p></li>
+<li><p><strong>dB1d</strong>: Jacobian discrete input matrix (first order hold)</p></li>
+<li><p><strong>dQd</strong>: Jacobian of the upper Cholesky factor of the process noise covariance</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.base.StateSpace.delete_continuous_dssm">
+<code class="sig-name descname">delete_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/base.html#StateSpace.delete_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.base.StateSpace.delete_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete the jacobians of the continuous state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.base.StateSpace.discretization">
+<code class="sig-name descname">discretization</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dt</span></em>, <em class="sig-param"><span class="n">jacobian</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/base.html#StateSpace.discretization"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.base.StateSpace.discretization" title="Permalink to this definition">¶</a></dt>
+<dd><p>Discretization of LTI state-space model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dt</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Sampling time</p></li>
+<li><p><strong>jacobian</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Discretize the jacobian if True</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>6-elements tuple containing</dt><dd><ul class="simple">
+<li><p><strong>idx</strong>: Index of unique time intervals</p></li>
+<li><p><strong>Ad</strong>: Discrete state matrix</p></li>
+<li><p><strong>B0d</strong>: Discrete input matrix (zero order hold)</p></li>
+<li><p><strong>B1d</strong>: Discrete input matrix (first order hold)</p></li>
+<li><p><strong>Qd</strong>: Upper Cholesky factor of the process noise covariance matrix</p></li>
+<li><dl class="simple">
+<dt><strong>d</strong>: Tuple of the discrete jacobian matrices if <cite>jacobian</cite> = True</dt><dd><ul>
+<li><p><strong>dAd</strong>: Jacobian discrete state matrix</p></li>
+<li><p><strong>dB0d</strong>: Jacobian discrete input matrix (zero order hold)</p></li>
+<li><p><strong>dB1d</strong>: Jacobian discrete input matrix (first order hold)</p></li>
+<li><p><strong>dQd</strong>: Jacobian of the upper Cholesky factor of the process noise covariance</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.base.StateSpace.get_discrete_dssm">
+<code class="sig-name descname">get_discrete_dssm</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dt</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/base.html#StateSpace.get_discrete_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.base.StateSpace.get_discrete_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the updated discrete state-space model with the discrete jacobians</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dt</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Sampling time</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Retuns:</dt><dd><dl class="simple">
+<dt>3-elements tuple containing</dt><dd><ul class="simple">
+<li><p><strong>ssm</strong>: Discrete state-space model</p></li>
+<li><p><strong>dssm</strong>: Jacobian discrete state-space model</p></li>
+<li><p><strong>index</strong>: Index of unique sampling time</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">NamedTuple</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">NamedTuple</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.base.StateSpace.get_discrete_ssm">
+<code class="sig-name descname">get_discrete_ssm</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dt</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/base.html#StateSpace.get_discrete_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.base.StateSpace.get_discrete_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the updated discrete state-space model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dt</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Sampling time</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Retuns:</dt><dd><dl class="simple">
+<dt>2-elements tuple containing</dt><dd><ul class="simple">
+<li><p><strong>ssm</strong>: Discrete state-space model</p></li>
+<li><p><strong>index</strong>: Index of unique sampling time</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">NamedTuple</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.base.StateSpace.init_continuous_dssm">
+<code class="sig-name descname">init_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/base.html#StateSpace.init_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.base.StateSpace.init_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the jacobians of the continuous state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.base.StateSpace.set_constant_continuous_dssm">
+<code class="sig-name descname">set_constant_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/base.html#StateSpace.set_constant_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.base.StateSpace.set_constant_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in jacobians</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.base.StateSpace.set_constant_continuous_ssm">
+<code class="sig-name descname">set_constant_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/base.html#StateSpace.set_constant_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.base.StateSpace.set_constant_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.base.StateSpace.update_continuous_dssm">
+<code class="sig-name descname">update_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/base.html#StateSpace.update_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.base.StateSpace.update_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the jacobians with the constrained parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.base.StateSpace.update_continuous_ssm">
+<code class="sig-name descname">update_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/base.html#StateSpace.update_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.base.StateSpace.update_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the state-space model with the constrained parameters</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="rc.html" class="btn btn-neutral float-right" title="Dynamic Thermal Models" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../guides/quickstart.html" class="btn btn-neutral float-left" title="Gettings started with pySIP" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2018, Loic Raillon, Maxime Janvier
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

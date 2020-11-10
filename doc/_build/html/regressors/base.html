@@ -1,0 +1,540 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Base regressor &mdash; Stochastic state-space Inference and Prediction  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Frequentist regressor" href="frequentist.html" />
+    <link rel="prev" title="Latent Force Model" href="../statespace/lfm.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Stochastic state-space Inference and Prediction
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guides/quickstart.html">Gettings started with pySIP</a></li>
+</ul>
+<p class="caption"><span class="caption-text">State-space models</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/base.html">Linear Time Invariant State-Space Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/rc.html">Dynamic Thermal Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/gp.html">Gaussian Processes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/lfm.html">Latent Force Model</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Regressors</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Base regressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frequentist.html">Frequentist regressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bayesian.html">Bayesian regressor</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Parameters settings</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../core/parameter.html">Parameter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../core/parameters.html">Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../core/prior.html">Prior</a></li>
+</ul>
+<p class="caption"><span class="caption-text">State estimation and log-likelihood evaluation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../state_estimator/kalman_qr.html">Robust Kalman filtering and sensitivity equations</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Markov Chain Monte Carlo</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../mcmc/hmc.html">Dynamic Hamiltonian Monte Carlo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcmc/hmc.html#inference-summary">Inference summary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcmc/hmc.html#hamiltonian-system">Hamiltonian system</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/gaussian_process.html">Gaussian Process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/thermal_network.html">Armadillo</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Stochastic state-space Inference and Prediction</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Base regressor</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/regressors/base.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="base-regressor">
+<h1>Base regressor<a class="headerlink" href="#base-regressor" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="pysip.regressors.base.BaseRegressor">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.regressors.base.</code><code class="sig-name descname">BaseRegressor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ss</span></em>, <em class="sig-param"><span class="n">bayesian_filter</span></em>, <em class="sig-param"><span class="n">time_scale</span></em>, <em class="sig-param"><span class="n">use_jacobian</span></em>, <em class="sig-param"><span class="n">use_penalty</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/regressors/base.html#BaseRegressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.regressors.base.BaseRegressor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Regressor with common methods for frequentist and Baysian regressor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ss</strong> (<a class="reference internal" href="../statespace/base.html#pysip.statespace.base.StateSpace" title="pysip.statespace.base.StateSpace"><code class="xref py py-class docutils literal notranslate"><span class="pre">StateSpace</span></code></a>) – StateSpace()</p></li>
+<li><p><strong>bayesian_filter</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">BayesianFilter</span></code>) – BayesianFilter()</p></li>
+<li><p><strong>time_scale</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Time series frequency, e.g. ‘s’: seconds, ‘D’: days, etc.
+Works only for pandas.DataFrame with DateTime index</p></li>
+<li><p><strong>use_jacobian</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Use jacobian adjustement</p></li>
+<li><p><strong>use_penalty</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Use penalty function</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="pysip.regressors.base.BaseRegressor._estimate_output">
+<code class="sig-name descname">_estimate_output</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dt</span></em>, <em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">u1</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">x0</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">P0</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/regressors/base.html#BaseRegressor._estimate_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.regressors.base.BaseRegressor._estimate_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimate the output filtered distribution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dt</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Sampling time</p></li>
+<li><p><strong>u</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Input data</p></li>
+<li><p><strong>u1</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Forward finite difference of the input data</p></li>
+<li><p><strong>y</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Output data</p></li>
+<li><p><strong>x0</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – Initial state mean different from <cite>ss.x0</cite></p></li>
+<li><p><strong>P0</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – Initial state deviation different from <cite>ss.P0</cite></p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>2-element tuple containing</dt><dd><ul class="simple">
+<li><p>Filtered output mean</p></li>
+<li><p>Filtered output standard deviation</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.regressors.base.BaseRegressor._estimate_states">
+<code class="sig-name descname">_estimate_states</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dt</span></em>, <em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">u1</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">x0</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">P0</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">smooth</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/regressors/base.html#BaseRegressor._estimate_states"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.regressors.base.BaseRegressor._estimate_states" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimate the state filtered/smoothed distribution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dt</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Sampling time</p></li>
+<li><p><strong>u</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Input data</p></li>
+<li><p><strong>u1</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Forward finite difference of the input data</p></li>
+<li><p><strong>y</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Output data</p></li>
+<li><p><strong>x0</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – Initial state mean different from <cite>ss.x0</cite></p></li>
+<li><p><strong>P0</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – Initial state deviation different from <cite>ss.P0</cite></p></li>
+<li><p><strong>smooth</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Use RTS smoother</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>2-element tuple containing</dt><dd><ul class="simple">
+<li><p>Filtered or smoothed state mean</p></li>
+<li><p>Filtered or smoothed state covariance</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.regressors.base.BaseRegressor._eval_dlog_likelihood">
+<code class="sig-name descname">_eval_dlog_likelihood</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dt</span></em>, <em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">u1</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/regressors/base.html#BaseRegressor._eval_dlog_likelihood"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.regressors.base.BaseRegressor._eval_dlog_likelihood" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the negative log-likelihood and the gradient</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dt</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Sampling time</p></li>
+<li><p><strong>u</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Input data</p></li>
+<li><p><strong>u1</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Forward finite difference of the input data</p></li>
+<li><p><strong>y</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Output data</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>2-element tuple containing</dt><dd><ul class="simple">
+<li><p>The negative log-likelihood</p></li>
+<li><p>The gradient of the negative log-likelihood</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.regressors.base.BaseRegressor._eval_dlog_posterior">
+<code class="sig-name descname">_eval_dlog_posterior</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">eta</span></em>, <em class="sig-param"><span class="n">dt</span></em>, <em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">u1</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/regressors/base.html#BaseRegressor._eval_dlog_posterior"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.regressors.base.BaseRegressor._eval_dlog_posterior" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the negative log-posterior and the gradient</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>eta</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Unconstrained parameters</p></li>
+<li><p><strong>dt</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Sampling time</p></li>
+<li><p><strong>u</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Input data</p></li>
+<li><p><strong>u1</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Forward finite difference of the input data</p></li>
+<li><p><strong>y</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Output data</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>2-element tuple containing</dt><dd><ul class="simple">
+<li><p>The negative log-posterior</p></li>
+<li><p>The gradient of the negative log-posterior</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.regressors.base.BaseRegressor._eval_log_likelihood">
+<code class="sig-name descname">_eval_log_likelihood</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dt</span></em>, <em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">u1</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">pointwise</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/regressors/base.html#BaseRegressor._eval_log_likelihood"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.regressors.base.BaseRegressor._eval_log_likelihood" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the negative log-likelihood</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dt</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Sampling time</p></li>
+<li><p><strong>u</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Input data</p></li>
+<li><p><strong>u1</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Forward finite difference of the input data</p></li>
+<li><p><strong>y</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Output data</p></li>
+<li><p><strong>pointwise</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Return the negative log-likelihood for each time instants</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The negative log-likelihood or the predictive density evaluated for each observation</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.regressors.base.BaseRegressor._eval_log_posterior">
+<code class="sig-name descname">_eval_log_posterior</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">eta</span></em>, <em class="sig-param"><span class="n">dt</span></em>, <em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">u1</span></em>, <em class="sig-param"><span class="n">y</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/regressors/base.html#BaseRegressor._eval_log_posterior"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.regressors.base.BaseRegressor._eval_log_posterior" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the negative log-posterior</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>eta</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Unconstrained parameters</p></li>
+<li><p><strong>dt</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Sampling time</p></li>
+<li><p><strong>u</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Input data</p></li>
+<li><p><strong>u1</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Forward finite difference of the input data</p></li>
+<li><p><strong>y</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Output data</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The negative log-posterior</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.regressors.base.BaseRegressor._init_parameters">
+<code class="sig-name descname">_init_parameters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n_init</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'unconstrained'</span></em>, <em class="sig-param"><span class="n">hpd</span><span class="o">=</span><span class="default_value">0.95</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/regressors/base.html#BaseRegressor._init_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.regressors.base.BaseRegressor._init_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Random initialization of the parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_init</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of random initialization</p></li>
+<li><p><strong>method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – <ul>
+<li><p><strong>unconstrained</strong>: Uniform draw between [-1, 1] in the uncsontrained space</p></li>
+<li><p><strong>prior</strong>: Uniform draw from the prior distribution</p></li>
+<li><p><strong>zero</strong>: Set the unconstrained parameters to 0</p></li>
+<li><p><strong>fixed</strong>: The current parameter values are used</p></li>
+<li><p><strong>value</strong>: Uniform draw between the parameter value +/- 25%</p></li>
+</ul>
+</p></li>
+<li><p><strong>hpd</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Highest Prior Density to draw sample from (True for unimodal distribution)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Array of unconstrained parameters of shape (n_par, n_init), where n_par is the
+number of free parameters and n_init the number of random initialization</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>eta0</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.regressors.base.BaseRegressor._prepare_data">
+<code class="sig-name descname">_prepare_data</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">inputs</span></em>, <em class="sig-param"><span class="n">outputs</span></em>, <em class="sig-param"><span class="n">tnew</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/regressors/base.html#BaseRegressor._prepare_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.regressors.base.BaseRegressor._prepare_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare the data</p>
+<p>This method converts data from the public methods (DataFrame) to the private methods (array)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> – Input/output data with a time index</p></li>
+<li><p><strong>inputs</strong> – Input name(s)</p></li>
+<li><p><strong>outputs</strong> – Output name(s)</p></li>
+<li><p><strong>tnew</strong> – Interpolated/extrapolated time index</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>5-elements tuple containing</dt><dd><ul class="simple">
+<li><p><strong>dt</strong>: Sampling time</p></li>
+<li><p><strong>u</strong>: Input data</p></li>
+<li><p><strong>u1</strong>: Forward finite difference of the input data</p></li>
+<li><p><strong>y</strong>: Output data</p></li>
+<li><p><strong>index_back</strong>: Index corresponding to the new time array <cite>tnew</cite></p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The use of <cite>tnew</cite> is discouraged at the moment; DateTimeIndex are not yet supported.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.regressors.base.BaseRegressor._simulate_output">
+<code class="sig-name descname">_simulate_output</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dt</span></em>, <em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">u1</span></em>, <em class="sig-param"><span class="n">x0</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/regressors/base.html#BaseRegressor._simulate_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.regressors.base.BaseRegressor._simulate_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stochastic simulation of the state-space model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dt</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Sampling time</p></li>
+<li><p><strong>u</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Input data</p></li>
+<li><p><strong>u1</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Forward finite difference of the input data</p></li>
+<li><p><strong>x0</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]) – Initial state mean different from <cite>ss.x0</cite></p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Simulated output</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.regressors.base.BaseRegressor.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">outputs</span></em>, <em class="sig-param"><span class="n">inputs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">options</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/regressors/base.html#BaseRegressor.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.regressors.base.BaseRegressor.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit the state-space model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> – Training data</p></li>
+<li><p><strong>outputs</strong> – Output name(s)</p></li>
+<li><p><strong>inputs</strong> – Inputs names(s)</p></li>
+<li><p><strong>options</strong> – See options for frequentist and Bayesian regressor</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Fit object</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>Must be overriden</strong> – </p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="frequentist.html" class="btn btn-neutral float-right" title="Frequentist regressor" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../statespace/lfm.html" class="btn btn-neutral float-left" title="Latent Force Model" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2018, Loic Raillon, Maxime Janvier
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

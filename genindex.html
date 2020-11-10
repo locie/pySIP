@@ -1,0 +1,1076 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Index &mdash; Stochastic state-space Inference and Prediction  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="#" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> Stochastic state-space Inference and Prediction
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="guides/quickstart.html">Gettings started with pySIP</a></li>
+</ul>
+<p class="caption"><span class="caption-text">State-space models</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="statespace/base.html">Linear Time Invariant State-Space Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="statespace/rc.html">Dynamic Thermal Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="statespace/gp.html">Gaussian Processes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="statespace/lfm.html">Latent Force Model</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Regressors</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="regressors/base.html">Base regressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="regressors/frequentist.html">Frequentist regressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="regressors/bayesian.html">Bayesian regressor</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Parameters settings</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="core/parameter.html">Parameter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="core/parameters.html">Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="core/prior.html">Prior</a></li>
+</ul>
+<p class="caption"><span class="caption-text">State estimation and log-likelihood evaluation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="state_estimator/kalman_qr.html">Robust Kalman filtering and sensitivity equations</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Markov Chain Monte Carlo</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="mcmc/hmc.html">Dynamic Hamiltonian Monte Carlo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mcmc/hmc.html#inference-summary">Inference summary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mcmc/hmc.html#hamiltonian-system">Hamiltonian system</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="examples/gaussian_process.html">Gaussian Process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/thermal_network.html">Armadillo</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Stochastic state-space Inference and Prediction</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Index</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+
+<h1 id="index">Index</h1>
+
+<div class="genindex-jumpbox">
+ <a href="#_"><strong>_</strong></a>
+ | <a href="#B"><strong>B</strong></a>
+ | <a href="#D"><strong>D</strong></a>
+ | <a href="#E"><strong>E</strong></a>
+ | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
+ | <a href="#H"><strong>H</strong></a>
+ | <a href="#I"><strong>I</strong></a>
+ | <a href="#K"><strong>K</strong></a>
+ | <a href="#L"><strong>L</strong></a>
+ | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
+ | <a href="#P"><strong>P</strong></a>
+ | <a href="#Q"><strong>Q</strong></a>
+ | <a href="#R"><strong>R</strong></a>
+ | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
+ | <a href="#U"><strong>U</strong></a>
+ | <a href="#V"><strong>V</strong></a>
+ 
+</div>
+<h2 id="_">_</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="regressors/bayesian.html#pysip.regressors.bayesian.BayesRegressor._array_to_dict">_array_to_dict() (pysip.regressors.bayesian.BayesRegressor method)</a>
+</li>
+      <li><a href="mcmc/hmc.html#pysip.mcmc.hmc.DynamicHMC._build_tree">_build_tree() (pysip.mcmc.hmc.DynamicHMC method)</a>
+</li>
+      <li><a href="core/parameter.html#pysip.core.Parameter._d_penalty">_d_penalty() (pysip.core.Parameter method)</a>
+</li>
+      <li><a href="statespace/base.html#pysip.statespace.base.StateSpace._delete_continuous_dssm">_delete_continuous_dssm() (pysip.statespace.base.StateSpace method)</a>
+</li>
+      <li><a href="regressors/bayesian.html#pysip.regressors.bayesian.BayesRegressor._dict_to_array">_dict_to_array() (pysip.regressors.bayesian.BayesRegressor method)</a>
+</li>
+      <li><a href="regressors/base.html#pysip.regressors.base.BaseRegressor._estimate_output">_estimate_output() (pysip.regressors.base.BaseRegressor method)</a>
+</li>
+      <li><a href="regressors/base.html#pysip.regressors.base.BaseRegressor._estimate_states">_estimate_states() (pysip.regressors.base.BaseRegressor method)</a>
+</li>
+      <li><a href="regressors/base.html#pysip.regressors.base.BaseRegressor._eval_dlog_likelihood">_eval_dlog_likelihood() (pysip.regressors.base.BaseRegressor method)</a>
+</li>
+      <li><a href="regressors/base.html#pysip.regressors.base.BaseRegressor._eval_dlog_posterior">_eval_dlog_posterior() (pysip.regressors.base.BaseRegressor method)</a>
+</li>
+      <li><a href="regressors/base.html#pysip.regressors.base.BaseRegressor._eval_log_likelihood">_eval_log_likelihood() (pysip.regressors.base.BaseRegressor method)</a>
+</li>
+      <li><a href="regressors/base.html#pysip.regressors.base.BaseRegressor._eval_log_posterior">_eval_log_posterior() (pysip.regressors.base.BaseRegressor method)</a>
+</li>
+      <li><a href="mcmc/hmc.html#pysip.mcmc.hmc.DynamicHMC._hamiltonian_state">_hamiltonian_state() (pysip.mcmc.hmc.DynamicHMC method)</a>
+</li>
+      <li><a href="mcmc/hmc.html#pysip.mcmc.hmc.DynamicHMC._hmc_step">_hmc_step() (pysip.mcmc.hmc.DynamicHMC method)</a>
+</li>
+      <li><a href="statespace/base.html#pysip.statespace.base.StateSpace._init_continuous_dssm">_init_continuous_dssm() (pysip.statespace.base.StateSpace method)</a>
+</li>
+      <li><a href="regressors/base.html#pysip.regressors.base.BaseRegressor._init_parameters">_init_parameters() (pysip.regressors.base.BaseRegressor method)</a>
+</li>
+      <li><a href="core/parameter.html#pysip.core.Parameter._inv_transform">_inv_transform() (pysip.core.Parameter method)</a>
+</li>
+      <li><a href="regressors/bayesian.html#pysip.regressors.bayesian.BayesRegressor._inv_transform_chains">_inv_transform_chains() (pysip.regressors.bayesian.BayesRegressor method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="core/parameter.html#pysip.core.Parameter._inv_transform_dlog_jacobian">_inv_transform_dlog_jacobian() (pysip.core.Parameter method)</a>
+</li>
+      <li><a href="core/parameter.html#pysip.core.Parameter._inv_transform_jacobian">_inv_transform_jacobian() (pysip.core.Parameter method)</a>
+</li>
+      <li><a href="mcmc/hmc.html#pysip.mcmc.hmc.DynamicHMC._leapfrog_step">_leapfrog_step() (pysip.mcmc.hmc.DynamicHMC method)</a>
+</li>
+      <li><a href="statespace/base.html#pysip.statespace.base.StateSpace._lti_disc">_lti_disc() (pysip.statespace.base.StateSpace method)</a>
+
+      <ul>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.matern.Matern32._lti_disc">(pysip.statespace.gaussian_process.matern.Matern32 method)</a>
+</li>
+        <li><a href="statespace/lfm.html#pysip.statespace.latent_force_model.LatentForceModel._lti_disc">(pysip.statespace.latent_force_model.LatentForceModel method)</a>
+</li>
+      </ul></li>
+      <li><a href="statespace/base.html#pysip.statespace.base.StateSpace._lti_jacobian_disc">_lti_jacobian_disc() (pysip.statespace.base.StateSpace method)</a>
+
+      <ul>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.matern.Matern32._lti_jacobian_disc">(pysip.statespace.gaussian_process.matern.Matern32 method)</a>
+</li>
+        <li><a href="statespace/lfm.html#pysip.statespace.latent_force_model.LatentForceModel._lti_jacobian_disc">(pysip.statespace.latent_force_model.LatentForceModel method)</a>
+</li>
+      </ul></li>
+      <li><a href="core/parameter.html#pysip.core.Parameter._penalty">_penalty() (pysip.core.Parameter method)</a>
+</li>
+      <li><a href="regressors/base.html#pysip.regressors.base.BaseRegressor._prepare_data">_prepare_data() (pysip.regressors.base.BaseRegressor method)</a>
+</li>
+      <li><a href="core/prior.html#pysip.core.prior.Prior._random">_random() (pysip.core.prior.Prior method)</a>
+</li>
+      <li><a href="mcmc/hmc.html#pysip.mcmc.hmc.DynamicHMC._sample_chain">_sample_chain() (pysip.mcmc.hmc.DynamicHMC method)</a>
+</li>
+      <li><a href="regressors/base.html#pysip.regressors.base.BaseRegressor._simulate_output">_simulate_output() (pysip.regressors.base.BaseRegressor method)</a>
+</li>
+      <li><a href="core/parameter.html#pysip.core.Parameter._transform">_transform() (pysip.core.Parameter method)</a>
+</li>
+      <li><a href="core/parameter.html#pysip.core.Parameter._transform_jacobian">_transform_jacobian() (pysip.core.Parameter method)</a>
+</li>
+      <li><a href="mcmc/hmc.html#pysip.mcmc.hmc.DynamicHMC._transition">_transition() (pysip.mcmc.hmc.DynamicHMC method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="B">B</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="regressors/base.html#pysip.regressors.base.BaseRegressor">BaseRegressor (class in pysip.regressors.base)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="regressors/bayesian.html#pysip.regressors.bayesian.BayesRegressor">BayesRegressor (class in pysip.regressors.bayesian)</a>
+</li>
+      <li><a href="core/prior.html#pysip.core.prior.Beta">Beta (class in pysip.core.prior)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="core/parameters.html#pysip.core.Parameters.d_penalty">d_penalty() (pysip.core.Parameters property)</a>
+</li>
+      <li><a href="core/parameters.html#pysip.core.Parameters.d_prior">d_prior() (pysip.core.Parameters property)</a>
+</li>
+      <li><a href="statespace/base.html#pysip.statespace.base.StateSpace.delete_continuous_dssm">delete_continuous_dssm() (pysip.statespace.base.StateSpace method)</a>
+
+      <ul>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.gp_product.GPProduct.delete_continuous_dssm">(pysip.statespace.gaussian_process.gp_product.GPProduct method)</a>
+</li>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.gp_sum.GPSum.delete_continuous_dssm">(pysip.statespace.gaussian_process.gp_sum.GPSum method)</a>
+</li>
+        <li><a href="statespace/lfm.html#pysip.statespace.latent_force_model.LatentForceModel.delete_continuous_dssm">(pysip.statespace.latent_force_model.LatentForceModel method)</a>
+</li>
+      </ul></li>
+      <li><a href="mcmc/hmc.html#pysip.mcmc.hmc.Fit_Bayes.diagnostic">diagnostic() (pysip.mcmc.hmc.Fit_Bayes property)</a>
+</li>
+      <li><a href="statespace/base.html#pysip.statespace.base.StateSpace.discretization">discretization() (pysip.statespace.base.StateSpace method)</a>
+</li>
+      <li><a href="mcmc/hmc.html#pysip.mcmc.hamiltonian.EuclideanHamiltonian.dK">dK() (pysip.mcmc.hamiltonian.EuclideanHamiltonian method)</a>
+</li>
+      <li><a href="state_estimator/kalman_qr.html#pysip.state_estimator.kalman_qr.Kalman_QR.dlog_likelihood">dlog_likelihood() (pysip.state_estimator.kalman_qr.Kalman_QR method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="core/prior.html#pysip.core.prior.Beta.dlog_pdf">dlog_pdf() (pysip.core.prior.Beta method)</a>
+
+      <ul>
+        <li><a href="core/prior.html#pysip.core.prior.Gamma.dlog_pdf">(pysip.core.prior.Gamma method)</a>
+</li>
+        <li><a href="core/prior.html#pysip.core.prior.InverseGamma.dlog_pdf">(pysip.core.prior.InverseGamma method)</a>
+</li>
+        <li><a href="core/prior.html#pysip.core.prior.LogNormal.dlog_pdf">(pysip.core.prior.LogNormal method)</a>
+</li>
+        <li><a href="core/prior.html#pysip.core.prior.Normal.dlog_pdf">(pysip.core.prior.Normal method)</a>
+</li>
+        <li><a href="core/prior.html#pysip.core.prior.Prior.dlog_pdf">(pysip.core.prior.Prior method)</a>
+</li>
+      </ul></li>
+      <li><a href="state_estimator/kalman_qr.html#pysip.state_estimator.kalman_qr.Kalman_QR.dpredict">dpredict() (pysip.state_estimator.kalman_qr.Kalman_QR method)</a>
+</li>
+      <li><a href="state_estimator/kalman_qr.html#pysip.state_estimator.kalman_qr.Kalman_QR.dupdate">dupdate() (pysip.state_estimator.kalman_qr.Kalman_QR method)</a>
+</li>
+      <li><a href="mcmc/hmc.html#pysip.mcmc.hamiltonian.EuclideanHamiltonian.dV">dV() (pysip.mcmc.hamiltonian.EuclideanHamiltonian method)</a>
+</li>
+      <li><a href="mcmc/hmc.html#pysip.mcmc.hmc.DynamicHMC">DynamicHMC (class in pysip.mcmc.hmc)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="regressors/frequentist.html#pysip.regressors.frequentist.FreqRegressor.estimate_states">estimate_states() (pysip.regressors.frequentist.FreqRegressor method)</a>
+</li>
+      <li><a href="core/parameter.html#pysip.core.Parameter.eta">eta() (pysip.core.Parameter property)</a>
+
+      <ul>
+        <li><a href="core/parameters.html#pysip.core.Parameters.eta">(pysip.core.Parameters property)</a>
+</li>
+      </ul></li>
+      <li><a href="core/parameters.html#pysip.core.Parameters.eta_free">eta_free() (pysip.core.Parameters property)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="core/parameters.html#pysip.core.Parameters.eta_jacobian">eta_jacobian() (pysip.core.Parameters property)</a>
+</li>
+      <li><a href="mcmc/hmc.html#pysip.mcmc.hamiltonian.EuclideanHamiltonian">EuclideanHamiltonian (class in pysip.mcmc.hamiltonian)</a>
+</li>
+      <li><a href="regressors/frequentist.html#pysip.regressors.frequentist.FreqRegressor.eval_log_likelihood">eval_log_likelihood() (pysip.regressors.frequentist.FreqRegressor method)</a>
+</li>
+      <li><a href="regressors/frequentist.html#pysip.regressors.frequentist.FreqRegressor.eval_residuals">eval_residuals() (pysip.regressors.frequentist.FreqRegressor method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="F">F</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="state_estimator/kalman_qr.html#pysip.state_estimator.kalman_qr.Kalman_QR.filtering">filtering() (pysip.state_estimator.kalman_qr.Kalman_QR method)</a>
+</li>
+      <li><a href="core/prior.html#pysip.core.prior.InverseGamma.find_hyperparameters">find_hyperparameters() (pysip.core.prior.InverseGamma method)</a>
+
+      <ul>
+        <li><a href="core/prior.html#pysip.core.prior.Normal.find_hyperparameters">(pysip.core.prior.Normal method)</a>
+</li>
+      </ul></li>
+      <li><a href="regressors/base.html#pysip.regressors.base.BaseRegressor.fit">fit() (pysip.regressors.base.BaseRegressor method)</a>
+
+      <ul>
+        <li><a href="regressors/bayesian.html#pysip.regressors.bayesian.BayesRegressor.fit">(pysip.regressors.bayesian.BayesRegressor method)</a>
+</li>
+        <li><a href="regressors/frequentist.html#pysip.regressors.frequentist.FreqRegressor.fit">(pysip.regressors.frequentist.FreqRegressor method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="mcmc/hmc.html#pysip.mcmc.hmc.Fit_Bayes">Fit_Bayes (class in pysip.mcmc.hmc)</a>
+</li>
+      <li><a href="core/parameter.html#pysip.core.Parameter.free">free() (pysip.core.Parameter property)</a>
+
+      <ul>
+        <li><a href="core/parameters.html#pysip.core.Parameters.free">(pysip.core.Parameters property)</a>
+</li>
+      </ul></li>
+      <li><a href="regressors/frequentist.html#pysip.regressors.frequentist.FreqRegressor">FreqRegressor (class in pysip.regressors.frequentist)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="core/prior.html#pysip.core.prior.Gamma">Gamma (class in pysip.core.prior)</a>
+</li>
+      <li><a href="statespace/base.html#pysip.statespace.base.StateSpace.get_discrete_dssm">get_discrete_dssm() (pysip.statespace.base.StateSpace method)</a>
+</li>
+      <li><a href="statespace/base.html#pysip.statespace.base.StateSpace.get_discrete_ssm">get_discrete_ssm() (pysip.statespace.base.StateSpace method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="mcmc/hmc.html#pysip.mcmc.hmc.Fit_Bayes.get_options">get_options() (pysip.mcmc.hmc.Fit_Bayes method)</a>
+</li>
+      <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.gp_product.GPProduct">GPProduct (class in pysip.statespace.gaussian_process.gp_product)</a>
+</li>
+      <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.gp_sum.GPSum">GPSum (class in pysip.statespace.gaussian_process.gp_sum)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="H">H</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="mcmc/hmc.html#pysip.mcmc.hamiltonian.EuclideanHamiltonian.H">H() (pysip.mcmc.hamiltonian.EuclideanHamiltonian method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="statespace/base.html#pysip.statespace.base.StateSpace.init_continuous_dssm">init_continuous_dssm() (pysip.statespace.base.StateSpace method)</a>
+
+      <ul>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.gp_product.GPProduct.init_continuous_dssm">(pysip.statespace.gaussian_process.gp_product.GPProduct method)</a>
+</li>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.gp_sum.GPSum.init_continuous_dssm">(pysip.statespace.gaussian_process.gp_sum.GPSum method)</a>
+</li>
+        <li><a href="statespace/lfm.html#pysip.statespace.latent_force_model.LatentForceModel.init_continuous_dssm">(pysip.statespace.latent_force_model.LatentForceModel method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="mcmc/hmc.html#pysip.mcmc.hamiltonian.EuclideanHamiltonian.inverse_mass_matrix">inverse_mass_matrix() (pysip.mcmc.hamiltonian.EuclideanHamiltonian property)</a>
+</li>
+      <li><a href="core/prior.html#pysip.core.prior.InverseGamma">InverseGamma (class in pysip.core.prior)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="K">K</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="mcmc/hmc.html#pysip.mcmc.hamiltonian.EuclideanHamiltonian.K">K() (pysip.mcmc.hamiltonian.EuclideanHamiltonian method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="state_estimator/kalman_qr.html#pysip.state_estimator.kalman_qr.Kalman_QR">Kalman_QR (class in pysip.state_estimator.kalman_qr)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="statespace/lfm.html#pysip.statespace.latent_force_model.LatentForceModel">LatentForceModel (class in pysip.statespace.latent_force_model)</a>
+</li>
+      <li><a href="state_estimator/kalman_qr.html#pysip.state_estimator.kalman_qr.Kalman_QR.log_likelihood">log_likelihood() (pysip.state_estimator.kalman_qr.Kalman_QR method)</a>
+</li>
+      <li><a href="core/prior.html#pysip.core.prior.Beta.log_pdf">log_pdf() (pysip.core.prior.Beta method)</a>
+
+      <ul>
+        <li><a href="core/prior.html#pysip.core.prior.Gamma.log_pdf">(pysip.core.prior.Gamma method)</a>
+</li>
+        <li><a href="core/prior.html#pysip.core.prior.InverseGamma.log_pdf">(pysip.core.prior.InverseGamma method)</a>
+</li>
+        <li><a href="core/prior.html#pysip.core.prior.LogNormal.log_pdf">(pysip.core.prior.LogNormal method)</a>
+</li>
+        <li><a href="core/prior.html#pysip.core.prior.Normal.log_pdf">(pysip.core.prior.Normal method)</a>
+</li>
+        <li><a href="core/prior.html#pysip.core.prior.Prior.log_pdf">(pysip.core.prior.Prior method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="core/prior.html#pysip.core.prior.LogNormal">LogNormal (class in pysip.core.prior)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="M">M</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.matern.Matern12">Matern12 (class in pysip.statespace.gaussian_process.matern)</a>
+</li>
+      <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.matern.Matern32">Matern32 (class in pysip.statespace.gaussian_process.matern)</a>
+</li>
+      <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.matern.Matern52">Matern52 (class in pysip.statespace.gaussian_process.matern)</a>
+</li>
+      <li><a href="core/prior.html#pysip.core.prior.Beta.mean">mean() (pysip.core.prior.Beta property)</a>
+
+      <ul>
+        <li><a href="core/prior.html#pysip.core.prior.Gamma.mean">(pysip.core.prior.Gamma property)</a>
+</li>
+        <li><a href="core/prior.html#pysip.core.prior.InverseGamma.mean">(pysip.core.prior.InverseGamma property)</a>
+</li>
+        <li><a href="core/prior.html#pysip.core.prior.LogNormal.mean">(pysip.core.prior.LogNormal property)</a>
+</li>
+        <li><a href="core/prior.html#pysip.core.prior.Normal.mean">(pysip.core.prior.Normal property)</a>
+</li>
+        <li><a href="core/prior.html#pysip.core.prior.Prior.mean">(pysip.core.prior.Prior method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="core/prior.html#pysip.core.prior.Beta.mode">mode() (pysip.core.prior.Beta property)</a>
+
+      <ul>
+        <li><a href="core/prior.html#pysip.core.prior.Gamma.mode">(pysip.core.prior.Gamma property)</a>
+</li>
+        <li><a href="core/prior.html#pysip.core.prior.InverseGamma.mode">(pysip.core.prior.InverseGamma property)</a>
+</li>
+        <li><a href="core/prior.html#pysip.core.prior.LogNormal.mode">(pysip.core.prior.LogNormal property)</a>
+</li>
+        <li><a href="core/prior.html#pysip.core.prior.Normal.mode">(pysip.core.prior.Normal property)</a>
+</li>
+        <li><a href="core/prior.html#pysip.core.prior.Prior.mode">(pysip.core.prior.Prior method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="core/parameters.html#pysip.core.Parameters.n_par">n_par() (pysip.core.Parameters property)</a>
+</li>
+      <li><a href="mcmc/hmc.html#pysip.mcmc.hmc.Fit_Bayes.n_warmup">n_warmup() (pysip.mcmc.hmc.Fit_Bayes property)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="core/parameters.html#pysip.core.Parameters.names">names() (pysip.core.Parameters property)</a>
+</li>
+      <li><a href="core/parameters.html#pysip.core.Parameters.names_free">names_free() (pysip.core.Parameters property)</a>
+</li>
+      <li><a href="core/prior.html#pysip.core.prior.Normal">Normal (class in pysip.core.prior)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="P">P</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="core/parameter.html#pysip.core.Parameter">Parameter (class in pysip.core)</a>
+</li>
+      <li><a href="core/parameters.html#pysip.core.Parameters">Parameters (class in pysip.core)</a>
+</li>
+      <li><a href="core/parameters.html#pysip.core.Parameters.parameters">parameters() (pysip.core.Parameters property)</a>
+</li>
+      <li><a href="core/parameters.html#pysip.core.Parameters.parameters_free">parameters_free() (pysip.core.Parameters property)</a>
+</li>
+      <li><a href="core/prior.html#pysip.core.prior.Prior.pdf">pdf() (pysip.core.prior.Prior method)</a>
+</li>
+      <li><a href="core/parameters.html#pysip.core.Parameters.penalty">penalty() (pysip.core.Parameters property)</a>
+</li>
+      <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.periodic.Periodic">Periodic (class in pysip.statespace.gaussian_process.periodic)</a>
+</li>
+      <li><a href="regressors/bayesian.html#pysip.regressors.bayesian.BayesRegressor.pointwise_log_likelihood">pointwise_log_likelihood() (pysip.regressors.bayesian.BayesRegressor method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="mcmc/hmc.html#pysip.mcmc.hmc.Fit_Bayes.posterior">posterior() (pysip.mcmc.hmc.Fit_Bayes property)</a>
+</li>
+      <li><a href="regressors/bayesian.html#pysip.regressors.bayesian.BayesRegressor.posterior_predictive">posterior_predictive() (pysip.regressors.bayesian.BayesRegressor method)</a>
+</li>
+      <li><a href="regressors/bayesian.html#pysip.regressors.bayesian.BayesRegressor.posterior_state_distribution">posterior_state_distribution() (pysip.regressors.bayesian.BayesRegressor method)</a>
+</li>
+      <li><a href="regressors/frequentist.html#pysip.regressors.frequentist.FreqRegressor.predict">predict() (pysip.regressors.frequentist.FreqRegressor method)</a>
+
+      <ul>
+        <li><a href="state_estimator/kalman_qr.html#pysip.state_estimator.kalman_qr.Kalman_QR.predict">(pysip.state_estimator.kalman_qr.Kalman_QR method)</a>
+</li>
+      </ul></li>
+      <li><a href="core/prior.html#pysip.core.prior.Prior">Prior (class in pysip.core.prior)</a>
+</li>
+      <li><a href="core/parameters.html#pysip.core.Parameters.prior">prior() (pysip.core.Parameters property)</a>
+</li>
+      <li><a href="core/parameters.html#pysip.core.Parameters.prior_init">prior_init() (pysip.core.Parameters method)</a>
+</li>
+      <li><a href="regressors/bayesian.html#pysip.regressors.bayesian.BayesRegressor.prior_predictive">prior_predictive() (pysip.regressors.bayesian.BayesRegressor method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="Q">Q</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic12">QuasiPeriodic12 (class in pysip.statespace.gaussian_process.quasi_periodic)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic32">QuasiPeriodic32 (class in pysip.statespace.gaussian_process.quasi_periodic)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="core/prior.html#pysip.core.prior.Beta.random">random() (pysip.core.prior.Beta method)</a>
+
+      <ul>
+        <li><a href="core/prior.html#pysip.core.prior.Gamma.random">(pysip.core.prior.Gamma method)</a>
+</li>
+        <li><a href="core/prior.html#pysip.core.prior.InverseGamma.random">(pysip.core.prior.InverseGamma method)</a>
+</li>
+        <li><a href="core/prior.html#pysip.core.prior.LogNormal.random">(pysip.core.prior.LogNormal method)</a>
+</li>
+        <li><a href="core/prior.html#pysip.core.prior.Normal.random">(pysip.core.prior.Normal method)</a>
+</li>
+        <li><a href="core/prior.html#pysip.core.prior.Prior.random">(pysip.core.prior.Prior method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="mcmc/hmc.html#pysip.mcmc.hmc.DynamicHMC.sample">sample() (pysip.mcmc.hmc.DynamicHMC method)</a>
+</li>
+      <li><a href="mcmc/hmc.html#pysip.mcmc.hamiltonian.EuclideanHamiltonian.sample_p">sample_p() (pysip.mcmc.hamiltonian.EuclideanHamiltonian method)</a>
+</li>
+      <li><a href="core/parameters.html#pysip.core.Parameters.scale">scale() (pysip.core.Parameters property)</a>
+</li>
+      <li><a href="statespace/base.html#pysip.statespace.base.StateSpace.set_constant_continuous_dssm">set_constant_continuous_dssm() (pysip.statespace.base.StateSpace method)</a>
+
+      <ul>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.gp_product.GPProduct.set_constant_continuous_dssm">(pysip.statespace.gaussian_process.gp_product.GPProduct method)</a>
+</li>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.gp_sum.GPSum.set_constant_continuous_dssm">(pysip.statespace.gaussian_process.gp_sum.GPSum method)</a>
+</li>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.matern.Matern12.set_constant_continuous_dssm">(pysip.statespace.gaussian_process.matern.Matern12 method)</a>
+</li>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.matern.Matern32.set_constant_continuous_dssm">(pysip.statespace.gaussian_process.matern.Matern32 method)</a>
+</li>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.matern.Matern52.set_constant_continuous_dssm">(pysip.statespace.gaussian_process.matern.Matern52 method)</a>
+</li>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.periodic.Periodic.set_constant_continuous_dssm">(pysip.statespace.gaussian_process.periodic.Periodic method)</a>
+</li>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic12.set_constant_continuous_dssm">(pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic12 method)</a>
+</li>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic32.set_constant_continuous_dssm">(pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic32 method)</a>
+</li>
+        <li><a href="statespace/lfm.html#pysip.statespace.latent_force_model.LatentForceModel.set_constant_continuous_dssm">(pysip.statespace.latent_force_model.LatentForceModel method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.ti_ra.Ti_RA.set_constant_continuous_dssm">(pysip.statespace.thermal_network.ti_ra.Ti_RA method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.ti_racv.Ti_RAcv.set_constant_continuous_dssm">(pysip.statespace.thermal_network.ti_racv.Ti_RAcv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.tith_rwrhai.TiTh_RwRhAi.set_constant_continuous_dssm">(pysip.statespace.thermal_network.tith_rwrhai.TiTh_RwRhAi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.titm_rwrmai.TiTm_RwRmAi.set_constant_continuous_dssm">(pysip.statespace.thermal_network.titm_rwrmai.TiTm_RwRmAi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twti_rori.TwTi_RoRi.set_constant_continuous_dssm">(pysip.statespace.thermal_network.twti_rori.TwTi_RoRi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twti_roriawai.TwTi_RoRiAwAi.set_constant_continuous_dssm">(pysip.statespace.thermal_network.twti_roriawai.TwTi_RoRiAwAi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twti_roriawaicv.TwTi_RoRiAwAicv.set_constant_continuous_dssm">(pysip.statespace.thermal_network.twti_roriawaicv.TwTi_RoRiAwAicv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twti_rorirbawai.TwTi_RoRiRbAwAi.set_constant_continuous_dssm">(pysip.statespace.thermal_network.twti_rorirbawai.TwTi_RoRiRbAwAi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twti_rorirbawaicv.TwTi_RoRiRbAwAicv.set_constant_continuous_dssm">(pysip.statespace.thermal_network.twti_rorirbawaicv.TwTi_RoRiRbAwAicv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitb_rorirbawaicv.TwTiTb_RoRiRbAwAicv.set_constant_continuous_dssm">(pysip.statespace.thermal_network.twtitb_rorirbawaicv.TwTiTb_RoRiRbAwAicv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitb_roriribrbbawaicv.TwTiTb_RoRiRibRbbAwAicv.set_constant_continuous_dssm">(pysip.statespace.thermal_network.twtitb_roriribrbbawaicv.TwTiTb_RoRiRibRbbAwAicv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtith_rorirhawai.TwTiTh_RoRiRhAwAi.set_constant_continuous_dssm">(pysip.statespace.thermal_network.twtith_rorirhawai.TwTiTh_RoRiRhAwAi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtith_rorirhawaicv.TwTiTh_RoRiRhAwAicv.set_constant_continuous_dssm">(pysip.statespace.thermal_network.twtith_rorirhawaicv.TwTiTh_RoRiRhAwAicv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_roriawai.TwTiTm_RoRiAwAi.set_constant_continuous_dssm">(pysip.statespace.thermal_network.twtitm_roriawai.TwTiTm_RoRiAwAi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_roriawaicv.TwTiTm_RoRiAwAicv.set_constant_continuous_dssm">(pysip.statespace.thermal_network.twtitm_roriawaicv.TwTiTm_RoRiAwAicv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirbawaicv.TwTiTm_RoRiRbAwAicv.set_constant_continuous_dssm">(pysip.statespace.thermal_network.twtitm_rorirbawaicv.TwTiTm_RoRiRbAwAicv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirmawai.TwTiTm_RoRiRmAwAi.set_constant_continuous_dssm">(pysip.statespace.thermal_network.twtitm_rorirmawai.TwTiTm_RoRiRmAwAi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirmawaiam.TwTiTm_RoRiRmAwAiAm.set_constant_continuous_dssm">(pysip.statespace.thermal_network.twtitm_rorirmawaiam.TwTiTm_RoRiRmAwAiAm method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirmawaicv.TwTiTm_RoRiRmAwAicv.set_constant_continuous_dssm">(pysip.statespace.thermal_network.twtitm_rorirmawaicv.TwTiTm_RoRiRmAwAicv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirmrbawai.TwTiTm_RoRiRmRbAwAi.set_constant_continuous_dssm">(pysip.statespace.thermal_network.twtitm_rorirmrbawai.TwTiTm_RoRiRmRbAwAi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirmrbawaicv.TwTiTm_RoRiRmRbAwAicv.set_constant_continuous_dssm">(pysip.statespace.thermal_network.twtitm_rorirmrbawaicv.TwTiTm_RoRiRmRbAwAicv method)</a>
+</li>
+      </ul></li>
+      <li><a href="statespace/base.html#pysip.statespace.base.StateSpace.set_constant_continuous_ssm">set_constant_continuous_ssm() (pysip.statespace.base.StateSpace method)</a>
+
+      <ul>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.gp_product.GPProduct.set_constant_continuous_ssm">(pysip.statespace.gaussian_process.gp_product.GPProduct method)</a>
+</li>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.gp_sum.GPSum.set_constant_continuous_ssm">(pysip.statespace.gaussian_process.gp_sum.GPSum method)</a>
+</li>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.matern.Matern12.set_constant_continuous_ssm">(pysip.statespace.gaussian_process.matern.Matern12 method)</a>
+</li>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.matern.Matern32.set_constant_continuous_ssm">(pysip.statespace.gaussian_process.matern.Matern32 method)</a>
+</li>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.matern.Matern52.set_constant_continuous_ssm">(pysip.statespace.gaussian_process.matern.Matern52 method)</a>
+</li>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.periodic.Periodic.set_constant_continuous_ssm">(pysip.statespace.gaussian_process.periodic.Periodic method)</a>
+</li>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic12.set_constant_continuous_ssm">(pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic12 method)</a>
+</li>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic32.set_constant_continuous_ssm">(pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic32 method)</a>
+</li>
+        <li><a href="statespace/lfm.html#pysip.statespace.latent_force_model.LatentForceModel.set_constant_continuous_ssm">(pysip.statespace.latent_force_model.LatentForceModel method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.ti_ra.Ti_RA.set_constant_continuous_ssm">(pysip.statespace.thermal_network.ti_ra.Ti_RA method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.ti_racv.Ti_RAcv.set_constant_continuous_ssm">(pysip.statespace.thermal_network.ti_racv.Ti_RAcv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.tith_rwrhai.TiTh_RwRhAi.set_constant_continuous_ssm">(pysip.statespace.thermal_network.tith_rwrhai.TiTh_RwRhAi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.titm_rwrmai.TiTm_RwRmAi.set_constant_continuous_ssm">(pysip.statespace.thermal_network.titm_rwrmai.TiTm_RwRmAi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twti_rori.TwTi_RoRi.set_constant_continuous_ssm">(pysip.statespace.thermal_network.twti_rori.TwTi_RoRi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twti_roriawai.TwTi_RoRiAwAi.set_constant_continuous_ssm">(pysip.statespace.thermal_network.twti_roriawai.TwTi_RoRiAwAi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twti_roriawaicv.TwTi_RoRiAwAicv.set_constant_continuous_ssm">(pysip.statespace.thermal_network.twti_roriawaicv.TwTi_RoRiAwAicv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twti_rorirbawai.TwTi_RoRiRbAwAi.set_constant_continuous_ssm">(pysip.statespace.thermal_network.twti_rorirbawai.TwTi_RoRiRbAwAi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twti_rorirbawaicv.TwTi_RoRiRbAwAicv.set_constant_continuous_ssm">(pysip.statespace.thermal_network.twti_rorirbawaicv.TwTi_RoRiRbAwAicv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitb_rorirbawaicv.TwTiTb_RoRiRbAwAicv.set_constant_continuous_ssm">(pysip.statespace.thermal_network.twtitb_rorirbawaicv.TwTiTb_RoRiRbAwAicv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitb_roriribrbbawaicv.TwTiTb_RoRiRibRbbAwAicv.set_constant_continuous_ssm">(pysip.statespace.thermal_network.twtitb_roriribrbbawaicv.TwTiTb_RoRiRibRbbAwAicv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtith_rorirhawai.TwTiTh_RoRiRhAwAi.set_constant_continuous_ssm">(pysip.statespace.thermal_network.twtith_rorirhawai.TwTiTh_RoRiRhAwAi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtith_rorirhawaicv.TwTiTh_RoRiRhAwAicv.set_constant_continuous_ssm">(pysip.statespace.thermal_network.twtith_rorirhawaicv.TwTiTh_RoRiRhAwAicv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_roriawai.TwTiTm_RoRiAwAi.set_constant_continuous_ssm">(pysip.statespace.thermal_network.twtitm_roriawai.TwTiTm_RoRiAwAi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_roriawaicv.TwTiTm_RoRiAwAicv.set_constant_continuous_ssm">(pysip.statespace.thermal_network.twtitm_roriawaicv.TwTiTm_RoRiAwAicv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirbawaicv.TwTiTm_RoRiRbAwAicv.set_constant_continuous_ssm">(pysip.statespace.thermal_network.twtitm_rorirbawaicv.TwTiTm_RoRiRbAwAicv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirmawai.TwTiTm_RoRiRmAwAi.set_constant_continuous_ssm">(pysip.statespace.thermal_network.twtitm_rorirmawai.TwTiTm_RoRiRmAwAi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirmawaiam.TwTiTm_RoRiRmAwAiAm.set_constant_continuous_ssm">(pysip.statespace.thermal_network.twtitm_rorirmawaiam.TwTiTm_RoRiRmAwAiAm method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirmawaicv.TwTiTm_RoRiRmAwAicv.set_constant_continuous_ssm">(pysip.statespace.thermal_network.twtitm_rorirmawaicv.TwTiTm_RoRiRmAwAicv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirmrbawai.TwTiTm_RoRiRmRbAwAi.set_constant_continuous_ssm">(pysip.statespace.thermal_network.twtitm_rorirmrbawai.TwTiTm_RoRiRmRbAwAi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirmrbawaicv.TwTiTm_RoRiRmRbAwAicv.set_constant_continuous_ssm">(pysip.statespace.thermal_network.twtitm_rorirmrbawaicv.TwTiTm_RoRiRmRbAwAicv method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="core/parameters.html#pysip.core.Parameters.set_parameter">set_parameter() (pysip.core.Parameters method)</a>
+</li>
+      <li><a href="state_estimator/kalman_qr.html#pysip.state_estimator.kalman_qr.Kalman_QR.simulate">simulate() (pysip.state_estimator.kalman_qr.Kalman_QR method)</a>
+</li>
+      <li><a href="state_estimator/kalman_qr.html#pysip.state_estimator.kalman_qr.Kalman_QR.simulate_output">simulate_output() (pysip.state_estimator.kalman_qr.Kalman_QR method)</a>
+</li>
+      <li><a href="state_estimator/kalman_qr.html#pysip.state_estimator.kalman_qr.Kalman_QR.smoothing">smoothing() (pysip.state_estimator.kalman_qr.Kalman_QR method)</a>
+</li>
+      <li><a href="statespace/base.html#pysip.statespace.base.StateSpace">StateSpace (class in pysip.statespace.base)</a>
+</li>
+      <li><a href="mcmc/hmc.html#pysip.mcmc.hmc.Fit_Bayes.stats">stats() (pysip.mcmc.hmc.Fit_Bayes property)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="core/parameter.html#pysip.core.Parameter.theta">theta() (pysip.core.Parameter property)</a>
+
+      <ul>
+        <li><a href="core/parameters.html#pysip.core.Parameters.theta">(pysip.core.Parameters property)</a>
+</li>
+      </ul></li>
+      <li><a href="core/parameters.html#pysip.core.Parameters.theta_dlog_jacobian">theta_dlog_jacobian() (pysip.core.Parameters property)</a>
+</li>
+      <li><a href="core/parameters.html#pysip.core.Parameters.theta_free">theta_free() (pysip.core.Parameters property)</a>
+</li>
+      <li><a href="core/parameters.html#pysip.core.Parameters.theta_jacobian">theta_jacobian() (pysip.core.Parameters property)</a>
+</li>
+      <li><a href="core/parameters.html#pysip.core.Parameters.theta_log_jacobian">theta_log_jacobian() (pysip.core.Parameters property)</a>
+</li>
+      <li><a href="core/parameter.html#pysip.core.Parameter.theta_sd">theta_sd() (pysip.core.Parameter property)</a>
+
+      <ul>
+        <li><a href="core/parameters.html#pysip.core.Parameters.theta_sd">(pysip.core.Parameters property)</a>
+</li>
+      </ul></li>
+      <li><a href="statespace/rc.html#pysip.statespace.thermal_network.ti_ra.Ti_RA">Ti_RA (class in pysip.statespace.thermal_network.ti_ra)</a>
+</li>
+      <li><a href="statespace/rc.html#pysip.statespace.thermal_network.ti_racv.Ti_RAcv">Ti_RAcv (class in pysip.statespace.thermal_network.ti_racv)</a>
+</li>
+      <li><a href="statespace/rc.html#pysip.statespace.thermal_network.tith_rwrhai.TiTh_RwRhAi">TiTh_RwRhAi (class in pysip.statespace.thermal_network.tith_rwrhai)</a>
+</li>
+      <li><a href="statespace/rc.html#pysip.statespace.thermal_network.titm_rwrmai.TiTm_RwRmAi">TiTm_RwRmAi (class in pysip.statespace.thermal_network.titm_rwrmai)</a>
+</li>
+      <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twti_rori.TwTi_RoRi">TwTi_RoRi (class in pysip.statespace.thermal_network.twti_rori)</a>
+</li>
+      <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twti_roriawai.TwTi_RoRiAwAi">TwTi_RoRiAwAi (class in pysip.statespace.thermal_network.twti_roriawai)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twti_roriawaicv.TwTi_RoRiAwAicv">TwTi_RoRiAwAicv (class in pysip.statespace.thermal_network.twti_roriawaicv)</a>
+</li>
+      <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twti_rorirbawai.TwTi_RoRiRbAwAi">TwTi_RoRiRbAwAi (class in pysip.statespace.thermal_network.twti_rorirbawai)</a>
+</li>
+      <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twti_rorirbawaicv.TwTi_RoRiRbAwAicv">TwTi_RoRiRbAwAicv (class in pysip.statespace.thermal_network.twti_rorirbawaicv)</a>
+</li>
+      <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitb_rorirbawaicv.TwTiTb_RoRiRbAwAicv">TwTiTb_RoRiRbAwAicv (class in pysip.statespace.thermal_network.twtitb_rorirbawaicv)</a>
+</li>
+      <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitb_roriribrbbawaicv.TwTiTb_RoRiRibRbbAwAicv">TwTiTb_RoRiRibRbbAwAicv (class in pysip.statespace.thermal_network.twtitb_roriribrbbawaicv)</a>
+</li>
+      <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtith_rorirhawai.TwTiTh_RoRiRhAwAi">TwTiTh_RoRiRhAwAi (class in pysip.statespace.thermal_network.twtith_rorirhawai)</a>
+</li>
+      <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtith_rorirhawaicv.TwTiTh_RoRiRhAwAicv">TwTiTh_RoRiRhAwAicv (class in pysip.statespace.thermal_network.twtith_rorirhawaicv)</a>
+</li>
+      <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_roriawai.TwTiTm_RoRiAwAi">TwTiTm_RoRiAwAi (class in pysip.statespace.thermal_network.twtitm_roriawai)</a>
+</li>
+      <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_roriawaicv.TwTiTm_RoRiAwAicv">TwTiTm_RoRiAwAicv (class in pysip.statespace.thermal_network.twtitm_roriawaicv)</a>
+</li>
+      <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirbawaicv.TwTiTm_RoRiRbAwAicv">TwTiTm_RoRiRbAwAicv (class in pysip.statespace.thermal_network.twtitm_rorirbawaicv)</a>
+</li>
+      <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirmawai.TwTiTm_RoRiRmAwAi">TwTiTm_RoRiRmAwAi (class in pysip.statespace.thermal_network.twtitm_rorirmawai)</a>
+</li>
+      <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirmawaiam.TwTiTm_RoRiRmAwAiAm">TwTiTm_RoRiRmAwAiAm (class in pysip.statespace.thermal_network.twtitm_rorirmawaiam)</a>
+</li>
+      <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirmawaicv.TwTiTm_RoRiRmAwAicv">TwTiTm_RoRiRmAwAicv (class in pysip.statespace.thermal_network.twtitm_rorirmawaicv)</a>
+</li>
+      <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirmrbawai.TwTiTm_RoRiRmRbAwAi">TwTiTm_RoRiRmRbAwAi (class in pysip.statespace.thermal_network.twtitm_rorirmrbawai)</a>
+</li>
+      <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirmrbawaicv.TwTiTm_RoRiRmRbAwAicv">TwTiTm_RoRiRmRbAwAicv (class in pysip.statespace.thermal_network.twtitm_rorirmrbawaicv)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="state_estimator/kalman_qr.html#pysip.state_estimator.kalman_qr.Kalman_QR.update">update() (pysip.state_estimator.kalman_qr.Kalman_QR method)</a>
+</li>
+      <li><a href="statespace/base.html#pysip.statespace.base.StateSpace.update_continuous_dssm">update_continuous_dssm() (pysip.statespace.base.StateSpace method)</a>
+
+      <ul>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.gp_product.GPProduct.update_continuous_dssm">(pysip.statespace.gaussian_process.gp_product.GPProduct method)</a>
+</li>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.gp_sum.GPSum.update_continuous_dssm">(pysip.statespace.gaussian_process.gp_sum.GPSum method)</a>
+</li>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.matern.Matern12.update_continuous_dssm">(pysip.statespace.gaussian_process.matern.Matern12 method)</a>
+</li>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.matern.Matern32.update_continuous_dssm">(pysip.statespace.gaussian_process.matern.Matern32 method)</a>
+</li>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.matern.Matern52.update_continuous_dssm">(pysip.statespace.gaussian_process.matern.Matern52 method)</a>
+</li>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.periodic.Periodic.update_continuous_dssm">(pysip.statespace.gaussian_process.periodic.Periodic method)</a>
+</li>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic12.update_continuous_dssm">(pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic12 method)</a>
+</li>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic32.update_continuous_dssm">(pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic32 method)</a>
+</li>
+        <li><a href="statespace/lfm.html#pysip.statespace.latent_force_model.LatentForceModel.update_continuous_dssm">(pysip.statespace.latent_force_model.LatentForceModel method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.ti_ra.Ti_RA.update_continuous_dssm">(pysip.statespace.thermal_network.ti_ra.Ti_RA method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.ti_racv.Ti_RAcv.update_continuous_dssm">(pysip.statespace.thermal_network.ti_racv.Ti_RAcv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.tith_rwrhai.TiTh_RwRhAi.update_continuous_dssm">(pysip.statespace.thermal_network.tith_rwrhai.TiTh_RwRhAi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.titm_rwrmai.TiTm_RwRmAi.update_continuous_dssm">(pysip.statespace.thermal_network.titm_rwrmai.TiTm_RwRmAi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twti_rori.TwTi_RoRi.update_continuous_dssm">(pysip.statespace.thermal_network.twti_rori.TwTi_RoRi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twti_roriawai.TwTi_RoRiAwAi.update_continuous_dssm">(pysip.statespace.thermal_network.twti_roriawai.TwTi_RoRiAwAi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twti_roriawaicv.TwTi_RoRiAwAicv.update_continuous_dssm">(pysip.statespace.thermal_network.twti_roriawaicv.TwTi_RoRiAwAicv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twti_rorirbawai.TwTi_RoRiRbAwAi.update_continuous_dssm">(pysip.statespace.thermal_network.twti_rorirbawai.TwTi_RoRiRbAwAi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twti_rorirbawaicv.TwTi_RoRiRbAwAicv.update_continuous_dssm">(pysip.statespace.thermal_network.twti_rorirbawaicv.TwTi_RoRiRbAwAicv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitb_rorirbawaicv.TwTiTb_RoRiRbAwAicv.update_continuous_dssm">(pysip.statespace.thermal_network.twtitb_rorirbawaicv.TwTiTb_RoRiRbAwAicv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitb_roriribrbbawaicv.TwTiTb_RoRiRibRbbAwAicv.update_continuous_dssm">(pysip.statespace.thermal_network.twtitb_roriribrbbawaicv.TwTiTb_RoRiRibRbbAwAicv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtith_rorirhawai.TwTiTh_RoRiRhAwAi.update_continuous_dssm">(pysip.statespace.thermal_network.twtith_rorirhawai.TwTiTh_RoRiRhAwAi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtith_rorirhawaicv.TwTiTh_RoRiRhAwAicv.update_continuous_dssm">(pysip.statespace.thermal_network.twtith_rorirhawaicv.TwTiTh_RoRiRhAwAicv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_roriawai.TwTiTm_RoRiAwAi.update_continuous_dssm">(pysip.statespace.thermal_network.twtitm_roriawai.TwTiTm_RoRiAwAi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_roriawaicv.TwTiTm_RoRiAwAicv.update_continuous_dssm">(pysip.statespace.thermal_network.twtitm_roriawaicv.TwTiTm_RoRiAwAicv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirbawaicv.TwTiTm_RoRiRbAwAicv.update_continuous_dssm">(pysip.statespace.thermal_network.twtitm_rorirbawaicv.TwTiTm_RoRiRbAwAicv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirmawai.TwTiTm_RoRiRmAwAi.update_continuous_dssm">(pysip.statespace.thermal_network.twtitm_rorirmawai.TwTiTm_RoRiRmAwAi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirmawaiam.TwTiTm_RoRiRmAwAiAm.update_continuous_dssm">(pysip.statespace.thermal_network.twtitm_rorirmawaiam.TwTiTm_RoRiRmAwAiAm method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirmawaicv.TwTiTm_RoRiRmAwAicv.update_continuous_dssm">(pysip.statespace.thermal_network.twtitm_rorirmawaicv.TwTiTm_RoRiRmAwAicv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirmrbawai.TwTiTm_RoRiRmRbAwAi.update_continuous_dssm">(pysip.statespace.thermal_network.twtitm_rorirmrbawai.TwTiTm_RoRiRmRbAwAi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirmrbawaicv.TwTiTm_RoRiRmRbAwAicv.update_continuous_dssm">(pysip.statespace.thermal_network.twtitm_rorirmrbawaicv.TwTiTm_RoRiRmRbAwAicv method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="statespace/base.html#pysip.statespace.base.StateSpace.update_continuous_ssm">update_continuous_ssm() (pysip.statespace.base.StateSpace method)</a>
+
+      <ul>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.gp_product.GPProduct.update_continuous_ssm">(pysip.statespace.gaussian_process.gp_product.GPProduct method)</a>
+</li>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.gp_sum.GPSum.update_continuous_ssm">(pysip.statespace.gaussian_process.gp_sum.GPSum method)</a>
+</li>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.matern.Matern12.update_continuous_ssm">(pysip.statespace.gaussian_process.matern.Matern12 method)</a>
+</li>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.matern.Matern32.update_continuous_ssm">(pysip.statespace.gaussian_process.matern.Matern32 method)</a>
+</li>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.matern.Matern52.update_continuous_ssm">(pysip.statespace.gaussian_process.matern.Matern52 method)</a>
+</li>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.periodic.Periodic.update_continuous_ssm">(pysip.statespace.gaussian_process.periodic.Periodic method)</a>
+</li>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic12.update_continuous_ssm">(pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic12 method)</a>
+</li>
+        <li><a href="statespace/gp.html#pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic32.update_continuous_ssm">(pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic32 method)</a>
+</li>
+        <li><a href="statespace/lfm.html#pysip.statespace.latent_force_model.LatentForceModel.update_continuous_ssm">(pysip.statespace.latent_force_model.LatentForceModel method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.ti_ra.Ti_RA.update_continuous_ssm">(pysip.statespace.thermal_network.ti_ra.Ti_RA method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.ti_racv.Ti_RAcv.update_continuous_ssm">(pysip.statespace.thermal_network.ti_racv.Ti_RAcv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.tith_rwrhai.TiTh_RwRhAi.update_continuous_ssm">(pysip.statespace.thermal_network.tith_rwrhai.TiTh_RwRhAi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.titm_rwrmai.TiTm_RwRmAi.update_continuous_ssm">(pysip.statespace.thermal_network.titm_rwrmai.TiTm_RwRmAi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twti_rori.TwTi_RoRi.update_continuous_ssm">(pysip.statespace.thermal_network.twti_rori.TwTi_RoRi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twti_roriawai.TwTi_RoRiAwAi.update_continuous_ssm">(pysip.statespace.thermal_network.twti_roriawai.TwTi_RoRiAwAi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twti_roriawaicv.TwTi_RoRiAwAicv.update_continuous_ssm">(pysip.statespace.thermal_network.twti_roriawaicv.TwTi_RoRiAwAicv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twti_rorirbawai.TwTi_RoRiRbAwAi.update_continuous_ssm">(pysip.statespace.thermal_network.twti_rorirbawai.TwTi_RoRiRbAwAi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twti_rorirbawaicv.TwTi_RoRiRbAwAicv.update_continuous_ssm">(pysip.statespace.thermal_network.twti_rorirbawaicv.TwTi_RoRiRbAwAicv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitb_rorirbawaicv.TwTiTb_RoRiRbAwAicv.update_continuous_ssm">(pysip.statespace.thermal_network.twtitb_rorirbawaicv.TwTiTb_RoRiRbAwAicv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitb_roriribrbbawaicv.TwTiTb_RoRiRibRbbAwAicv.update_continuous_ssm">(pysip.statespace.thermal_network.twtitb_roriribrbbawaicv.TwTiTb_RoRiRibRbbAwAicv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtith_rorirhawai.TwTiTh_RoRiRhAwAi.update_continuous_ssm">(pysip.statespace.thermal_network.twtith_rorirhawai.TwTiTh_RoRiRhAwAi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtith_rorirhawaicv.TwTiTh_RoRiRhAwAicv.update_continuous_ssm">(pysip.statespace.thermal_network.twtith_rorirhawaicv.TwTiTh_RoRiRhAwAicv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_roriawai.TwTiTm_RoRiAwAi.update_continuous_ssm">(pysip.statespace.thermal_network.twtitm_roriawai.TwTiTm_RoRiAwAi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_roriawaicv.TwTiTm_RoRiAwAicv.update_continuous_ssm">(pysip.statespace.thermal_network.twtitm_roriawaicv.TwTiTm_RoRiAwAicv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirbawaicv.TwTiTm_RoRiRbAwAicv.update_continuous_ssm">(pysip.statespace.thermal_network.twtitm_rorirbawaicv.TwTiTm_RoRiRbAwAicv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirmawai.TwTiTm_RoRiRmAwAi.update_continuous_ssm">(pysip.statespace.thermal_network.twtitm_rorirmawai.TwTiTm_RoRiRmAwAi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirmawaiam.TwTiTm_RoRiRmAwAiAm.update_continuous_ssm">(pysip.statespace.thermal_network.twtitm_rorirmawaiam.TwTiTm_RoRiRmAwAiAm method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirmawaicv.TwTiTm_RoRiRmAwAicv.update_continuous_ssm">(pysip.statespace.thermal_network.twtitm_rorirmawaicv.TwTiTm_RoRiRmAwAicv method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirmrbawai.TwTiTm_RoRiRmRbAwAi.update_continuous_ssm">(pysip.statespace.thermal_network.twtitm_rorirmrbawai.TwTiTm_RoRiRmRbAwAi method)</a>
+</li>
+        <li><a href="statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirmrbawaicv.TwTiTm_RoRiRmRbAwAicv.update_continuous_ssm">(pysip.statespace.thermal_network.twtitm_rorirmrbawaicv.TwTiTm_RoRiRmRbAwAicv method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="V">V</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="mcmc/hmc.html#pysip.mcmc.hamiltonian.EuclideanHamiltonian.V">V() (pysip.mcmc.hamiltonian.EuclideanHamiltonian method)</a>
+</li>
+      <li><a href="mcmc/hmc.html#pysip.mcmc.hamiltonian.EuclideanHamiltonian.V_and_dV">V_and_dV() (pysip.mcmc.hamiltonian.EuclideanHamiltonian method)</a>
+</li>
+      <li><a href="core/prior.html#pysip.core.prior.Beta.variance">variance() (pysip.core.prior.Beta property)</a>
+
+      <ul>
+        <li><a href="core/prior.html#pysip.core.prior.Gamma.variance">(pysip.core.prior.Gamma property)</a>
+</li>
+        <li><a href="core/prior.html#pysip.core.prior.InverseGamma.variance">(pysip.core.prior.InverseGamma property)</a>
+</li>
+        <li><a href="core/prior.html#pysip.core.prior.LogNormal.variance">(pysip.core.prior.LogNormal property)</a>
+</li>
+        <li><a href="core/prior.html#pysip.core.prior.Normal.variance">(pysip.core.prior.Normal property)</a>
+</li>
+        <li><a href="core/prior.html#pysip.core.prior.Prior.variance">(pysip.core.prior.Prior method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2018, Loic Raillon, Maxime Janvier
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,269 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Overview: module code &mdash; Stochastic state-space Inference and Prediction  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Stochastic state-space Inference and Prediction
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guides/quickstart.html">Gettings started with pySIP</a></li>
+</ul>
+<p class="caption"><span class="caption-text">State-space models</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/base.html">Linear Time Invariant State-Space Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/rc.html">Dynamic Thermal Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/gp.html">Gaussian Processes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/lfm.html">Latent Force Model</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Regressors</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../regressors/base.html">Base regressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../regressors/frequentist.html">Frequentist regressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../regressors/bayesian.html">Bayesian regressor</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Parameters settings</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../core/parameter.html">Parameter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../core/parameters.html">Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../core/prior.html">Prior</a></li>
+</ul>
+<p class="caption"><span class="caption-text">State estimation and log-likelihood evaluation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../state_estimator/kalman_qr.html">Robust Kalman filtering and sensitivity equations</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Markov Chain Monte Carlo</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../mcmc/hmc.html">Dynamic Hamiltonian Monte Carlo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcmc/hmc.html#inference-summary">Inference summary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcmc/hmc.html#hamiltonian-system">Hamiltonian system</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/gaussian_process.html">Gaussian Process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/thermal_network.html">Armadillo</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Stochastic state-space Inference and Prediction</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Overview: module code</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>All modules for which code is available</h1>
+<ul><li><a href="pysip/core/parameter.html">pysip.core.parameter</a></li>
+<li><a href="pysip/core/parameters.html">pysip.core.parameters</a></li>
+<li><a href="pysip/core/prior.html">pysip.core.prior</a></li>
+<li><a href="pysip/mcmc/hamiltonian.html">pysip.mcmc.hamiltonian</a></li>
+<li><a href="pysip/mcmc/hmc.html">pysip.mcmc.hmc</a></li>
+<li><a href="pysip/regressors/base.html">pysip.regressors.base</a></li>
+<li><a href="pysip/regressors/bayesian.html">pysip.regressors.bayesian</a></li>
+<li><a href="pysip/regressors/frequentist.html">pysip.regressors.frequentist</a></li>
+<li><a href="pysip/state_estimator/kalman_qr.html">pysip.state_estimator.kalman_qr</a></li>
+<li><a href="pysip/statespace/base.html">pysip.statespace.base</a></li>
+<li><a href="pysip/statespace/gaussian_process/gp_product.html">pysip.statespace.gaussian_process.gp_product</a></li>
+<li><a href="pysip/statespace/gaussian_process/gp_sum.html">pysip.statespace.gaussian_process.gp_sum</a></li>
+<li><a href="pysip/statespace/gaussian_process/matern.html">pysip.statespace.gaussian_process.matern</a></li>
+<li><a href="pysip/statespace/gaussian_process/periodic.html">pysip.statespace.gaussian_process.periodic</a></li>
+<li><a href="pysip/statespace/gaussian_process/quasi_periodic.html">pysip.statespace.gaussian_process.quasi_periodic</a></li>
+<li><a href="pysip/statespace/latent_force_model.html">pysip.statespace.latent_force_model</a></li>
+<li><a href="pysip/statespace/thermal_network/ti_ra.html">pysip.statespace.thermal_network.ti_ra</a></li>
+<li><a href="pysip/statespace/thermal_network/ti_racv.html">pysip.statespace.thermal_network.ti_racv</a></li>
+<li><a href="pysip/statespace/thermal_network/tith_rwrhai.html">pysip.statespace.thermal_network.tith_rwrhai</a></li>
+<li><a href="pysip/statespace/thermal_network/titm_rwrmai.html">pysip.statespace.thermal_network.titm_rwrmai</a></li>
+<li><a href="pysip/statespace/thermal_network/twti_rori.html">pysip.statespace.thermal_network.twti_rori</a></li>
+<li><a href="pysip/statespace/thermal_network/twti_roriawai.html">pysip.statespace.thermal_network.twti_roriawai</a></li>
+<li><a href="pysip/statespace/thermal_network/twti_roriawaicv.html">pysip.statespace.thermal_network.twti_roriawaicv</a></li>
+<li><a href="pysip/statespace/thermal_network/twti_rorirbawai.html">pysip.statespace.thermal_network.twti_rorirbawai</a></li>
+<li><a href="pysip/statespace/thermal_network/twti_rorirbawaicv.html">pysip.statespace.thermal_network.twti_rorirbawaicv</a></li>
+<li><a href="pysip/statespace/thermal_network/twtitb_rorirbawaicv.html">pysip.statespace.thermal_network.twtitb_rorirbawaicv</a></li>
+<li><a href="pysip/statespace/thermal_network/twtitb_roriribrbbawaicv.html">pysip.statespace.thermal_network.twtitb_roriribrbbawaicv</a></li>
+<li><a href="pysip/statespace/thermal_network/twtith_rorirhawai.html">pysip.statespace.thermal_network.twtith_rorirhawai</a></li>
+<li><a href="pysip/statespace/thermal_network/twtith_rorirhawaicv.html">pysip.statespace.thermal_network.twtith_rorirhawaicv</a></li>
+<li><a href="pysip/statespace/thermal_network/twtitm_roriawai.html">pysip.statespace.thermal_network.twtitm_roriawai</a></li>
+<li><a href="pysip/statespace/thermal_network/twtitm_roriawaicv.html">pysip.statespace.thermal_network.twtitm_roriawaicv</a></li>
+<li><a href="pysip/statespace/thermal_network/twtitm_rorirbawaicv.html">pysip.statespace.thermal_network.twtitm_rorirbawaicv</a></li>
+<li><a href="pysip/statespace/thermal_network/twtitm_rorirmawai.html">pysip.statespace.thermal_network.twtitm_rorirmawai</a></li>
+<li><a href="pysip/statespace/thermal_network/twtitm_rorirmawaiam.html">pysip.statespace.thermal_network.twtitm_rorirmawaiam</a></li>
+<li><a href="pysip/statespace/thermal_network/twtitm_rorirmawaicv.html">pysip.statespace.thermal_network.twtitm_rorirmawaicv</a></li>
+<li><a href="pysip/statespace/thermal_network/twtitm_rorirmrbawai.html">pysip.statespace.thermal_network.twtitm_rorirmrbawai</a></li>
+<li><a href="pysip/statespace/thermal_network/twtitm_rorirmrbawaicv.html">pysip.statespace.thermal_network.twtitm_rorirmrbawaicv</a></li>
+</ul>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2018, Loic Raillon, Maxime Janvier
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

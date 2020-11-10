@@ -1,0 +1,414 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pysip.mcmc.hamiltonian &mdash; Stochastic state-space Inference and Prediction  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> Stochastic state-space Inference and Prediction
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../guides/quickstart.html">Gettings started with pySIP</a></li>
+</ul>
+<p class="caption"><span class="caption-text">State-space models</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../statespace/base.html">Linear Time Invariant State-Space Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../statespace/rc.html">Dynamic Thermal Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../statespace/gp.html">Gaussian Processes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../statespace/lfm.html">Latent Force Model</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Regressors</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../regressors/base.html">Base regressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../regressors/frequentist.html">Frequentist regressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../regressors/bayesian.html">Bayesian regressor</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Parameters settings</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../core/parameter.html">Parameter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../core/parameters.html">Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../core/prior.html">Prior</a></li>
+</ul>
+<p class="caption"><span class="caption-text">State estimation and log-likelihood evaluation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../state_estimator/kalman_qr.html">Robust Kalman filtering and sensitivity equations</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Markov Chain Monte Carlo</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../mcmc/hmc.html">Dynamic Hamiltonian Monte Carlo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mcmc/hmc.html#inference-summary">Inference summary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mcmc/hmc.html#hamiltonian-system">Hamiltonian system</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/gaussian_process.html">Gaussian Process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../examples/thermal_network.html">Armadillo</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Stochastic state-space Inference and Prediction</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>pysip.mcmc.hamiltonian</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pysip.mcmc.hamiltonian</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span> <span class="nn">.metrics</span> <span class="kn">import</span> <span class="n">EuclideanMetric</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.linalg</span> <span class="k">as</span> <span class="nn">sla</span>
+
+
+<div class="viewcode-block" id="EuclideanHamiltonian"><a class="viewcode-back" href="../../../mcmc/hmc.html#pysip.mcmc.hamiltonian.EuclideanHamiltonian">[docs]</a><span class="k">class</span> <span class="nc">EuclideanHamiltonian</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Hamiltonian System</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">       :nowrap:</span>
+
+<span class="sd">        \\begin{align*}</span>
+<span class="sd">            H(q, p) &amp;= -\\log \\pi(p \\mid q) -\\log \\pi(q) \\\\</span>
+<span class="sd">                    &amp;= K(p, q) + V(q)</span>
+<span class="sd">        \\end{align*}</span>
+
+<span class="sd">    where :math:`H(q, p)` is the Hamiltonian function with :math:`q` and :math:`p`,</span>
+<span class="sd">    the position and momentum variables in phase space. :math:`K(p, q)` is the Kinetic energy</span>
+<span class="sd">    and :math:`V(q)` is the potential energy. The potential energy is completely determined by the</span>
+<span class="sd">    target distribution while the kinetic energy is specified by the implementation.</span>
+
+<span class="sd">    Hamiltonian&#39;s equations</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">       :nowrap:</span>
+
+<span class="sd">        \\begin{align*}</span>
+<span class="sd">            \\frac{\\mathrm{d}q}{\\mathrm{d}t} &amp;= \\frac{\\partial H}{\\partial p} =</span>
+<span class="sd">                \\frac{\\partial K}{\\partial p} \\\\</span>
+<span class="sd">            \\frac{\\mathrm{d}p}{\\mathrm{d}t} &amp;= -\\frac{\\partial H}{\\partial q} =</span>
+<span class="sd">                -\\frac{\\partial K}{\\partial q} - \\frac{\\partial V}{\\partial q}</span>
+<span class="sd">        \\end{align*}</span>
+
+
+<span class="sd">    For Euclidean-Gaussian kinetic energy</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">       :nowrap:</span>
+
+<span class="sd">        \\begin{align*}</span>
+<span class="sd">            K(p) &amp;= \\frac{1}{2} p M^{-1} p + \\log \\lvert M \\rvert + \\text{const.} \\\\</span>
+<span class="sd">            &amp;\\propto \\frac{1}{2} p M^{-1} p</span>
+<span class="sd">        \\end{align*}</span>
+
+
+<span class="sd">    with :math:`M` the mass matrix, the Hamiltonian system is separable such that</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">       :nowrap:</span>
+
+<span class="sd">        \\begin{align*}</span>
+<span class="sd">            H(q, p) &amp;= -\\log \\pi(p) -\\log \\pi(q) \\\\</span>
+<span class="sd">                    &amp;= K(p) + V(q)</span>
+<span class="sd">        \\end{align*}</span>
+
+
+<span class="sd">    which simplifies the Hamiltonian&#39;s equations to</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">       :nowrap:</span>
+
+<span class="sd">        \\begin{align*}</span>
+<span class="sd">            \\frac{\\mathrm{d}q}{\\mathrm{d}t} &amp;= \\frac{\\partial H}{\\partial p} =</span>
+<span class="sd">                \\frac{\\partial K}{\\partial p}\\\\</span>
+<span class="sd">            \\frac{\\mathrm{d}p}{\\mathrm{d}t} &amp;= -\\frac{\\partial H}{\\partial q} =</span>
+<span class="sd">                -\\frac{\\partial V}{\\partial q}</span>
+<span class="sd">        \\end{align*}</span>
+
+
+<span class="sd">    Args:</span>
+<span class="sd">        potential: Function which evaluate the potential energy and the gradient at a given position</span>
+<span class="sd">        metric: Diagonal or Dense Euclidean metric</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        Betancourt, M., 2017. A conceptual introduction to Hamiltonian Monte Carlo.</span>
+<span class="sd">        arXiv preprint arXiv:1701.02434.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">potential</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">metric</span><span class="p">:</span> <span class="n">EuclideanMetric</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_V_dV</span> <span class="o">=</span> <span class="n">potential</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_metric</span> <span class="o">=</span> <span class="n">metric</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">metric</span><span class="p">,</span> <span class="n">EuclideanMetric</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;`metric` must be an EuclideanMetric&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="EuclideanHamiltonian.V"><a class="viewcode-back" href="../../../mcmc/hmc.html#pysip.mcmc.hamiltonian.EuclideanHamiltonian.V">[docs]</a>    <span class="k">def</span> <span class="nf">V</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Evaluate the potential energy function :math:`V(q)`at the position `q`</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            q: Position variable</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Potential energy</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_V_dV</span><span class="p">(</span><span class="n">q</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="EuclideanHamiltonian.dV"><a class="viewcode-back" href="../../../mcmc/hmc.html#pysip.mcmc.hamiltonian.EuclideanHamiltonian.dV">[docs]</a>    <span class="k">def</span> <span class="nf">dV</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Evaluate the gradient of the potential energy function</span>
+<span class="sd">        :math:`\\frac{\\partial V(q)} {\\partial q}` at the position `q`</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            q: Position variable</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Gradient of the potential energy</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_V_dV</span><span class="p">(</span><span class="n">q</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="EuclideanHamiltonian.V_and_dV"><a class="viewcode-back" href="../../../mcmc/hmc.html#pysip.mcmc.hamiltonian.EuclideanHamiltonian.V_and_dV">[docs]</a>    <span class="k">def</span> <span class="nf">V_and_dV</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Evaluate the potential energy function :math:`V(q)` and the gradient of the potential</span>
+<span class="sd">        energy function :math:`\\frac{\\partial V(q)} {\\partial q}` at the position `q`</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            q: Position variable</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            2-element tuple containing</span>
+<span class="sd">                - Potential energy</span>
+<span class="sd">                - Gradient of the potential energy</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_V_dV</span><span class="p">(</span><span class="n">q</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EuclideanHamiltonian.K"><a class="viewcode-back" href="../../../mcmc/hmc.html#pysip.mcmc.hamiltonian.EuclideanHamiltonian.K">[docs]</a>    <span class="k">def</span> <span class="nf">K</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Evaluate the kinetic energy function :math:`K(p)` at the momentum variable `p`</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            p: Momentum variable</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Kinetic energy</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metric</span><span class="o">.</span><span class="n">kinetic_energy</span><span class="p">(</span><span class="n">momentum</span><span class="o">=</span><span class="n">p</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EuclideanHamiltonian.dK"><a class="viewcode-back" href="../../../mcmc/hmc.html#pysip.mcmc.hamiltonian.EuclideanHamiltonian.dK">[docs]</a>    <span class="k">def</span> <span class="nf">dK</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Evaluate the gradient of the kinetic energy function</span>
+<span class="sd">        :math:`\\frac{\\partial K}{\\partial p}` at the momentum variable `p`</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            p: Momentum variable</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Gradient of the kinetic energy</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metric</span><span class="o">.</span><span class="n">gradient_kinetic_energy</span><span class="p">(</span><span class="n">momentum</span><span class="o">=</span><span class="n">p</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="EuclideanHamiltonian.sample_p"><a class="viewcode-back" href="../../../mcmc/hmc.html#pysip.mcmc.hamiltonian.EuclideanHamiltonian.sample_p">[docs]</a>    <span class="k">def</span> <span class="nf">sample_p</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Sample momentum</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Momentum variables</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metric</span><span class="o">.</span><span class="n">sample_momentum</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="EuclideanHamiltonian.H"><a class="viewcode-back" href="../../../mcmc/hmc.html#pysip.mcmc.hamiltonian.EuclideanHamiltonian.H">[docs]</a>    <span class="k">def</span> <span class="nf">H</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Evaluate the energy, i.e. the Hamiltonian in phase space :math:`H(q, p)`</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            q: Position variable</span>
+<span class="sd">            p: Momentum variable</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Energy</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">V</span><span class="p">(</span><span class="n">q</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">inverse_mass_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the inverse of the mass matrix `M`&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metric</span><span class="o">.</span><span class="n">get_inverse_metric</span><span class="p">()</span>
+
+    <span class="nd">@inverse_mass_matrix</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">inverse_mass_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set the inverse of the mass matrix `M`</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            M: Mass matrix (Full matrix or only diagonal elements)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_metric</span><span class="o">.</span><span class="n">set_inverse_metric</span><span class="p">(</span><span class="n">M</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2018, Loic Raillon, Maxime Janvier
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

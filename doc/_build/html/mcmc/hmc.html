@@ -1,0 +1,799 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Dynamic Hamiltonian Monte Carlo &mdash; Stochastic state-space Inference and Prediction  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Gaussian Process" href="../examples/gaussian_process.html" />
+    <link rel="prev" title="Robust Kalman filtering and sensitivity equations" href="../state_estimator/kalman_qr.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Stochastic state-space Inference and Prediction
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guides/quickstart.html">Gettings started with pySIP</a></li>
+</ul>
+<p class="caption"><span class="caption-text">State-space models</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/base.html">Linear Time Invariant State-Space Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/rc.html">Dynamic Thermal Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/gp.html">Gaussian Processes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/lfm.html">Latent Force Model</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Regressors</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../regressors/base.html">Base regressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../regressors/frequentist.html">Frequentist regressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../regressors/bayesian.html">Bayesian regressor</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Parameters settings</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../core/parameter.html">Parameter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../core/parameters.html">Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../core/prior.html">Prior</a></li>
+</ul>
+<p class="caption"><span class="caption-text">State estimation and log-likelihood evaluation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../state_estimator/kalman_qr.html">Robust Kalman filtering and sensitivity equations</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Markov Chain Monte Carlo</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Dynamic Hamiltonian Monte Carlo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#inference-summary">Inference summary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#hamiltonian-system">Hamiltonian system</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/gaussian_process.html">Gaussian Process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/thermal_network.html">Armadillo</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Stochastic state-space Inference and Prediction</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Dynamic Hamiltonian Monte Carlo</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/mcmc/hmc.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="dynamic-hamiltonian-monte-carlo">
+<h1>Dynamic Hamiltonian Monte Carlo<a class="headerlink" href="#dynamic-hamiltonian-monte-carlo" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="pysip.mcmc.hmc.DynamicHMC">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.mcmc.hmc.</code><code class="sig-name descname">DynamicHMC</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">hamiltonian</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/mcmc/hmc.html#DynamicHMC"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.mcmc.hmc.DynamicHMC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dynamic Hamiltonian Monte Carlo Sampler with Multinomial sampling</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>hamiltonian</strong> (<a class="reference internal" href="#pysip.mcmc.hamiltonian.EuclideanHamiltonian" title="pysip.mcmc.hamiltonian.EuclideanHamiltonian"><code class="xref py py-class docutils literal notranslate"><span class="pre">EuclideanHamiltonian</span></code></a>) – Hamiltonian system with Euclidean-Gaussian kinetic energies</p>
+</dd>
+</dl>
+<p>References:
+Betancourt, M., 2017. A conceptual introduction to Hamiltonian Monte Carlo.
+arXiv preprint arXiv:1701.02434.</p>
+<dl class="py method">
+<dt id="pysip.mcmc.hmc.DynamicHMC._build_tree">
+<code class="sig-name descname">_build_tree</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">depth</span></em>, <em class="sig-param"><span class="n">direction</span></em>, <em class="sig-param"><span class="n">state</span></em>, <em class="sig-param"><span class="n">stepsize</span></em>, <em class="sig-param"><span class="n">H0</span></em>, <em class="sig-param"><span class="n">sum_p</span></em>, <em class="sig-param"><span class="n">sum_w</span></em>, <em class="sig-param"><span class="n">stats</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/mcmc/hmc.html#DynamicHMC._build_tree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.mcmc.hmc.DynamicHMC._build_tree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recursively build the binary tree</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>depth</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Depth of the desired subtree</p></li>
+<li><p><strong>direction</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – direction in time to build subtree [-1 or 1]</p></li>
+<li><p><strong>state</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">NamedTuple</span></code>) – State proposed from the subtree</p></li>
+<li><p><strong>stepsize</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Step-size of the leapfrog integrator</p></li>
+<li><p><strong>H0</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Hamiltonian of the initial state</p></li>
+<li><p><strong>sum_p</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Summed momentum accross trajectory</p></li>
+<li><p><strong>sum_w</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Summed weight accross trajectory</p></li>
+<li><p><strong>stats</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>) – Trajectory statistics
+- <strong>accept_prob</strong>: Summed acceptance probability accross trajectory
+- <strong>leapfrog_steps</strong>: Summed number of leapfrog integrations
+- <strong>diverging</strong>: Flag for diverging transition</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">NamedTuple</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">NamedTuple</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">NamedTuple</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>5-elements tuple with</dt><dd><p>stop: Flag indicating a divergent transition or a U-turn
+state_inner: State of the inner subtree
+state_outer: State of the outer subtree
+state_proposed: State of the proposed subtree
+sum_w: Summed weight accross trajectory</p>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.mcmc.hmc.DynamicHMC._hamiltonian_state">
+<code class="sig-name descname">_hamiltonian_state</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">q</span></em>, <em class="sig-param"><span class="n">p</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/mcmc/hmc.html#DynamicHMC._hamiltonian_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.mcmc.hmc.DynamicHMC._hamiltonian_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute Hamiltonian state at a point in phase space</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>q</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Position in phase space</p></li>
+<li><p><strong>p</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Momentum in phase space</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NamedTuple</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Hamiltonian state</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.mcmc.hmc.DynamicHMC._hmc_step">
+<code class="sig-name descname">_hmc_step</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">q</span></em>, <em class="sig-param"><span class="n">stepsize</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/mcmc/hmc.html#DynamicHMC._hmc_step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.mcmc.hmc.DynamicHMC._hmc_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dynamic Hamiltonian Monte Carlo step</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>q</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Position in phase space</p></li>
+<li><p><strong>stepsize</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Step-size of the leapfrog integrator</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Next position
+stats: Statistic from the Hamiltonian transition</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>state_n.q</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.mcmc.hmc.DynamicHMC._leapfrog_step">
+<code class="sig-name descname">_leapfrog_step</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state</span></em>, <em class="sig-param"><span class="n">direction</span></em>, <em class="sig-param"><span class="n">stepsize</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/mcmc/hmc.html#DynamicHMC._leapfrog_step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.mcmc.hmc.DynamicHMC._leapfrog_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Explicit leapfrog integrator for separable Hamiltonian systems</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">NamedTuple</span></code>) – State of the Hamiltonian at the current point in phase space</p></li>
+<li><p><strong>direction</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Time direction for integration, e.g forward=1, backward=-1</p></li>
+<li><p><strong>stepsize</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Step-size of the leapfrog integrator</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">NamedTuple</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>State of the Hamiltonian a step further in the trajectory</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.mcmc.hmc.DynamicHMC._sample_chain">
+<code class="sig-name descname">_sample_chain</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">q</span></em>, <em class="sig-param"><span class="n">pbar</span></em>, <em class="sig-param"><span class="n">stepsize</span></em>, <em class="sig-param"><span class="n">step_adapter</span></em>, <em class="sig-param"><span class="n">cov_adapter</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/mcmc/hmc.html#DynamicHMC._sample_chain"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.mcmc.hmc.DynamicHMC._sample_chain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sample a chain</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>q</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Initial position variables</p></li>
+<li><p><strong>pbar</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">trange</span></code>) – Progress bar</p></li>
+<li><p><strong>stepsize</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Initial step-size of the leapfrog integrator</p></li>
+<li><p><strong>step_adapter</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DualAveraging</span></code>) – Dual averaging algorithm for learning the step-size</p></li>
+<li><p><strong>cov_adapter</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">CovAdaptation</span></code>) – Windowed Welford covariance estimator</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Sampled chain
+stats: Transition statistics</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>chain</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.mcmc.hmc.DynamicHMC._transition">
+<code class="sig-name descname">_transition</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state</span></em>, <em class="sig-param"><span class="n">stepsize</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/mcmc/hmc.html#DynamicHMC._transition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.mcmc.hmc.DynamicHMC._transition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dynamic Hamiltonian Monte Carlo transition with multinomial sampling</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">NamedTuple</span></code>) – Hamiltonian state at the current point in phase space</p></li>
+<li><p><strong>stepsize</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Step-size of the leapfrog integrator</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>Next Hamiltonian state
+stats: Trajectory statistics</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>accept_prob</strong>: Average acceptance probability accross trajectory</p></li>
+<li><p><strong>leapfrog_steps</strong>: Number of leapfrog steps</p></li>
+<li><p><strong>diverging</strong>: Flag for diverging transition</p></li>
+<li><p><strong>energy</strong>: Hamiltonian at the next state</p></li>
+<li><p><strong>tree_depth</strong>: Depth of the binary tree</p></li>
+<li><p><strong>max_tree_depth</strong>: Flag for maximum integration steps</p></li>
+<li><p><strong>stepsize</strong>: Step-size of the leapfrog integrator</p></li>
+<li><p><strong>potential</strong>: Potential energy (negative log-posterior)</p></li>
+</ul>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>state_n</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.mcmc.hmc.DynamicHMC.sample">
+<code class="sig-name descname">sample</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">q</span></em>, <em class="sig-param"><span class="n">n_draws</span><span class="o">=</span><span class="default_value">2000</span></em>, <em class="sig-param"><span class="n">n_chains</span><span class="o">=</span><span class="default_value">4</span></em>, <em class="sig-param"><span class="n">n_warmup</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">options</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/mcmc/hmc.html#DynamicHMC.sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.mcmc.hmc.DynamicHMC.sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw samples from the target distribution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>q</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Initial position variables (e.g. initial parameters)</p></li>
+<li><p><strong>n_draws</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of samples</p></li>
+<li><p><strong>n_chains</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of Markov chains</p></li>
+<li><p><strong>n_warmup</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of iterations to use for adapting the step size and the mass matrix</p></li>
+<li><p><strong>options</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>]) – <ul>
+<li><dl class="simple">
+<dt><strong>stepsize</strong> (float, default=0.25 / n_par**0.25)</dt><dd><p>Step-size of the leapfrog integrator</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>dense_mass_matrix</strong> (bool, default=False)</dt><dd><p>Estimate the dense mass matrix during adaptation. By default, only the diagonal
+elements are estimated.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>shrinkage</strong> (bool, default=True)</dt><dd><p>Shrink towards unity the diagonal elements of the estimated mass matrix</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>max_tree_depth</strong> (int, default=10)</dt><dd><p>Maximum tree depth</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>dH_max</strong> (float, default=1000)</dt><dd><p>Maximum energy change allowed in a trajectory. Larger
+deviations are considered as diverging transitions.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>accp_target</strong> (float, default=0.8):</dt><dd><p>Target average acceptance probability. Valid values are between ]0, 1[</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>t0</strong> (float, default=10.0):</dt><dd><p>Adaptation iteration offset (primal-dual averaging algorithm parameter)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>gamma</strong> (float, default=0.05):</dt><dd><p>Adaptation regularization scale (primal-dual averaging algorithm parameter)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>kappa</strong> (float, default=0.75):</dt><dd><p>Adaptation relaxation exponent (primal-dual averaging algorithm parameter)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>mu</strong> (float, default=log(10 * stepsize)):</dt><dd><p>Asymptotic mean of the step-size (primal-dual averaging algorithm parameter)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>n_cpu</strong>: (int, default=-1):</dt><dd><p>Number of cpu to use. To use all available cpu, set the value to -1,
+otherwise valid values are between [1, +Inf[</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>init_buffer</strong>: (int, default=75)</dt><dd><p>Width of initial fast adaptation interval</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>term_buffer</strong>: (int, default=100)</dt><dd><p>Width of final fast adaptation interval</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>window</strong>: (int, default=25)</dt><dd><p>Initial width of slow adaptation interval</p>
+</dd>
+</dl>
+</li>
+</ul>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Markov chain traces
+stats: Hamiltonian transition statistics
+df: Hamiltonian sampler diagnostic</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>chains</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="inference-summary">
+<h1>Inference summary<a class="headerlink" href="#inference-summary" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="pysip.mcmc.hmc.Fit_Bayes">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.mcmc.hmc.</code><code class="sig-name descname">Fit_Bayes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chains</span></em>, <em class="sig-param"><span class="n">stats</span></em>, <em class="sig-param"><span class="n">options</span></em>, <em class="sig-param"><span class="n">n_warmup</span></em>, <em class="sig-param"><span class="n">model</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/mcmc/hmc.html#Fit_Bayes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.mcmc.hmc.Fit_Bayes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit summary returned by DynamicHMC</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chains</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>) – Markov Chains Traces</p></li>
+<li><p><strong>stats</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>) – Hamiltonian transition statistics</p></li>
+<li><p><strong>options</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>) – Sampler options</p></li>
+<li><p><strong>n_warmup</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of iterations used as warmup</p></li>
+<li><p><strong>model</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]) – Model name</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="pysip.mcmc.hmc.Fit_Bayes.diagnostic">
+<em class="property">property </em><code class="sig-name descname">diagnostic</code><a class="headerlink" href="#pysip.mcmc.hmc.Fit_Bayes.diagnostic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sampler diagnostic</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Sampler diagnostic</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>df</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>EBFMI (Energy Bayesian Fraction of Missing Information) values below 0.3 indicates
+that momentum resampling will ineffciently explore the energy level sets.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.mcmc.hmc.Fit_Bayes.get_options">
+<code class="sig-name descname">get_options</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">keys</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/mcmc/hmc.html#Fit_Bayes.get_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.mcmc.hmc.Fit_Bayes.get_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the dictionary of options or only the options given in <cite>keys</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>keys</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – List of options (keys)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dictionary of options</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>d</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.mcmc.hmc.Fit_Bayes.n_warmup">
+<em class="property">property </em><code class="sig-name descname">n_warmup</code><a class="headerlink" href="#pysip.mcmc.hmc.Fit_Bayes.n_warmup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of iterations used as warmup</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.mcmc.hmc.Fit_Bayes.posterior">
+<em class="property">property </em><code class="sig-name descname">posterior</code><a class="headerlink" href="#pysip.mcmc.hmc.Fit_Bayes.posterior" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the Markov chain traces with without warm-up</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.mcmc.hmc.Fit_Bayes.stats">
+<em class="property">property </em><code class="sig-name descname">stats</code><a class="headerlink" href="#pysip.mcmc.hmc.Fit_Bayes.stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the Markov chain traces with without warm-up</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="hamiltonian-system">
+<h1>Hamiltonian system<a class="headerlink" href="#hamiltonian-system" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="pysip.mcmc.hamiltonian.EuclideanHamiltonian">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.mcmc.hamiltonian.</code><code class="sig-name descname">EuclideanHamiltonian</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">potential</span></em>, <em class="sig-param"><span class="n">metric</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/mcmc/hamiltonian.html#EuclideanHamiltonian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.mcmc.hamiltonian.EuclideanHamiltonian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hamiltonian System</p>
+<div class="math notranslate nohighlight">
+ \begin{align*}
+     H(q, p) &amp;= -\log \pi(p \mid q) -\log \pi(q) \\
+             &amp;= K(p, q) + V(q)
+ \end{align*}</div><p>where <span class="math notranslate nohighlight">\(H(q, p)\)</span> is the Hamiltonian function with <span class="math notranslate nohighlight">\(q\)</span> and <span class="math notranslate nohighlight">\(p\)</span>,
+the position and momentum variables in phase space. <span class="math notranslate nohighlight">\(K(p, q)\)</span> is the Kinetic energy
+and <span class="math notranslate nohighlight">\(V(q)\)</span> is the potential energy. The potential energy is completely determined by the
+target distribution while the kinetic energy is specified by the implementation.</p>
+<p>Hamiltonian’s equations</p>
+<div class="math notranslate nohighlight">
+ \begin{align*}
+     \frac{\mathrm{d}q}{\mathrm{d}t} &amp;= \frac{\partial H}{\partial p} =
+         \frac{\partial K}{\partial p} \\
+     \frac{\mathrm{d}p}{\mathrm{d}t} &amp;= -\frac{\partial H}{\partial q} =
+         -\frac{\partial K}{\partial q} - \frac{\partial V}{\partial q}
+ \end{align*}</div><p>For Euclidean-Gaussian kinetic energy</p>
+<div class="math notranslate nohighlight">
+ \begin{align*}
+     K(p) &amp;= \frac{1}{2} p M^{-1} p + \log \lvert M \rvert + \text{const.} \\
+     &amp;\propto \frac{1}{2} p M^{-1} p
+ \end{align*}</div><p>with <span class="math notranslate nohighlight">\(M\)</span> the mass matrix, the Hamiltonian system is separable such that</p>
+<div class="math notranslate nohighlight">
+ \begin{align*}
+     H(q, p) &amp;= -\log \pi(p) -\log \pi(q) \\
+             &amp;= K(p) + V(q)
+ \end{align*}</div><p>which simplifies the Hamiltonian’s equations to</p>
+<div class="math notranslate nohighlight">
+ \begin{align*}
+     \frac{\mathrm{d}q}{\mathrm{d}t} &amp;= \frac{\partial H}{\partial p} =
+         \frac{\partial K}{\partial p}\\
+     \frac{\mathrm{d}p}{\mathrm{d}t} &amp;= -\frac{\partial H}{\partial q} =
+         -\frac{\partial V}{\partial q}
+ \end{align*}</div><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>potential</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>) – Function which evaluate the potential energy and the gradient at a given position</p></li>
+<li><p><strong>metric</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">EuclideanMetric</span></code>) – Diagonal or Dense Euclidean metric</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<p>Betancourt, M., 2017. A conceptual introduction to Hamiltonian Monte Carlo.
+arXiv preprint arXiv:1701.02434.</p>
+<dl class="py method">
+<dt id="pysip.mcmc.hamiltonian.EuclideanHamiltonian.H">
+<code class="sig-name descname">H</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">q</span></em>, <em class="sig-param"><span class="n">p</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/mcmc/hamiltonian.html#EuclideanHamiltonian.H"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.mcmc.hamiltonian.EuclideanHamiltonian.H" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the energy, i.e. the Hamiltonian in phase space <span class="math notranslate nohighlight">\(H(q, p)\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>q</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>) – Position variable</p></li>
+<li><p><strong>p</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>) – Momentum variable</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Energy</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.mcmc.hamiltonian.EuclideanHamiltonian.K">
+<code class="sig-name descname">K</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">p</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/mcmc/hamiltonian.html#EuclideanHamiltonian.K"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.mcmc.hamiltonian.EuclideanHamiltonian.K" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the kinetic energy function <span class="math notranslate nohighlight">\(K(p)\)</span> at the momentum variable <cite>p</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>p</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>) – Momentum variable</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Kinetic energy</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.mcmc.hamiltonian.EuclideanHamiltonian.V">
+<code class="sig-name descname">V</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">q</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/mcmc/hamiltonian.html#EuclideanHamiltonian.V"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.mcmc.hamiltonian.EuclideanHamiltonian.V" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the potential energy function <span class="math notranslate nohighlight">\(V(q)\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>q</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>) – Position variable</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Potential energy</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.mcmc.hamiltonian.EuclideanHamiltonian.V_and_dV">
+<code class="sig-name descname">V_and_dV</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">q</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/mcmc/hamiltonian.html#EuclideanHamiltonian.V_and_dV"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.mcmc.hamiltonian.EuclideanHamiltonian.V_and_dV" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the potential energy function <span class="math notranslate nohighlight">\(V(q)\)</span> and the gradient of the potential
+energy function <span class="math notranslate nohighlight">\(\frac{\partial V(q)} {\partial q}\)</span> at the position <cite>q</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>q</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>) – Position variable</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>2-element tuple containing</dt><dd><ul class="simple">
+<li><p>Potential energy</p></li>
+<li><p>Gradient of the potential energy</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.mcmc.hamiltonian.EuclideanHamiltonian.dK">
+<code class="sig-name descname">dK</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">p</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/mcmc/hamiltonian.html#EuclideanHamiltonian.dK"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.mcmc.hamiltonian.EuclideanHamiltonian.dK" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the gradient of the kinetic energy function
+<span class="math notranslate nohighlight">\(\frac{\partial K}{\partial p}\)</span> at the momentum variable <cite>p</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>p</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>) – Momentum variable</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Gradient of the kinetic energy</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.mcmc.hamiltonian.EuclideanHamiltonian.dV">
+<code class="sig-name descname">dV</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">q</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/mcmc/hamiltonian.html#EuclideanHamiltonian.dV"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.mcmc.hamiltonian.EuclideanHamiltonian.dV" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the gradient of the potential energy function
+<span class="math notranslate nohighlight">\(\frac{\partial V(q)} {\partial q}\)</span> at the position <cite>q</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>q</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array</span></code>) – Position variable</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Gradient of the potential energy</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.mcmc.hamiltonian.EuclideanHamiltonian.inverse_mass_matrix">
+<em class="property">property </em><code class="sig-name descname">inverse_mass_matrix</code><a class="headerlink" href="#pysip.mcmc.hamiltonian.EuclideanHamiltonian.inverse_mass_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the inverse of the mass matrix <cite>M</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.mcmc.hamiltonian.EuclideanHamiltonian.sample_p">
+<code class="sig-name descname">sample_p</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/mcmc/hamiltonian.html#EuclideanHamiltonian.sample_p"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.mcmc.hamiltonian.EuclideanHamiltonian.sample_p" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sample momentum</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Momentum variables</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../examples/gaussian_process.html" class="btn btn-neutral float-right" title="Gaussian Process" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../state_estimator/kalman_qr.html" class="btn btn-neutral float-left" title="Robust Kalman filtering and sensitivity equations" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2018, Loic Raillon, Maxime Janvier
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

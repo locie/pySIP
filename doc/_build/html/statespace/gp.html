@@ -1,0 +1,916 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Gaussian Processes &mdash; Stochastic state-space Inference and Prediction  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Latent Force Model" href="lfm.html" />
+    <link rel="prev" title="Dynamic Thermal Models" href="rc.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Stochastic state-space Inference and Prediction
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guides/quickstart.html">Gettings started with pySIP</a></li>
+</ul>
+<p class="caption"><span class="caption-text">State-space models</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="base.html">Linear Time Invariant State-Space Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rc.html">Dynamic Thermal Models</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Gaussian Processes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#sum-and-product-of-gaussian-process">Sum and product of Gaussian process</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#gpsum">GPSum</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#gpproduct">GPProduct</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#stationary-covariance-function">Stationary covariance function</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#matern12">Matern12</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#matern32">Matern32</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#matern52">Matern52</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#non-stationary-covariance-function">Non-stationary covariance function</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#periodic">Periodic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#quasiperiodic12">QuasiPeriodic12</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#quasiperiodic32">QuasiPeriodic32</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="lfm.html">Latent Force Model</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Regressors</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../regressors/base.html">Base regressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../regressors/frequentist.html">Frequentist regressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../regressors/bayesian.html">Bayesian regressor</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Parameters settings</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../core/parameter.html">Parameter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../core/parameters.html">Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../core/prior.html">Prior</a></li>
+</ul>
+<p class="caption"><span class="caption-text">State estimation and log-likelihood evaluation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../state_estimator/kalman_qr.html">Robust Kalman filtering and sensitivity equations</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Markov Chain Monte Carlo</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../mcmc/hmc.html">Dynamic Hamiltonian Monte Carlo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcmc/hmc.html#inference-summary">Inference summary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcmc/hmc.html#hamiltonian-system">Hamiltonian system</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/gaussian_process.html">Gaussian Process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/thermal_network.html">Armadillo</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Stochastic state-space Inference and Prediction</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Gaussian Processes</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/statespace/gp.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="gaussian-processes">
+<h1>Gaussian Processes<a class="headerlink" href="#gaussian-processes" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="sum-and-product-of-gaussian-process">
+<h2>Sum and product of Gaussian process<a class="headerlink" href="#sum-and-product-of-gaussian-process" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="gpsum">
+<h3>GPSum<a class="headerlink" href="#gpsum" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="pysip.statespace.gaussian_process.gp_sum.GPSum">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.statespace.gaussian_process.gp_sum.</code><code class="sig-name descname">GPSum</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gp1</span></em>, <em class="sig-param"><span class="n">gp2</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/gp_sum.html#GPSum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.gp_sum.GPSum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sum of two Gaussian Process model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gp1</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">GPModel</span></code>) – GPModel instance</p></li>
+<li><p><strong>gp2</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">GPModel</span></code>) – GPModel instance</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The MEASURE_DEVIATION of <cite>gp2</cite> is fixed because it is already defined in <cite>gp1</cite>.</p>
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.gp_sum.GPSum.delete_continuous_dssm">
+<code class="sig-name descname">delete_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/gp_sum.html#GPSum.delete_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.gp_sum.GPSum.delete_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete the jacobians of the continuous state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.gp_sum.GPSum.init_continuous_dssm">
+<code class="sig-name descname">init_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/gp_sum.html#GPSum.init_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.gp_sum.GPSum.init_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the jacobians of the continuous state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.gp_sum.GPSum.set_constant_continuous_dssm">
+<code class="sig-name descname">set_constant_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/gp_sum.html#GPSum.set_constant_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.gp_sum.GPSum.set_constant_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in jacobians</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.gp_sum.GPSum.set_constant_continuous_ssm">
+<code class="sig-name descname">set_constant_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/gp_sum.html#GPSum.set_constant_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.gp_sum.GPSum.set_constant_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.gp_sum.GPSum.update_continuous_dssm">
+<code class="sig-name descname">update_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/gp_sum.html#GPSum.update_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.gp_sum.GPSum.update_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the jacobians with the constrained parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.gp_sum.GPSum.update_continuous_ssm">
+<code class="sig-name descname">update_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/gp_sum.html#GPSum.update_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.gp_sum.GPSum.update_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the state-space model with the constrained parameters</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="gpproduct">
+<h3>GPProduct<a class="headerlink" href="#gpproduct" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="pysip.statespace.gaussian_process.gp_product.GPProduct">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.statespace.gaussian_process.gp_product.</code><code class="sig-name descname">GPProduct</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">gp1</span></em>, <em class="sig-param"><span class="n">gp2</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/gp_product.html#GPProduct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.gp_product.GPProduct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Product of two Gaussian Process Covariance</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gp1</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">GPModel</span></code>) – GPModel instance</p></li>
+<li><p><strong>gp2</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">GPModel</span></code>) – GPModel instance</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The MEASURE_DEVIATION and MAGNITUDE_SCALE of the <cite>gp2</cite> are fixed
+because they are already defined in <cite>gp1</cite>.</p>
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.gp_product.GPProduct.delete_continuous_dssm">
+<code class="sig-name descname">delete_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/gp_product.html#GPProduct.delete_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.gp_product.GPProduct.delete_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete the jacobians of the continuous state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.gp_product.GPProduct.init_continuous_dssm">
+<code class="sig-name descname">init_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/gp_product.html#GPProduct.init_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.gp_product.GPProduct.init_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the jacobians of the continuous state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.gp_product.GPProduct.set_constant_continuous_dssm">
+<code class="sig-name descname">set_constant_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/gp_product.html#GPProduct.set_constant_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.gp_product.GPProduct.set_constant_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in jacobians</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.gp_product.GPProduct.set_constant_continuous_ssm">
+<code class="sig-name descname">set_constant_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/gp_product.html#GPProduct.set_constant_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.gp_product.GPProduct.set_constant_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.gp_product.GPProduct.update_continuous_dssm">
+<code class="sig-name descname">update_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/gp_product.html#GPProduct.update_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.gp_product.GPProduct.update_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the jacobians with the constrained parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.gp_product.GPProduct.update_continuous_ssm">
+<code class="sig-name descname">update_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/gp_product.html#GPProduct.update_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.gp_product.GPProduct.update_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the state-space model with the constrained parameters</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="stationary-covariance-function">
+<h2>Stationary covariance function<a class="headerlink" href="#stationary-covariance-function" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="matern12">
+<h3>Matern12<a class="headerlink" href="#matern12" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="pysip.statespace.gaussian_process.matern.Matern12">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.statespace.gaussian_process.matern.</code><code class="sig-name descname">Matern12</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hold_order</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'mfd'</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/matern.html#Matern12"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.matern.Matern12" title="Permalink to this definition">¶</a></dt>
+<dd><p>Matérn covariance function with smoothness parameter = 1/2</p>
+<p>Inputs</p>
+<dl class="simple">
+<dt>Outputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">f(t)</span></code>: stochastic process <cite>(any)</cite></p></li>
+</ul>
+</dd>
+<dt>States</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">f(t)</span></code>: stochastic process <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Model parameters</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>Measure deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigv</span></code>: measurement standard deviation <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Length scale</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">lscale</span></code>: control the smoothness of the function <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Magnitude scale</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">mscale</span></code>: control the overall variance of the function <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.matern.Matern12.set_constant_continuous_dssm">
+<code class="sig-name descname">set_constant_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/matern.html#Matern12.set_constant_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.matern.Matern12.set_constant_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in jacobians</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.matern.Matern12.set_constant_continuous_ssm">
+<code class="sig-name descname">set_constant_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/matern.html#Matern12.set_constant_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.matern.Matern12.set_constant_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.matern.Matern12.update_continuous_dssm">
+<code class="sig-name descname">update_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/matern.html#Matern12.update_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.matern.Matern12.update_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the jacobians with the constrained parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.matern.Matern12.update_continuous_ssm">
+<code class="sig-name descname">update_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/matern.html#Matern12.update_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.matern.Matern12.update_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the state-space model with the constrained parameters</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="matern32">
+<h3>Matern32<a class="headerlink" href="#matern32" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="pysip.statespace.gaussian_process.matern.Matern32">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.statespace.gaussian_process.matern.</code><code class="sig-name descname">Matern32</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hold_order</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'mfd'</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/matern.html#Matern32"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.matern.Matern32" title="Permalink to this definition">¶</a></dt>
+<dd><p>Matérn covariance function with smoothness parameter = 3/2</p>
+<p>Inputs</p>
+<dl class="simple">
+<dt>Outputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">f(t)</span></code>: stochastic process <cite>(any)</cite></p></li>
+</ul>
+</dd>
+<dt>States</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">f(t)</span></code>: stochastic process <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">df(t)/dt</span></code>: derivative stochastic process <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Model parameters</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>Measure deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigv</span></code>: measurement standard deviation <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Length scale</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">lscale</span></code>: control the smoothness of the function <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Magnitude scale</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">mscale</span></code>: control the overall variance of the function <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.matern.Matern32._lti_disc">
+<code class="sig-name descname">_lti_disc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dt</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/matern.html#Matern32._lti_disc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.matern.Matern32._lti_disc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Discretization of temporal Gaussian Process</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dt</strong> – sampling time</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>4-elements tuple containing</dt><dd><ul class="simple">
+<li><p><strong>Ad</strong>: Discrete state matrix</p></li>
+<li><p><strong>B0d</strong>: Discrete input matrix (zero order hold)</p></li>
+<li><p><strong>B1d</strong>: Discrete input matrix (first order hold)</p></li>
+<li><p><strong>Qd</strong>: Upper Cholesky factor of the process noise covariance</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.matern.Matern32._lti_jacobian_disc">
+<code class="sig-name descname">_lti_jacobian_disc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dt</span></em>, <em class="sig-param"><span class="n">dA</span></em>, <em class="sig-param"><span class="n">dB</span></em>, <em class="sig-param"><span class="n">dPinf_upper</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/matern.html#Matern32._lti_jacobian_disc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.matern.Matern32._lti_jacobian_disc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Discretization of augmented temportal Gaussian Process</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dt</strong> – Sampling time</p></li>
+<li><p><strong>dA</strong> – Jacobian state matrix</p></li>
+<li><p><strong>dB</strong> – Jacobian input matrix</p></li>
+<li><p><strong>dPinf</strong> – Jacobian upper Cholesky factor of the stationary covariance matrix</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>8-elements tuple containing</dt><dd><ul class="simple">
+<li><p><strong>Ad</strong>: Discrete state matrix</p></li>
+<li><p><strong>B0d</strong>: Discrete input matrix (zero order hold)</p></li>
+<li><p><strong>B1d</strong>: Discrete input matrix (first order hold)</p></li>
+<li><p><strong>Qd</strong>: Upper Cholesky factor of the process noise covariance matrix</p></li>
+<li><p><strong>dAd</strong>: Jacobian discrete state matrix</p></li>
+<li><p><strong>dB0d</strong>: Jacobian discrete input matrix (zero order hold)</p></li>
+<li><p><strong>dB1d</strong>: Jacobian discrete input matrix (first order hold)</p></li>
+<li><p><strong>dQd</strong>: Jacobian of the upper Cholesky factor of the process noise covariance</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.matern.Matern32.set_constant_continuous_dssm">
+<code class="sig-name descname">set_constant_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/matern.html#Matern32.set_constant_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.matern.Matern32.set_constant_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in jacobians</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.matern.Matern32.set_constant_continuous_ssm">
+<code class="sig-name descname">set_constant_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/matern.html#Matern32.set_constant_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.matern.Matern32.set_constant_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.matern.Matern32.update_continuous_dssm">
+<code class="sig-name descname">update_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/matern.html#Matern32.update_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.matern.Matern32.update_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the jacobians with the constrained parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.matern.Matern32.update_continuous_ssm">
+<code class="sig-name descname">update_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/matern.html#Matern32.update_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.matern.Matern32.update_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the state-space model with the constrained parameters</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="matern52">
+<h3>Matern52<a class="headerlink" href="#matern52" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="pysip.statespace.gaussian_process.matern.Matern52">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.statespace.gaussian_process.matern.</code><code class="sig-name descname">Matern52</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hold_order</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'mfd'</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/matern.html#Matern52"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.matern.Matern52" title="Permalink to this definition">¶</a></dt>
+<dd><p>Matérn covariance function with smoothness parameter = 5/2</p>
+<p>Inputs</p>
+<dl class="simple">
+<dt>Outputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">f(t)</span></code>: stochastic process <cite>(any)</cite></p></li>
+</ul>
+</dd>
+<dt>States</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">f(t)</span></code>: stochastic process <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">df(t)/dt</span></code>: derivative stochastic process <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">d²f(t)/d²t</span></code>: second derivative stochastic process <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Model parameters</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>Measure deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigv</span></code>: measurement standard deviation <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Length scale</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">lscale</span></code>: control the smoothness of the function <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Magnitude scale</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">mscale</span></code>: control the overall variance of the function <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.matern.Matern52.set_constant_continuous_dssm">
+<code class="sig-name descname">set_constant_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/matern.html#Matern52.set_constant_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.matern.Matern52.set_constant_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in jacobians</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.matern.Matern52.set_constant_continuous_ssm">
+<code class="sig-name descname">set_constant_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/matern.html#Matern52.set_constant_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.matern.Matern52.set_constant_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.matern.Matern52.update_continuous_dssm">
+<code class="sig-name descname">update_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/matern.html#Matern52.update_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.matern.Matern52.update_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the jacobians with the constrained parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.matern.Matern52.update_continuous_ssm">
+<code class="sig-name descname">update_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/matern.html#Matern52.update_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.matern.Matern52.update_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the state-space model with the constrained parameters</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="non-stationary-covariance-function">
+<h2>Non-stationary covariance function<a class="headerlink" href="#non-stationary-covariance-function" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="periodic">
+<h3>Periodic<a class="headerlink" href="#periodic" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="pysip.statespace.gaussian_process.periodic.Periodic">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.statespace.gaussian_process.periodic.</code><code class="sig-name descname">Periodic</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hold_order</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'mfd'</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">J</span><span class="o">=</span><span class="default_value">7</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/periodic.html#Periodic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.periodic.Periodic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Periodic covariance function</p>
+<blockquote>
+<div><p><cite>iv</cite> is the modified Bessel function of the first kind.
+Useful relation: iv(J+1, x) = iv(J-1, x) - 2*J/x * iv(J, x)</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>J: Degree of approximation (default=7)</p>
+</dd>
+<dt>References:</dt><dd><p>Arno Solin and Simo Särkkä (2014). Explicit link between periodic
+covariance functions and state space models. In Proceedings of the
+Seventeenth International Conference on Artifcial Intelligence and
+Statistics (AISTATS 2014). JMLR: W&amp;CP, volume 33.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Inputs</p>
+<dl class="simple">
+<dt>Outputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sum(f(t))</span></code>: sum of stochastic processes <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Model parameters</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>Period</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">period</span></code>: period of the function <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Length scale</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">lscale</span></code>: control the smoothness of the function <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Measure deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigv</span></code>: measurement standard deviation <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Magnitude scale</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">mscale</span></code>: control the overall variance of the function <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.periodic.Periodic.set_constant_continuous_dssm">
+<code class="sig-name descname">set_constant_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/periodic.html#Periodic.set_constant_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.periodic.Periodic.set_constant_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in jacobians</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.periodic.Periodic.set_constant_continuous_ssm">
+<code class="sig-name descname">set_constant_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/periodic.html#Periodic.set_constant_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.periodic.Periodic.set_constant_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.periodic.Periodic.update_continuous_dssm">
+<code class="sig-name descname">update_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/periodic.html#Periodic.update_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.periodic.Periodic.update_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the jacobians with the constrained parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.periodic.Periodic.update_continuous_ssm">
+<code class="sig-name descname">update_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/periodic.html#Periodic.update_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.periodic.Periodic.update_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the state-space model with the constrained parameters</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="quasiperiodic12">
+<h3>QuasiPeriodic12<a class="headerlink" href="#quasiperiodic12" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic12">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.statespace.gaussian_process.quasi_periodic.</code><code class="sig-name descname">QuasiPeriodic12</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hold_order</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'mfd'</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">J</span><span class="o">=</span><span class="default_value">7</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/quasi_periodic.html#QuasiPeriodic12"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic12" title="Permalink to this definition">¶</a></dt>
+<dd><p>Quasi Periodic covariance function, e.g. Periodic x Matern12</p>
+<blockquote>
+<div><p><cite>iv</cite> is the modified Bessel function of the first kind.
+Useful relation: iv(J+1, x) = iv(J-1, x) - 2*J/x * iv(J, x)</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>J: Degree of approximation (default=7)</p>
+</dd>
+<dt>References:</dt><dd><p>Arno Solin and Simo Särkkä (2014). Explicit link between periodic
+covariance functions and state space models. In Proceedings of the
+Seventeenth International Conference on Artifcial Intelligence and
+Statistics (AISTATS 2014). JMLR: W&amp;CP, volume 33.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Inputs</p>
+<dl class="simple">
+<dt>Outputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sum(f(t))</span></code>: sum of stochastic processes <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Model parameters</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>Period</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">period</span></code>: period of the function <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Length scale</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">lscale</span></code>: control the smoothness of the function <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">decay</span></code>: control the decay of the periodicity <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Measure deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigv</span></code>: measurement standard deviation <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Magnitude scale</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">mscale</span></code>: control the overall variance of the function <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic12.set_constant_continuous_dssm">
+<code class="sig-name descname">set_constant_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/quasi_periodic.html#QuasiPeriodic12.set_constant_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic12.set_constant_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in jacobians</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic12.set_constant_continuous_ssm">
+<code class="sig-name descname">set_constant_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/quasi_periodic.html#QuasiPeriodic12.set_constant_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic12.set_constant_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic12.update_continuous_dssm">
+<code class="sig-name descname">update_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/quasi_periodic.html#QuasiPeriodic12.update_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic12.update_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the jacobians with the constrained parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic12.update_continuous_ssm">
+<code class="sig-name descname">update_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/quasi_periodic.html#QuasiPeriodic12.update_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic12.update_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the state-space model with the constrained parameters</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="quasiperiodic32">
+<h3>QuasiPeriodic32<a class="headerlink" href="#quasiperiodic32" title="Permalink to this headline">¶</a></h3>
+<dl class="py class">
+<dt id="pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic32">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.statespace.gaussian_process.quasi_periodic.</code><code class="sig-name descname">QuasiPeriodic32</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameters</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">hold_order</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'mfd'</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">''</span></em>, <em class="sig-param"><span class="n">J</span><span class="o">=</span><span class="default_value">7</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/quasi_periodic.html#QuasiPeriodic32"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic32" title="Permalink to this definition">¶</a></dt>
+<dd><p>Quasi Periodic covariance function, e.g. Periodic x Matern32</p>
+<blockquote>
+<div><p><cite>iv</cite> is the modified Bessel function of the first kind.
+Useful relation: iv(J+1, x) = iv(J-1, x) - 2*J/x * iv(J, x)</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>J: Degree of approximation (default=7)</p>
+</dd>
+<dt>References:</dt><dd><p>Arno Solin and Simo Särkkä (2014). Explicit link between periodic
+covariance functions and state space models. In Proceedings of the
+Seventeenth International Conference on Artifcial Intelligence and
+Statistics (AISTATS 2014). JMLR: W&amp;CP, volume 33.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Inputs</p>
+<dl class="simple">
+<dt>Outputs</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sum(f(t))</span></code>: sum of stochastic processes <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+<p><strong>Model parameters</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>Period</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">period</span></code>: period of the function <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Length scale</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">lscale</span></code>: control the smoothness of the function <cite>(any)</cite></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">decay</span></code>: control the decay of the periodicity <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Measure deviation</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">sigv</span></code>: measurement standard deviation <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Magnitude scale</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">mscale</span></code>: control the overall variance of the function <cite>(any)</cite></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic32.set_constant_continuous_dssm">
+<code class="sig-name descname">set_constant_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/quasi_periodic.html#QuasiPeriodic32.set_constant_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic32.set_constant_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in jacobians</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic32.set_constant_continuous_ssm">
+<code class="sig-name descname">set_constant_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/quasi_periodic.html#QuasiPeriodic32.set_constant_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic32.set_constant_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set constant values in state-space model</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic32.update_continuous_dssm">
+<code class="sig-name descname">update_continuous_dssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/quasi_periodic.html#QuasiPeriodic32.update_continuous_dssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic32.update_continuous_dssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the jacobians with the constrained parameters</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic32.update_continuous_ssm">
+<code class="sig-name descname">update_continuous_ssm</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/statespace/gaussian_process/quasi_periodic.html#QuasiPeriodic32.update_continuous_ssm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.statespace.gaussian_process.quasi_periodic.QuasiPeriodic32.update_continuous_ssm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the state-space model with the constrained parameters</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="lfm.html" class="btn btn-neutral float-right" title="Latent Force Model" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="rc.html" class="btn btn-neutral float-left" title="Dynamic Thermal Models" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2018, Loic Raillon, Maxime Janvier
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

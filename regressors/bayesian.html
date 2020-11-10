@@ -1,0 +1,545 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Bayesian regressor &mdash; Stochastic state-space Inference and Prediction  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Parameter" href="../core/parameter.html" />
+    <link rel="prev" title="Frequentist regressor" href="frequentist.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Stochastic state-space Inference and Prediction
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guides/quickstart.html">Gettings started with pySIP</a></li>
+</ul>
+<p class="caption"><span class="caption-text">State-space models</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/base.html">Linear Time Invariant State-Space Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/rc.html">Dynamic Thermal Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/gp.html">Gaussian Processes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/lfm.html">Latent Force Model</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Regressors</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="base.html">Base regressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="frequentist.html">Frequentist regressor</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Bayesian regressor</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Parameters settings</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../core/parameter.html">Parameter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../core/parameters.html">Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../core/prior.html">Prior</a></li>
+</ul>
+<p class="caption"><span class="caption-text">State estimation and log-likelihood evaluation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../state_estimator/kalman_qr.html">Robust Kalman filtering and sensitivity equations</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Markov Chain Monte Carlo</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../mcmc/hmc.html">Dynamic Hamiltonian Monte Carlo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcmc/hmc.html#inference-summary">Inference summary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcmc/hmc.html#hamiltonian-system">Hamiltonian system</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/gaussian_process.html">Gaussian Process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/thermal_network.html">Armadillo</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Stochastic state-space Inference and Prediction</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Bayesian regressor</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/regressors/bayesian.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="bayesian-regressor">
+<h1>Bayesian regressor<a class="headerlink" href="#bayesian-regressor" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="pysip.regressors.bayesian.BayesRegressor">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.regressors.bayesian.</code><code class="sig-name descname">BayesRegressor</code><span class="sig-paren">(</span><em class="sig-param">ss</em>, <em class="sig-param">bayesian_filter=&lt;class 'pysip.state_estimator.kalman_qr.Kalman_QR'&gt;</em>, <em class="sig-param">time_scale='s'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/regressors/bayesian.html#BayesRegressor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.regressors.bayesian.BayesRegressor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bayesian Regressor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ss</strong> (<a class="reference internal" href="../statespace/base.html#pysip.statespace.base.StateSpace" title="pysip.statespace.base.StateSpace"><code class="xref py py-class docutils literal notranslate"><span class="pre">StateSpace</span></code></a>) – StateSpace()</p></li>
+<li><p><strong>bayesian_filter</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">BayesianFilter</span></code>) – BayesianFilter()</p></li>
+<li><p><strong>time_scale</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>) – Time series frequency, e.g. ‘s’: seconds, ‘D’: days, etc.
+Works only for pandas.DataFrame with DateTimeIndex</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="pysip.regressors.bayesian.BayesRegressor._array_to_dict">
+<code class="sig-name descname">_array_to_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chains</span></em>, <em class="sig-param"><span class="n">names</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/regressors/bayesian.html#BayesRegressor._array_to_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.regressors.bayesian.BayesRegressor._array_to_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert 3d numpy array to dictionary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chains</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Numpy array of shape (n_chains, n_par, n_draws)</p></li>
+<li><p><strong>names</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>]) – Parameter names list of size n_par</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Markov chains traces, [n_par keys](n_chains, n_draws)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.regressors.bayesian.BayesRegressor._dict_to_array">
+<code class="sig-name descname">_dict_to_array</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chains</span></em>, <em class="sig-param"><span class="n">names</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/regressors/bayesian.html#BayesRegressor._dict_to_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.regressors.bayesian.BayesRegressor._dict_to_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert dict [n_par keys](n_chains, n_draws) to numpy array (n_par, chain * draw)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chains</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>) – Markov Chain traces, chains[key](n_chains, n_draws)</p></li>
+<li><p><strong>names</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>]) – Parameter names to convert into numpy array</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Markov Chain traces (n_par, chain * draw)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.regressors.bayesian.BayesRegressor._inv_transform_chains">
+<code class="sig-name descname">_inv_transform_chains</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">eta_traces</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/regressors/bayesian.html#BayesRegressor._inv_transform_chains"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.regressors.bayesian.BayesRegressor._inv_transform_chains" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform samples to the constrained space</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>eta_traces</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>) – Unconstrained Markov chain traces of shape (n_chains, n_par, n_draws)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Constrained Markov chain traces of shape (n_chains, n_par, n_draws)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>theta_traces</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.regressors.bayesian.BayesRegressor.fit">
+<code class="sig-name descname">fit</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">outputs</span></em>, <em class="sig-param"><span class="n">inputs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">options</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/regressors/bayesian.html#BayesRegressor.fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.regressors.bayesian.BayesRegressor.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bayesian inference of the state-space model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – Training data</p></li>
+<li><p><strong>outputs</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>]) – Outputs name(s)</p></li>
+<li><p><strong>inputs</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – Inputs name(s)</p></li>
+<li><p><strong>options</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>]) – <ul>
+<li><dl class="simple">
+<dt><strong>stepsize</strong> (float, default=0.25 / n_par**0.25)</dt><dd><p>Step-size of the leapfrog integrator</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>dense_mass_matrix</strong> (bool, default=False)</dt><dd><p>Estimate the dense mass matrix during adaptation. By default, only the diagonal
+elements are estimated.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>max_tree_depth</strong> (int, default=10)</dt><dd><p>Maximum tree depth</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>dH_max</strong> (float, default=1000)</dt><dd><p>Maximum energy change allowed in a trajectory. Larger deviations are considered
+as diverging transitions.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>accp_target</strong> (float, default=0.8):</dt><dd><p>Target average acceptance probability. Valid values are between ]0, 1[</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>t0</strong> (float, default=10.0):</dt><dd><p>Adaptation iteration offset (primal-dual averaging algorithm parameter)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>gamma</strong> (float, default=0.05):</dt><dd><p>Adaptation regularization scale (primal-dual averaging algorithm parameter)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>kappa</strong> (float, default=0.75):</dt><dd><p>Adaptation relaxation exponent (primal-dual averaging algorithm parameter)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>mu</strong> (float, default=log(10 * stepsize)):</dt><dd><p>Asymptotic mean of the step-size (primal-dual averaging algorithm parameter)</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>n_cpu</strong>: (int, default=-1):</dt><dd><p>Number of cpu to use. To use all available cpu, set the value to -1,
+otherwise valid values are between [1, +Inf[</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>init_buffer</strong>: (int, default=75)</dt><dd><p>Width of initial fast adaptation interval</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>term_buffer</strong>: (int, default=150)</dt><dd><p>Width of final fast adaptation interval</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>window</strong>: (int, default=25)</dt><dd><p>Initial width of slow adaptation interval</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>init</strong> (str, default=`unconstrained`):</dt><dd><ul>
+<li><p>unconstrained: Uniform draw between [-1, 1] in the uncsontrained space</p></li>
+<li><p>prior: Uniform draw from the prior distribution</p></li>
+<li><p>zero: Set the unconstrained parameters to 0</p></li>
+<li><p>fixed: The current parameter values are used</p></li>
+<li><p>value: Uniform draw between the parameter value +/- 25%</p></li>
+<li><p>prior_mass (float, default=0.95):</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><strong>hpd</strong>: (float, default=0.95)</dt><dd><p>Highest Prior Density to draw sample from the prior (True if unimodal)</p>
+</dd>
+</dl>
+</li>
+</ul>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An instance summarizing the results from the Bayesian inference</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="../mcmc/hmc.html#pysip.mcmc.hmc.Fit_Bayes" title="pysip.mcmc.hmc.Fit_Bayes">Fit_Bayes</a>()</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.regressors.bayesian.BayesRegressor.pointwise_log_likelihood">
+<code class="sig-name descname">pointwise_log_likelihood</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">trace</span></em>, <em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">outputs</span></em>, <em class="sig-param"><span class="n">inputs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">n_cpu</span><span class="o">=</span><span class="default_value">- 1</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/regressors/bayesian.html#BayesRegressor.pointwise_log_likelihood"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.regressors.bayesian.BayesRegressor.pointwise_log_likelihood" title="Permalink to this definition">¶</a></dt>
+<dd><p>Point-wise log-likelihood for Pareto Smoothing Importance Sampling</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trace</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>) – Markov Chain traces, trace[key](chain, draw)</p></li>
+<li><p><strong>df</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – Data</p></li>
+<li><p><strong>outputs</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>]) – Output name(s)</p></li>
+<li><p><strong>inputs</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – Input name(s)</p></li>
+<li><p><strong>cpu</strong> – Number of cpus</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Positive log-likelihood evaluated point-wise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.regressors.bayesian.BayesRegressor.posterior_predictive">
+<code class="sig-name descname">posterior_predictive</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">trace</span></em>, <em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">inputs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">outputs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">n_cpu</span><span class="o">=</span><span class="default_value">- 1</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/regressors/bayesian.html#BayesRegressor.posterior_predictive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.regressors.bayesian.BayesRegressor.posterior_predictive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Posterior predictive distribution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trace</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>) – Markov Chain traces, trace[key](chain, draw)</p></li>
+<li><p><strong>df</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – Data</p></li>
+<li><p><strong>inputs</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – Input name(s)</p></li>
+<li><p><strong>outputs</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – Output name(s)</p></li>
+<li><p><strong>n_cpu</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of cpus</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>2-elements tuple containing</dt><dd><ul class="simple">
+<li><p><strong>ym</strong>: Mean of the predictive distribution</p></li>
+<li><p><strong>ysd</strong>: Standard deviation of the predictive distribution</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.regressors.bayesian.BayesRegressor.posterior_state_distribution">
+<code class="sig-name descname">posterior_state_distribution</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">trace</span></em>, <em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">outputs</span></em>, <em class="sig-param"><span class="n">inputs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">smooth</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">n_cpu</span><span class="o">=</span><span class="default_value">- 1</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/regressors/bayesian.html#BayesRegressor.posterior_state_distribution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.regressors.bayesian.BayesRegressor.posterior_state_distribution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Posterior state filtered/smoothed distribution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>trace</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>) – Markov Chain traces, trace[key](chain, draw)</p></li>
+<li><p><strong>df</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – Data</p></li>
+<li><p><strong>outputs</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>]) – Output name(s)</p></li>
+<li><p><strong>inputs</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – Input name(s)</p></li>
+<li><p><strong>smooth</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>) – Use Kalman smoother</p></li>
+<li><p><strong>cpu</strong> – Number of cpus</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>2-element tuple containing</dt><dd><ul class="simple">
+<li><p><strong>xm</strong>: State filtered/smoothed distribution mean</p></li>
+<li><p><strong>xsd</strong>: State filtered/smoothed distribution standard deviation</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.regressors.bayesian.BayesRegressor.prior_predictive">
+<code class="sig-name descname">prior_predictive</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">df</span></em>, <em class="sig-param"><span class="n">inputs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">n_sim</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">hpd</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">n_cpu</span><span class="o">=</span><span class="default_value">- 1</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/regressors/bayesian.html#BayesRegressor.prior_predictive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.regressors.bayesian.BayesRegressor.prior_predictive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prior predictive distribution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>) – Data</p></li>
+<li><p><strong>inputs</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]) – Input name(s)</p></li>
+<li><p><strong>n_sim</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of prior predictive draw</p></li>
+<li><p><strong>hpd</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Real</span></code>]) – Highest Prior Density to draw sample from (True for unimodal distribution)</p></li>
+<li><p><strong>n_cpu</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of cpu</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>2-elements tuple containing</dt><dd><ul class="simple">
+<li><p><strong>draws</strong>: Parameter draws</p></li>
+<li><p><strong>ppc</strong>: Prior predictive samples</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../core/parameter.html" class="btn btn-neutral float-right" title="Parameter" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="frequentist.html" class="btn btn-neutral float-left" title="Frequentist regressor" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2018, Loic Raillon, Maxime Janvier
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

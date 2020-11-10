@@ -1,0 +1,362 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pysip.statespace.thermal_network.twtitm_rorirbawaicv &mdash; Stochastic state-space Inference and Prediction  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/graphviz.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home" alt="Documentation Home"> Stochastic state-space Inference and Prediction
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../guides/quickstart.html">Gettings started with pySIP</a></li>
+</ul>
+<p class="caption"><span class="caption-text">State-space models</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../statespace/base.html">Linear Time Invariant State-Space Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../statespace/rc.html">Dynamic Thermal Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../statespace/gp.html">Gaussian Processes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../statespace/lfm.html">Latent Force Model</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Regressors</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../regressors/base.html">Base regressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../regressors/frequentist.html">Frequentist regressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../regressors/bayesian.html">Bayesian regressor</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Parameters settings</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../core/parameter.html">Parameter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../core/parameters.html">Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../core/prior.html">Prior</a></li>
+</ul>
+<p class="caption"><span class="caption-text">State estimation and log-likelihood evaluation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../state_estimator/kalman_qr.html">Robust Kalman filtering and sensitivity equations</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Markov Chain Monte Carlo</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mcmc/hmc.html">Dynamic Hamiltonian Monte Carlo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mcmc/hmc.html#inference-summary">Inference summary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mcmc/hmc.html#hamiltonian-system">Hamiltonian system</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/gaussian_process.html">Gaussian Process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/thermal_network.html">Armadillo</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Stochastic state-space Inference and Prediction</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>pysip.statespace.thermal_network.twtitm_rorirbawaicv</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pysip.statespace.thermal_network.twtitm_rorirbawaicv</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+
+<span class="kn">from</span> <span class="nn">..base</span> <span class="kn">import</span> <span class="n">RCModel</span>
+
+
+<div class="viewcode-block" id="TwTiTm_RoRiRbAwAicv"><a class="viewcode-back" href="../../../../statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirbawaicv.TwTiTm_RoRiRbAwAicv">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">TwTiTm_RoRiRbAwAicv</span><span class="p">(</span><span class="n">RCModel</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Third order RC model&quot;&quot;&quot;</span>
+
+    <span class="n">states</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;TEMPERATURE&#39;</span><span class="p">,</span> <span class="s1">&#39;xw&#39;</span><span class="p">,</span> <span class="s1">&#39;envelope temperature&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;TEMPERATURE&#39;</span><span class="p">,</span> <span class="s1">&#39;xi&#39;</span><span class="p">,</span> <span class="s1">&#39;indoor temperature&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;TEMPERATURE&#39;</span><span class="p">,</span> <span class="s1">&#39;xm&#39;</span><span class="p">,</span> <span class="s1">&#39;internal mass temperature&#39;</span><span class="p">),</span>
+    <span class="p">]</span>
+
+    <span class="n">params</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;THERMAL_RESISTANCE&#39;</span><span class="p">,</span> <span class="s1">&#39;Ro&#39;</span><span class="p">,</span> <span class="s1">&#39;between the outdoor and the envelope&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;THERMAL_RESISTANCE&#39;</span><span class="p">,</span> <span class="s1">&#39;Ri&#39;</span><span class="p">,</span> <span class="s1">&#39;between the envelope and the indoor&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;THERMAL_RESISTANCE&#39;</span><span class="p">,</span> <span class="s1">&#39;Rb&#39;</span><span class="p">,</span> <span class="s1">&#39;between the indoor and the adjacent space&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;THERMAL_CAPACITY&#39;</span><span class="p">,</span> <span class="s1">&#39;Cw&#39;</span><span class="p">,</span> <span class="s1">&#39;of the envelope&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;THERMAL_CAPACITY&#39;</span><span class="p">,</span> <span class="s1">&#39;Ci&#39;</span><span class="p">,</span> <span class="s1">&#39;of the indoor&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;THERMAL_CAPACITY&#39;</span><span class="p">,</span> <span class="s1">&#39;Cm&#39;</span><span class="p">,</span> <span class="s1">&#39;of the internal mass&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;SOLAR_APERTURE&#39;</span><span class="p">,</span> <span class="s1">&#39;Aw&#39;</span><span class="p">,</span> <span class="s1">&#39;of the envelope&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;SOLAR_APERTURE&#39;</span><span class="p">,</span> <span class="s1">&#39;Ai&#39;</span><span class="p">,</span> <span class="s1">&#39;of the windows&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;COEFFICIENT&#39;</span><span class="p">,</span> <span class="s1">&#39;cv&#39;</span><span class="p">,</span> <span class="s1">&#39;scaling of the heat from the ventilation&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;STATE_DEVIATION&#39;</span><span class="p">,</span> <span class="s1">&#39;sigw_w&#39;</span><span class="p">,</span> <span class="s1">&#39;of the envelope dynamic&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;STATE_DEVIATION&#39;</span><span class="p">,</span> <span class="s1">&#39;sigw_i&#39;</span><span class="p">,</span> <span class="s1">&#39;of the indoor dynamic&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;STATE_DEVIATION&#39;</span><span class="p">,</span> <span class="s1">&#39;sigw_m&#39;</span><span class="p">,</span> <span class="s1">&#39;of the internal mass dynamic&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;MEASURE_DEVIATION&#39;</span><span class="p">,</span> <span class="s1">&#39;sigv&#39;</span><span class="p">,</span> <span class="s1">&#39;of the indoor temperature measurements&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;INITIAL_MEAN&#39;</span><span class="p">,</span> <span class="s1">&#39;x0_w&#39;</span><span class="p">,</span> <span class="s1">&#39;of the envelope temperature&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;INITIAL_MEAN&#39;</span><span class="p">,</span> <span class="s1">&#39;x0_i&#39;</span><span class="p">,</span> <span class="s1">&#39;of the infoor temperature&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;INITIAL_MEAN&#39;</span><span class="p">,</span> <span class="s1">&#39;x0_m&#39;</span><span class="p">,</span> <span class="s1">&#39;of the internal mass temperature&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;INITIAL_DEVIATION&#39;</span><span class="p">,</span> <span class="s1">&#39;sigx0_w&#39;</span><span class="p">,</span> <span class="s1">&#39;of the envelope temperature&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;INITIAL_DEVIATION&#39;</span><span class="p">,</span> <span class="s1">&#39;sigx0_i&#39;</span><span class="p">,</span> <span class="s1">&#39;of the infoor temperature&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;INITIAL_DEVIATION&#39;</span><span class="p">,</span> <span class="s1">&#39;sigx0_m&#39;</span><span class="p">,</span> <span class="s1">&#39;of the internal mass temperature&#39;</span><span class="p">),</span>
+    <span class="p">]</span>
+
+    <span class="n">inputs</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;TEMPERATURE&#39;</span><span class="p">,</span> <span class="s1">&#39;To&#39;</span><span class="p">,</span> <span class="s1">&#39;outdoor temperature&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;TEMPERATURE&#39;</span><span class="p">,</span> <span class="s1">&#39;Tb&#39;</span><span class="p">,</span> <span class="s1">&#39;boundary temperature&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;POWER&#39;</span><span class="p">,</span> <span class="s1">&#39;Qgh&#39;</span><span class="p">,</span> <span class="s1">&#39;solar irradiance&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;POWER&#39;</span><span class="p">,</span> <span class="s1">&#39;Qh&#39;</span><span class="p">,</span> <span class="s1">&#39;HVAC system heat&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;POWER&#39;</span><span class="p">,</span> <span class="s1">&#39;Qv&#39;</span><span class="p">,</span> <span class="s1">&#39;heat from the ventilation system&#39;</span><span class="p">),</span>
+    <span class="p">]</span>
+
+    <span class="n">outputs</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;TEMPERATURE&#39;</span><span class="p">,</span> <span class="s1">&#39;xi&#39;</span><span class="p">,</span> <span class="s1">&#39;indoor temperature&#39;</span><span class="p">)]</span>
+
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__post_init__</span><span class="p">()</span>
+
+<div class="viewcode-block" id="TwTiTm_RoRiRbAwAicv.set_constant_continuous_ssm"><a class="viewcode-back" href="../../../../statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirbawaicv.TwTiTm_RoRiRbAwAicv.set_constant_continuous_ssm">[docs]</a>    <span class="k">def</span> <span class="nf">set_constant_continuous_ssm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span></div>
+
+<div class="viewcode-block" id="TwTiTm_RoRiRbAwAicv.set_constant_continuous_dssm"><a class="viewcode-back" href="../../../../statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirbawaicv.TwTiTm_RoRiRbAwAicv.set_constant_continuous_dssm">[docs]</a>    <span class="k">def</span> <span class="nf">set_constant_continuous_dssm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dQ</span><span class="p">[</span><span class="s1">&#39;sigw_w&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dQ</span><span class="p">[</span><span class="s1">&#39;sigw_i&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dQ</span><span class="p">[</span><span class="s1">&#39;sigw_m&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dR</span><span class="p">[</span><span class="s1">&#39;sigv&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dx0</span><span class="p">[</span><span class="s1">&#39;x0_w&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dx0</span><span class="p">[</span><span class="s1">&#39;x0_i&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dx0</span><span class="p">[</span><span class="s1">&#39;x0_m&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dP0</span><span class="p">[</span><span class="s1">&#39;sigx0_w&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dP0</span><span class="p">[</span><span class="s1">&#39;sigx0_i&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dP0</span><span class="p">[</span><span class="s1">&#39;sigx0_m&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span></div>
+
+<div class="viewcode-block" id="TwTiTm_RoRiRbAwAicv.update_continuous_ssm"><a class="viewcode-back" href="../../../../statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirbawaicv.TwTiTm_RoRiRbAwAicv.update_continuous_ssm">[docs]</a>    <span class="k">def</span> <span class="nf">update_continuous_ssm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="p">(</span>
+            <span class="n">Ro</span><span class="p">,</span>
+            <span class="n">Ri</span><span class="p">,</span>
+            <span class="n">Rb</span><span class="p">,</span>
+            <span class="n">Cw</span><span class="p">,</span>
+            <span class="n">Ci</span><span class="p">,</span>
+            <span class="n">Cm</span><span class="p">,</span>
+            <span class="n">Aw</span><span class="p">,</span>
+            <span class="n">Ai</span><span class="p">,</span>
+            <span class="n">cv</span><span class="p">,</span>
+            <span class="n">sigw_w</span><span class="p">,</span>
+            <span class="n">sigw_i</span><span class="p">,</span>
+            <span class="n">sigw_m</span><span class="p">,</span>
+            <span class="n">sigv</span><span class="p">,</span>
+            <span class="n">x0_w</span><span class="p">,</span>
+            <span class="n">x0_i</span><span class="p">,</span>
+            <span class="n">x0_m</span><span class="p">,</span>
+            <span class="n">sigx0_w</span><span class="p">,</span>
+            <span class="n">sigx0_i</span><span class="p">,</span>
+            <span class="n">sigx0_m</span><span class="p">,</span>
+            <span class="o">*</span><span class="n">_</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">theta</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">[:]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">[</span><span class="o">-</span><span class="p">(</span><span class="n">Ro</span> <span class="o">+</span> <span class="n">Ri</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">Cw</span> <span class="o">*</span> <span class="n">Ri</span> <span class="o">*</span> <span class="n">Ro</span><span class="p">),</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">Cw</span> <span class="o">*</span> <span class="n">Ri</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">Ci</span> <span class="o">*</span> <span class="n">Ri</span><span class="p">),</span> <span class="o">-</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">Rb</span> <span class="o">+</span> <span class="n">Ri</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">Ci</span> <span class="o">*</span> <span class="n">Rb</span> <span class="o">*</span> <span class="n">Ri</span><span class="p">),</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">Ci</span> <span class="o">*</span> <span class="n">Ri</span><span class="p">)],</span>
+            <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">Cm</span> <span class="o">*</span> <span class="n">Ri</span><span class="p">),</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">Cm</span> <span class="o">*</span> <span class="n">Ri</span><span class="p">)],</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">B</span><span class="p">[:</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">[</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">Cw</span> <span class="o">*</span> <span class="n">Ro</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">Aw</span> <span class="o">/</span> <span class="n">Cw</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">Ci</span> <span class="o">*</span> <span class="n">Rb</span><span class="p">),</span> <span class="n">Ai</span> <span class="o">/</span> <span class="n">Ci</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">Ci</span><span class="p">,</span> <span class="n">cv</span> <span class="o">/</span> <span class="n">Ci</span><span class="p">],</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_diag</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">sigw_w</span><span class="p">,</span> <span class="n">sigw_i</span><span class="p">,</span> <span class="n">sigw_m</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">sigv</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x0</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">x0_w</span><span class="p">,</span> <span class="n">x0_i</span><span class="p">,</span> <span class="n">x0_m</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">P0</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_diag</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">sigx0_w</span><span class="p">,</span> <span class="n">sigx0_i</span><span class="p">,</span> <span class="n">sigx0_m</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="TwTiTm_RoRiRbAwAicv.update_continuous_dssm"><a class="viewcode-back" href="../../../../statespace/rc.html#pysip.statespace.thermal_network.twtitm_rorirbawaicv.TwTiTm_RoRiRbAwAicv.update_continuous_dssm">[docs]</a>    <span class="k">def</span> <span class="nf">update_continuous_dssm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">Ro</span><span class="p">,</span> <span class="n">Ri</span><span class="p">,</span> <span class="n">Rb</span><span class="p">,</span> <span class="n">Cw</span><span class="p">,</span> <span class="n">Ci</span><span class="p">,</span> <span class="n">Cm</span><span class="p">,</span> <span class="n">Aw</span><span class="p">,</span> <span class="n">Ai</span><span class="p">,</span> <span class="n">cv</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">theta</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dA</span><span class="p">[</span><span class="s1">&#39;Ro&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">Cw</span> <span class="o">*</span> <span class="n">Ro</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dA</span><span class="p">[</span><span class="s1">&#39;Ri&#39;</span><span class="p">][:]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">[</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">Cw</span> <span class="o">*</span> <span class="n">Ri</span> <span class="o">**</span> <span class="mi">2</span><span class="p">),</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">Cw</span> <span class="o">*</span> <span class="n">Ri</span> <span class="o">**</span> <span class="mi">2</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">],</span>
+            <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">Ci</span> <span class="o">*</span> <span class="n">Ri</span> <span class="o">**</span> <span class="mi">2</span><span class="p">),</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">Ci</span> <span class="o">*</span> <span class="n">Ri</span> <span class="o">**</span> <span class="mi">2</span><span class="p">),</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">Ci</span> <span class="o">*</span> <span class="n">Ri</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)],</span>
+            <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">Cm</span> <span class="o">*</span> <span class="n">Ri</span> <span class="o">**</span> <span class="mi">2</span><span class="p">),</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">Cm</span> <span class="o">*</span> <span class="n">Ri</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)],</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dA</span><span class="p">[</span><span class="s1">&#39;Rb&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">Ci</span> <span class="o">*</span> <span class="n">Rb</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dA</span><span class="p">[</span><span class="s1">&#39;Cw&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">[(</span><span class="n">Ro</span> <span class="o">+</span> <span class="n">Ri</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">Ri</span> <span class="o">*</span> <span class="n">Ro</span> <span class="o">*</span> <span class="n">Cw</span> <span class="o">**</span> <span class="mi">2</span><span class="p">),</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">Ri</span> <span class="o">*</span> <span class="n">Cw</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dA</span><span class="p">[</span><span class="s1">&#39;Ci&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">Ri</span> <span class="o">*</span> <span class="n">Ci</span> <span class="o">**</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">Rb</span> <span class="o">+</span> <span class="n">Ri</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">Ci</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">Rb</span> <span class="o">*</span> <span class="n">Ri</span><span class="p">),</span>
+            <span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">Ri</span> <span class="o">*</span> <span class="n">Ci</span> <span class="o">**</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dA</span><span class="p">[</span><span class="s1">&#39;Cm&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">Ri</span> <span class="o">*</span> <span class="n">Cm</span> <span class="o">**</span> <span class="mi">2</span><span class="p">),</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">Ri</span> <span class="o">*</span> <span class="n">Cm</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dB</span><span class="p">[</span><span class="s1">&#39;Ro&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">Cw</span> <span class="o">*</span> <span class="n">Ro</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dB</span><span class="p">[</span><span class="s1">&#39;Rb&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">Ci</span> <span class="o">*</span> <span class="n">Rb</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dB</span><span class="p">[</span><span class="s1">&#39;Cw&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">Cw</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">Ro</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="n">Aw</span> <span class="o">/</span> <span class="n">Cw</span> <span class="o">**</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dB</span><span class="p">[</span><span class="s1">&#39;Ci&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">Ci</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">Rb</span><span class="p">),</span> <span class="o">-</span><span class="n">Ai</span> <span class="o">/</span> <span class="n">Ci</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">Ci</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="n">cv</span> <span class="o">/</span> <span class="n">Ci</span> <span class="o">**</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dB</span><span class="p">[</span><span class="s1">&#39;Aw&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">Cw</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dB</span><span class="p">[</span><span class="s1">&#39;Ai&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">Ci</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dB</span><span class="p">[</span><span class="s1">&#39;cv&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">Ci</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2018, Loic Raillon, Maxime Janvier
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

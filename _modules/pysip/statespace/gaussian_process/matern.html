@@ -1,0 +1,509 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pysip.statespace.gaussian_process.matern &mdash; Stochastic state-space Inference and Prediction  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/graphviz.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home" alt="Documentation Home"> Stochastic state-space Inference and Prediction
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../guides/quickstart.html">Gettings started with pySIP</a></li>
+</ul>
+<p class="caption"><span class="caption-text">State-space models</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../statespace/base.html">Linear Time Invariant State-Space Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../statespace/rc.html">Dynamic Thermal Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../statespace/gp.html">Gaussian Processes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../statespace/lfm.html">Latent Force Model</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Regressors</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../regressors/base.html">Base regressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../regressors/frequentist.html">Frequentist regressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../regressors/bayesian.html">Bayesian regressor</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Parameters settings</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../core/parameter.html">Parameter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../core/parameters.html">Parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../core/prior.html">Prior</a></li>
+</ul>
+<p class="caption"><span class="caption-text">State estimation and log-likelihood evaluation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../state_estimator/kalman_qr.html">Robust Kalman filtering and sensitivity equations</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Markov Chain Monte Carlo</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mcmc/hmc.html">Dynamic Hamiltonian Monte Carlo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mcmc/hmc.html#inference-summary">Inference summary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../mcmc/hmc.html#hamiltonian-system">Hamiltonian system</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/gaussian_process.html">Gaussian Process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../examples/thermal_network.html">Armadillo</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Stochastic state-space Inference and Prediction</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>pysip.statespace.gaussian_process.matern</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pysip.statespace.gaussian_process.matern</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">..base</span> <span class="kn">import</span> <span class="n">GPModel</span>
+<span class="kn">from</span> <span class="nn">..discretization</span> <span class="kn">import</span> <span class="n">disc_diffusion_stationary</span><span class="p">,</span> <span class="n">disc_d_diffusion_stationary</span>
+<span class="kn">from</span> <span class="nn">pysip.utils.draw</span> <span class="kn">import</span> <span class="n">TikzStateSpace</span>
+<span class="kn">from</span> <span class="nn">pysip.utils.math</span> <span class="kn">import</span> <span class="n">nearest_cholesky</span><span class="p">,</span> <span class="n">diff_upper_cholesky</span>
+
+
+<div class="viewcode-block" id="Matern12"><a class="viewcode-back" href="../../../../statespace/gp.html#pysip.statespace.gaussian_process.matern.Matern12">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Matern12</span><span class="p">(</span><span class="n">GPModel</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Matérn covariance function with smoothness parameter = 1/2&#39;&#39;&#39;</span>
+
+    <span class="n">states</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;ANY&#39;</span><span class="p">,</span> <span class="s1">&#39;f(t)&#39;</span><span class="p">,</span> <span class="s1">&#39;stochastic process&#39;</span><span class="p">)]</span>
+
+    <span class="n">params</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;MAGNITUDE_SCALE&#39;</span><span class="p">,</span> <span class="s1">&#39;mscale&#39;</span><span class="p">,</span> <span class="s1">&#39;control the overall variance of the function&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;LENGTH_SCALE&#39;</span><span class="p">,</span> <span class="s1">&#39;lscale&#39;</span><span class="p">,</span> <span class="s1">&#39;control the smoothness of the function&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;MEASURE_DEVIATION&#39;</span><span class="p">,</span> <span class="s1">&#39;sigv&#39;</span><span class="p">,</span> <span class="s1">&#39;measurement standard deviation&#39;</span><span class="p">),</span>
+    <span class="p">]</span>
+
+    <span class="n">inputs</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">outputs</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;ANY&#39;</span><span class="p">,</span> <span class="s1">&#39;f(t)&#39;</span><span class="p">,</span> <span class="s1">&#39;stochastic process&#39;</span><span class="p">)]</span>
+
+<div class="viewcode-block" id="Matern12.set_constant_continuous_ssm"><a class="viewcode-back" href="../../../../statespace/gp.html#pysip.statespace.gaussian_process.matern.Matern12.set_constant_continuous_ssm">[docs]</a>    <span class="k">def</span> <span class="nf">set_constant_continuous_ssm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span></div>
+
+<div class="viewcode-block" id="Matern12.set_constant_continuous_dssm"><a class="viewcode-back" href="../../../../statespace/gp.html#pysip.statespace.gaussian_process.matern.Matern12.set_constant_continuous_dssm">[docs]</a>    <span class="k">def</span> <span class="nf">set_constant_continuous_dssm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dR</span><span class="p">[</span><span class="s1">&#39;sigv&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dP0</span><span class="p">[</span><span class="s1">&#39;mscale&#39;</span><span class="p">][:]</span> <span class="o">=</span> <span class="mf">1.0</span></div>
+
+<div class="viewcode-block" id="Matern12.update_continuous_ssm"><a class="viewcode-back" href="../../../../statespace/gp.html#pysip.statespace.gaussian_process.matern.Matern12.update_continuous_ssm">[docs]</a>    <span class="k">def</span> <span class="nf">update_continuous_ssm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">mscale</span><span class="p">,</span> <span class="n">lscale</span><span class="p">,</span> <span class="n">sigv</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">theta</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">[:]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">lscale</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="p">[:]</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">mscale</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mf">0.5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">sigv</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">P0</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">mscale</span></div>
+
+<div class="viewcode-block" id="Matern12.update_continuous_dssm"><a class="viewcode-back" href="../../../../statespace/gp.html#pysip.statespace.gaussian_process.matern.Matern12.update_continuous_dssm">[docs]</a>    <span class="k">def</span> <span class="nf">update_continuous_dssm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">mscale</span><span class="p">,</span> <span class="n">lscale</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">theta</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dA</span><span class="p">[</span><span class="s1">&#39;lscale&#39;</span><span class="p">][:]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dQ</span><span class="p">[</span><span class="s1">&#39;mscale&#39;</span><span class="p">][:]</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mf">0.5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dQ</span><span class="p">[</span><span class="s1">&#39;lscale&#39;</span><span class="p">][:]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">mscale</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mf">1.5</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Matern32"><a class="viewcode-back" href="../../../../statespace/gp.html#pysip.statespace.gaussian_process.matern.Matern32">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Matern32</span><span class="p">(</span><span class="n">GPModel</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Matérn covariance function with smoothness parameter = 3/2&#39;&#39;&#39;</span>
+
+    <span class="n">states</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;ANY&#39;</span><span class="p">,</span> <span class="s1">&#39;f(t)&#39;</span><span class="p">,</span> <span class="s1">&#39;stochastic process&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;ANY&#39;</span><span class="p">,</span> <span class="s1">&#39;df(t)/dt&#39;</span><span class="p">,</span> <span class="s1">&#39;derivative stochastic process&#39;</span><span class="p">),</span>
+    <span class="p">]</span>
+
+    <span class="n">params</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;MAGNITUDE_SCALE&#39;</span><span class="p">,</span> <span class="s1">&#39;mscale&#39;</span><span class="p">,</span> <span class="s1">&#39;control the overall variance of the function&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;LENGTH_SCALE&#39;</span><span class="p">,</span> <span class="s1">&#39;lscale&#39;</span><span class="p">,</span> <span class="s1">&#39;control the smoothness of the function&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;MEASURE_DEVIATION&#39;</span><span class="p">,</span> <span class="s1">&#39;sigv&#39;</span><span class="p">,</span> <span class="s1">&#39;measurement standard deviation&#39;</span><span class="p">),</span>
+    <span class="p">]</span>
+
+    <span class="n">inputs</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">outputs</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;ANY&#39;</span><span class="p">,</span> <span class="s1">&#39;f(t)&#39;</span><span class="p">,</span> <span class="s1">&#39;stochastic process&#39;</span><span class="p">)]</span>
+
+<div class="viewcode-block" id="Matern32.set_constant_continuous_ssm"><a class="viewcode-back" href="../../../../statespace/gp.html#pysip.statespace.gaussian_process.matern.Matern32.set_constant_continuous_ssm">[docs]</a>    <span class="k">def</span> <span class="nf">set_constant_continuous_ssm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span></div>
+
+<div class="viewcode-block" id="Matern32.set_constant_continuous_dssm"><a class="viewcode-back" href="../../../../statespace/gp.html#pysip.statespace.gaussian_process.matern.Matern32.set_constant_continuous_dssm">[docs]</a>    <span class="k">def</span> <span class="nf">set_constant_continuous_dssm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dP0</span><span class="p">[</span><span class="s1">&#39;mscale&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dR</span><span class="p">[</span><span class="s1">&#39;sigv&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span></div>
+
+<div class="viewcode-block" id="Matern32.update_continuous_ssm"><a class="viewcode-back" href="../../../../statespace/gp.html#pysip.statespace.gaussian_process.matern.Matern32.update_continuous_ssm">[docs]</a>    <span class="k">def</span> <span class="nf">update_continuous_ssm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">mscale</span><span class="p">,</span> <span class="n">lscale</span><span class="p">,</span> <span class="n">sigv</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">theta</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">3.0</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.0</span> <span class="o">*</span> <span class="mf">3.0</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="n">lscale</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="mf">3.0</span> <span class="o">**</span> <span class="mf">0.75</span> <span class="o">*</span> <span class="n">mscale</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mf">1.5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">sigv</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">P0</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_diag</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">mscale</span><span class="p">,</span> <span class="mf">3.0</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">mscale</span> <span class="o">/</span> <span class="n">lscale</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Matern32.update_continuous_dssm"><a class="viewcode-back" href="../../../../statespace/gp.html#pysip.statespace.gaussian_process.matern.Matern32.update_continuous_dssm">[docs]</a>    <span class="k">def</span> <span class="nf">update_continuous_dssm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">mscale</span><span class="p">,</span> <span class="n">lscale</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">theta</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dA</span><span class="p">[</span><span class="s1">&#39;lscale&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">6.0</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mi">3</span><span class="p">,</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="mf">3.0</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mi">2</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dQ</span><span class="p">[</span><span class="s1">&#39;mscale&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="mf">3.0</span> <span class="o">**</span> <span class="mf">0.75</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mf">1.5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dQ</span><span class="p">[</span><span class="s1">&#39;lscale&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">**</span> <span class="mf">1.75</span><span class="p">)</span> <span class="o">*</span> <span class="n">mscale</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mf">2.5</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dP0</span><span class="p">[</span><span class="s1">&#39;mscale&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">3.0</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="n">lscale</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dP0</span><span class="p">[</span><span class="s1">&#39;lscale&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">mscale</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mi">2</span></div>
+
+<div class="viewcode-block" id="Matern32._lti_disc"><a class="viewcode-back" href="../../../../statespace/gp.html#pysip.statespace.gaussian_process.matern.Matern32._lti_disc">[docs]</a>    <span class="k">def</span> <span class="nf">_lti_disc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">):</span>
+        <span class="n">mscale</span><span class="p">,</span> <span class="n">lscale</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">theta</span>
+
+        <span class="n">lda</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="n">lscale</span>
+        <span class="n">_exp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">dt</span> <span class="o">*</span> <span class="n">lda</span><span class="p">)</span>
+        <span class="n">Ad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="p">[(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">lda</span><span class="p">)</span> <span class="o">*</span> <span class="n">_exp</span><span class="p">,</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">_exp</span><span class="p">],</span>
+                <span class="p">[</span><span class="o">-</span><span class="n">dt</span> <span class="o">*</span> <span class="n">lda</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">_exp</span><span class="p">,</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">lda</span><span class="p">)</span> <span class="o">*</span> <span class="n">_exp</span><span class="p">],</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="n">q00</span> <span class="o">=</span> <span class="n">mscale</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="p">(</span><span class="n">dt</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">lda</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">lda</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">_exp</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">q01</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">mscale</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">lda</span> <span class="o">**</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">_exp</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="n">q11</span> <span class="o">=</span> <span class="n">mscale</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="n">lda</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="p">(</span><span class="n">dt</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">lda</span> <span class="o">**</span> <span class="mi">4</span> <span class="o">+</span> <span class="n">lda</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">lda</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">_exp</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="p">)</span>
+
+        <span class="n">B0d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nu</span><span class="p">))</span>
+        <span class="n">Qd</span> <span class="o">=</span> <span class="n">nearest_cholesky</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">q00</span><span class="p">,</span> <span class="n">q01</span><span class="p">],</span> <span class="p">[</span><span class="n">q01</span><span class="p">,</span> <span class="n">q11</span><span class="p">]]))</span>
+
+        <span class="k">return</span> <span class="n">Ad</span><span class="p">,</span> <span class="n">B0d</span><span class="p">,</span> <span class="n">B0d</span><span class="p">,</span> <span class="n">Qd</span></div>
+
+<div class="viewcode-block" id="Matern32._lti_jacobian_disc"><a class="viewcode-back" href="../../../../statespace/gp.html#pysip.statespace.gaussian_process.matern.Matern32._lti_jacobian_disc">[docs]</a>    <span class="k">def</span> <span class="nf">_lti_jacobian_disc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">dA</span><span class="p">,</span> <span class="n">dB</span><span class="p">,</span> <span class="n">dPinf_upper</span><span class="p">):</span>
+        <span class="n">nj</span> <span class="o">=</span> <span class="n">dA</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">mscale</span><span class="p">,</span> <span class="n">lscale</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">theta</span>
+
+        <span class="n">lda</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="n">lscale</span>
+        <span class="n">_exp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">dt</span> <span class="o">*</span> <span class="n">lda</span><span class="p">)</span>
+        <span class="n">Ad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="p">[(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">lda</span><span class="p">)</span> <span class="o">*</span> <span class="n">_exp</span><span class="p">,</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">_exp</span><span class="p">],</span>
+                <span class="p">[</span><span class="o">-</span><span class="n">dt</span> <span class="o">*</span> <span class="n">lda</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">_exp</span><span class="p">,</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">lda</span><span class="p">)</span> <span class="o">*</span> <span class="n">_exp</span><span class="p">],</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="n">dAd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">))</span>
+        <span class="n">e_over_l</span> <span class="o">=</span> <span class="n">_exp</span> <span class="o">/</span> <span class="n">lscale</span>
+        <span class="n">dAd</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">[</span><span class="n">lda</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">e_over_l</span><span class="p">,</span> <span class="n">lda</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">e_over_l</span><span class="p">],</span>
+            <span class="p">[</span>
+                <span class="mf">3.0</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">e_over_l</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">dt</span> <span class="o">*</span> <span class="n">lda</span> <span class="o">+</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span>
+                <span class="n">dt</span> <span class="o">*</span> <span class="n">e_over_l</span> <span class="o">*</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">lda</span> <span class="o">-</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="p">],</span>
+        <span class="p">]</span>
+
+        <span class="n">B0d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nu</span><span class="p">))</span>
+        <span class="n">dB0d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nu</span><span class="p">))</span>
+
+        <span class="n">q00</span> <span class="o">=</span> <span class="n">mscale</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="p">(</span><span class="n">dt</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">lda</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">lda</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">_exp</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">q01</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">mscale</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">lda</span> <span class="o">**</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">_exp</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="n">q11</span> <span class="o">=</span> <span class="n">mscale</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="n">lda</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="p">(</span><span class="n">dt</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">lda</span> <span class="o">**</span> <span class="mi">4</span> <span class="o">+</span> <span class="n">lda</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">lda</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">_exp</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="p">)</span>
+
+        <span class="n">_exp2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">2.0</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">/</span> <span class="n">lscale</span><span class="p">)</span>
+        <span class="c1"># mscale</span>
+        <span class="n">dq00_dm</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mf">2.0</span>
+            <span class="o">*</span> <span class="n">mscale</span>
+            <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="mi">3</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">_exp2</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">dq01_dm</span> <span class="o">=</span> <span class="mf">12.0</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">mscale</span> <span class="o">*</span> <span class="n">_exp2</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mi">3</span>
+        <span class="n">dq11_dm</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mf">2.0</span>
+            <span class="o">*</span> <span class="n">mscale</span>
+            <span class="o">*</span> <span class="p">(</span>
+                <span class="o">-</span><span class="p">(</span>
+                    <span class="mf">9.0</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mi">4</span>
+                    <span class="o">+</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="mi">3</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mi">2</span>
+                <span class="p">)</span>
+                <span class="o">*</span> <span class="n">_exp2</span>
+                <span class="o">+</span> <span class="mf">3.0</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mi">2</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># lscale</span>
+        <span class="n">dq00_dl</span> <span class="o">=</span> <span class="o">-</span><span class="mf">12.0</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">**</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">mscale</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">_exp2</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mi">4</span>
+        <span class="n">dq01_dl</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mf">18.0</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">mscale</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">-</span> <span class="mi">3</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">lscale</span><span class="p">)</span> <span class="o">*</span> <span class="n">_exp2</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mi">5</span>
+        <span class="p">)</span>
+        <span class="n">dq11_dl</span> <span class="o">=</span> <span class="n">mscale</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span>
+            <span class="mf">2.0</span>
+            <span class="o">*</span> <span class="mi">3</span> <span class="o">**</span> <span class="mf">0.5</span>
+            <span class="o">*</span> <span class="n">dt</span>
+            <span class="o">*</span> <span class="p">(</span>
+                <span class="o">-</span><span class="mf">9.0</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mi">4</span>
+                <span class="o">-</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="mi">3</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mi">2</span>
+            <span class="p">)</span>
+            <span class="o">*</span> <span class="n">_exp2</span>
+            <span class="o">/</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mi">2</span>
+            <span class="o">+</span> <span class="p">(</span>
+                <span class="mf">36.0</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mi">5</span>
+                <span class="o">-</span> <span class="mf">6.0</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="mi">3</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mi">4</span>
+                <span class="o">+</span> <span class="mf">6.0</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="mi">3</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">dt</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mi">3</span>
+            <span class="p">)</span>
+            <span class="o">*</span> <span class="n">_exp2</span>
+            <span class="o">-</span> <span class="mf">6.0</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mi">3</span>
+        <span class="p">)</span>
+
+        <span class="n">dQcd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">))</span>
+        <span class="n">dQcd</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">[[</span><span class="n">dq00_dm</span><span class="p">,</span> <span class="n">dq01_dm</span><span class="p">],</span> <span class="p">[</span><span class="n">dq01_dm</span><span class="p">,</span> <span class="n">dq11_dm</span><span class="p">]]</span>
+        <span class="n">dQcd</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">[[</span><span class="n">dq00_dl</span><span class="p">,</span> <span class="n">dq01_dl</span><span class="p">],</span> <span class="p">[</span><span class="n">dq01_dl</span><span class="p">,</span> <span class="n">dq11_dl</span><span class="p">]]</span>
+
+        <span class="n">Qd</span> <span class="o">=</span> <span class="n">nearest_cholesky</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">q00</span><span class="p">,</span> <span class="n">q01</span><span class="p">],</span> <span class="p">[</span><span class="n">q01</span><span class="p">,</span> <span class="n">q11</span><span class="p">]]))</span>
+        <span class="n">dQd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nj</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">))</span>
+        <span class="n">dQd</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">diff_upper_cholesky</span><span class="p">(</span><span class="n">Qd</span><span class="p">,</span> <span class="n">dQcd</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">dQd</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">diff_upper_cholesky</span><span class="p">(</span><span class="n">Qd</span><span class="p">,</span> <span class="n">dQcd</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">Ad</span><span class="p">,</span> <span class="n">B0d</span><span class="p">,</span> <span class="n">B0d</span><span class="p">,</span> <span class="n">Qd</span><span class="p">,</span> <span class="n">dAd</span><span class="p">,</span> <span class="n">dB0d</span><span class="p">,</span> <span class="n">dB0d</span><span class="p">,</span> <span class="n">dQd</span></div></div>
+
+
+<div class="viewcode-block" id="Matern52"><a class="viewcode-back" href="../../../../statespace/gp.html#pysip.statespace.gaussian_process.matern.Matern52">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Matern52</span><span class="p">(</span><span class="n">GPModel</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Matérn covariance function with smoothness parameter = 5/2&#39;&#39;&#39;</span>
+
+    <span class="n">states</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;ANY&#39;</span><span class="p">,</span> <span class="s1">&#39;f(t)&#39;</span><span class="p">,</span> <span class="s1">&#39;stochastic process&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;ANY&#39;</span><span class="p">,</span> <span class="s1">&#39;df(t)/dt&#39;</span><span class="p">,</span> <span class="s1">&#39;derivative stochastic process&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;ANY&#39;</span><span class="p">,</span> <span class="s1">&#39;d²f(t)/d²t&#39;</span><span class="p">,</span> <span class="s1">&#39;second derivative stochastic process&#39;</span><span class="p">),</span>
+    <span class="p">]</span>
+
+    <span class="n">params</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;MAGNITUDE_SCALE&#39;</span><span class="p">,</span> <span class="s1">&#39;mscale&#39;</span><span class="p">,</span> <span class="s1">&#39;control the overall variance of the function&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;LENGTH_SCALE&#39;</span><span class="p">,</span> <span class="s1">&#39;lscale&#39;</span><span class="p">,</span> <span class="s1">&#39;control the smoothness of the function&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;MEASURE_DEVIATION&#39;</span><span class="p">,</span> <span class="s1">&#39;sigv&#39;</span><span class="p">,</span> <span class="s1">&#39;measurement standard deviation&#39;</span><span class="p">),</span>
+    <span class="p">]</span>
+
+    <span class="n">inputs</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">outputs</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;ANY&#39;</span><span class="p">,</span> <span class="s1">&#39;f(t)&#39;</span><span class="p">,</span> <span class="s1">&#39;stochastic process&#39;</span><span class="p">)]</span>
+
+<div class="viewcode-block" id="Matern52.set_constant_continuous_ssm"><a class="viewcode-back" href="../../../../statespace/gp.html#pysip.statespace.gaussian_process.matern.Matern52.set_constant_continuous_ssm">[docs]</a>    <span class="k">def</span> <span class="nf">set_constant_continuous_ssm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span></div>
+
+<div class="viewcode-block" id="Matern52.set_constant_continuous_dssm"><a class="viewcode-back" href="../../../../statespace/gp.html#pysip.statespace.gaussian_process.matern.Matern52.set_constant_continuous_dssm">[docs]</a>    <span class="k">def</span> <span class="nf">set_constant_continuous_dssm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dR</span><span class="p">[</span><span class="s1">&#39;sigv&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span></div>
+
+<div class="viewcode-block" id="Matern52.update_continuous_ssm"><a class="viewcode-back" href="../../../../statespace/gp.html#pysip.statespace.gaussian_process.matern.Matern52.update_continuous_ssm">[docs]</a>    <span class="k">def</span> <span class="nf">update_continuous_ssm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">mscale</span><span class="p">,</span> <span class="n">lscale</span><span class="p">,</span> <span class="n">sigv</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">theta</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="o">-</span><span class="p">(</span><span class="mf">5.0</span> <span class="o">**</span> <span class="mf">1.5</span><span class="p">)</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="o">-</span><span class="mf">15.0</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="o">-</span><span class="mf">3.0</span> <span class="o">*</span> <span class="mf">5.0</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="n">lscale</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">20.0</span> <span class="o">*</span> <span class="mf">5.0</span> <span class="o">**</span> <span class="mf">0.25</span> <span class="o">/</span> <span class="mf">3.0</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">mscale</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mf">2.5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">R</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">sigv</span>
+        <span class="c1"># Upper triangular Cholesky factor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">P0</span><span class="p">[:]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">[</span><span class="n">mscale</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">5.0</span> <span class="o">*</span> <span class="n">mscale</span> <span class="o">/</span> <span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)],</span>
+            <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">15</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">mscale</span> <span class="o">/</span> <span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">lscale</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mi">10</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">mscale</span> <span class="o">/</span> <span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)],</span>
+        <span class="p">]</span></div>
+
+<div class="viewcode-block" id="Matern52.update_continuous_dssm"><a class="viewcode-back" href="../../../../statespace/gp.html#pysip.statespace.gaussian_process.matern.Matern52.update_continuous_dssm">[docs]</a>    <span class="k">def</span> <span class="nf">update_continuous_dssm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">mscale</span><span class="p">,</span> <span class="n">lscale</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">theta</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dA</span><span class="p">[</span><span class="s1">&#39;lscale&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="mf">3.0</span> <span class="o">*</span> <span class="mf">5.0</span> <span class="o">**</span> <span class="mf">1.5</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mi">4</span><span class="p">,</span>
+            <span class="mf">30.0</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="mf">3.0</span> <span class="o">*</span> <span class="mf">5.0</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dQ</span><span class="p">[</span><span class="s1">&#39;mscale&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="n">mscale</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dQ</span><span class="p">[</span><span class="s1">&#39;lscale&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mf">2.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">Q</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="n">lscale</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dP0</span><span class="p">[</span><span class="s1">&#39;mscale&#39;</span><span class="p">][:]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">5.0</span> <span class="o">/</span> <span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)],</span>
+            <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mi">15</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">lscale</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mi">10</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">/</span> <span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)],</span>
+        <span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dP0</span><span class="p">[</span><span class="s1">&#39;lscale&#39;</span><span class="p">][:]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">10.0</span> <span class="o">*</span> <span class="n">mscale</span> <span class="o">/</span> <span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mi">3</span><span class="p">)],</span>
+            <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="p">(</span><span class="mi">15</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">mscale</span> <span class="o">/</span> <span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mi">2</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">],</span>
+            <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">20.0</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">mscale</span> <span class="o">/</span> <span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">lscale</span> <span class="o">**</span> <span class="mi">3</span><span class="p">)],</span>
+        <span class="p">]</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2018, Loic Raillon, Maxime Janvier
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

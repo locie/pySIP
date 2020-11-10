@@ -1,0 +1,730 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Prior &mdash; Stochastic state-space Inference and Prediction  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Robust Kalman filtering and sensitivity equations" href="../state_estimator/kalman_qr.html" />
+    <link rel="prev" title="Parameters" href="parameters.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Stochastic state-space Inference and Prediction
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guides/quickstart.html">Gettings started with pySIP</a></li>
+</ul>
+<p class="caption"><span class="caption-text">State-space models</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/base.html">Linear Time Invariant State-Space Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/rc.html">Dynamic Thermal Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/gp.html">Gaussian Processes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../statespace/lfm.html">Latent Force Model</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Regressors</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../regressors/base.html">Base regressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../regressors/frequentist.html">Frequentist regressor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../regressors/bayesian.html">Bayesian regressor</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Parameters settings</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="parameter.html">Parameter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameters.html">Parameters</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Prior</a></li>
+</ul>
+<p class="caption"><span class="caption-text">State estimation and log-likelihood evaluation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../state_estimator/kalman_qr.html">Robust Kalman filtering and sensitivity equations</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Markov Chain Monte Carlo</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../mcmc/hmc.html">Dynamic Hamiltonian Monte Carlo</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcmc/hmc.html#inference-summary">Inference summary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mcmc/hmc.html#hamiltonian-system">Hamiltonian system</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Examples</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/gaussian_process.html">Gaussian Process</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/thermal_network.html">Armadillo</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Stochastic state-space Inference and Prediction</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Prior</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/core/prior.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="prior">
+<h1>Prior<a class="headerlink" href="#prior" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="pysip.core.prior.Prior">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.core.prior.</code><code class="sig-name descname">Prior</code><a class="reference internal" href="../_modules/pysip/core/prior.html#Prior"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.prior.Prior" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prior class template</p>
+<p>The notation from the following book are used throughout the module:</p>
+<p>Appendix A - Gelman, A., Stern, H.S., Carlin, J.B., Dunson, D.B., Vehtari, A.
+and Rubin, D.B., 2013. Bayesian data analysis. Chapman and Hall/CRC.</p>
+<dl class="py method">
+<dt id="pysip.core.prior.Prior._random">
+<code class="sig-name descname">_random</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="n">hpd</span></em>, <em class="sig-param"><span class="n">f_rvs</span></em>, <em class="sig-param"><span class="n">f_ppf</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/prior.html#Prior._random"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.prior.Prior._random" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw random samples from a given distribution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of samples</p></li>
+<li><p><strong>hpd</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Highest probability density to draw sample from</p></li>
+<li><p><strong>f_rvs</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>) – Random variable function</p></li>
+<li><p><strong>f_ppf</strong> (<code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>) – Inverse of cumulative distribution function</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Random variable samples</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>rvs</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.prior.Prior.dlog_pdf">
+<code class="sig-name descname">dlog_pdf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/prior.html#Prior.dlog_pdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.prior.Prior.dlog_pdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Partial derivative of the logarithm of the probability density function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Quantiles</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.prior.Prior.log_pdf">
+<code class="sig-name descname">log_pdf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/prior.html#Prior.log_pdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.prior.Prior.log_pdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the logarithm of the  probability density function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Quantiles</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.prior.Prior.mean">
+<code class="sig-name descname">mean</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/prior.html#Prior.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.prior.Prior.mean" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.prior.Prior.mode">
+<code class="sig-name descname">mode</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/prior.html#Prior.mode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.prior.Prior.mode" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.prior.Prior.pdf">
+<code class="sig-name descname">pdf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/prior.html#Prior.pdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.prior.Prior.pdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the probability density function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Quantiles</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.prior.Prior.random">
+<code class="sig-name descname">random</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="n">hpd</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/prior.html#Prior.random"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.prior.Prior.random" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw random samples from the prior distribution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>) – Number of draws</p></li>
+<li><p><strong>hpd</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Highest Prior Density for drawing sample from (true for unimodal distribution)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.prior.Prior.variance">
+<code class="sig-name descname">variance</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/prior.html#Prior.variance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.prior.Prior.variance" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pysip.core.prior.Normal">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.core.prior.</code><code class="sig-name descname">Normal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mu</span><span class="o">=</span><span class="default_value">0.0</span></em>, <em class="sig-param"><span class="n">sigma</span><span class="o">=</span><span class="default_value">1.0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/prior.html#Normal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.prior.Normal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normal distribution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mu</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Location parameter</p></li>
+<li><p><strong>sigma</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Scale parameter &gt; 0</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="pysip.core.prior.Normal.dlog_pdf">
+<code class="sig-name descname">dlog_pdf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/prior.html#Normal.dlog_pdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.prior.Normal.dlog_pdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Partial derivative of the logarithm of the probability density function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> – Quantiles</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.prior.Normal.find_hyperparameters">
+<code class="sig-name descname">find_hyperparameters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lb</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">ub</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">lb_prob</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em class="sig-param"><span class="n">ub_prob</span><span class="o">=</span><span class="default_value">0.01</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/prior.html#Normal.find_hyperparameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.prior.Normal.find_hyperparameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find hyper-parameter values based on lower and upper bounds
+:type lb: <code class="xref py py-class docutils literal notranslate"><span class="pre">Real</span></code>
+:param lb: Lower bound
+:type ub: <code class="xref py py-class docutils literal notranslate"><span class="pre">Real</span></code>
+:param ub: Upper bound
+:type lb_prob: <code class="xref py py-class docutils literal notranslate"><span class="pre">Real</span></code>
+:param lb_prob: Probability at the lower bound
+:type ub_prob: <code class="xref py py-class docutils literal notranslate"><span class="pre">Real</span></code>
+:param ub_prob: Probability at the upper bound</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.prior.Normal.log_pdf">
+<code class="sig-name descname">log_pdf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/prior.html#Normal.log_pdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.prior.Normal.log_pdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the logarithm of the  probability density function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> – Quantiles</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.prior.Normal.mean">
+<em class="property">property </em><code class="sig-name descname">mean</code><a class="headerlink" href="#pysip.core.prior.Normal.mean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.prior.Normal.mode">
+<em class="property">property </em><code class="sig-name descname">mode</code><a class="headerlink" href="#pysip.core.prior.Normal.mode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.prior.Normal.random">
+<code class="sig-name descname">random</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">hpd</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/prior.html#Normal.random"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.prior.Normal.random" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw random samples from the prior distribution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> – Number of draws</p></li>
+<li><p><strong>hpd</strong> – Highest Prior Density for drawing sample from (true for unimodal distribution)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.prior.Normal.variance">
+<em class="property">property </em><code class="sig-name descname">variance</code><a class="headerlink" href="#pysip.core.prior.Normal.variance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pysip.core.prior.LogNormal">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.core.prior.</code><code class="sig-name descname">LogNormal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mu</span><span class="o">=</span><span class="default_value">0.0</span></em>, <em class="sig-param"><span class="n">sigma</span><span class="o">=</span><span class="default_value">1.0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/prior.html#LogNormal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.prior.LogNormal" title="Permalink to this definition">¶</a></dt>
+<dd><p>LogNormal distribution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mu</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Location parameter</p></li>
+<li><p><strong>sigma</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Scale parameter &gt; 0</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="pysip.core.prior.LogNormal.dlog_pdf">
+<code class="sig-name descname">dlog_pdf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/prior.html#LogNormal.dlog_pdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.prior.LogNormal.dlog_pdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Partial derivative of the logarithm of the probability density function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> – Quantiles</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.prior.LogNormal.log_pdf">
+<code class="sig-name descname">log_pdf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/prior.html#LogNormal.log_pdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.prior.LogNormal.log_pdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the logarithm of the  probability density function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> – Quantiles</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.prior.LogNormal.mean">
+<em class="property">property </em><code class="sig-name descname">mean</code><a class="headerlink" href="#pysip.core.prior.LogNormal.mean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.prior.LogNormal.mode">
+<em class="property">property </em><code class="sig-name descname">mode</code><a class="headerlink" href="#pysip.core.prior.LogNormal.mode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.prior.LogNormal.random">
+<code class="sig-name descname">random</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">hpd</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/prior.html#LogNormal.random"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.prior.LogNormal.random" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw random samples from the prior distribution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> – Number of draws</p></li>
+<li><p><strong>hpd</strong> – Highest Prior Density for drawing sample from (true for unimodal distribution)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.prior.LogNormal.variance">
+<em class="property">property </em><code class="sig-name descname">variance</code><a class="headerlink" href="#pysip.core.prior.LogNormal.variance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pysip.core.prior.Gamma">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.core.prior.</code><code class="sig-name descname">Gamma</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">a</span><span class="o">=</span><span class="default_value">3.0</span></em>, <em class="sig-param"><span class="n">b</span><span class="o">=</span><span class="default_value">1.0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/prior.html#Gamma"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.prior.Gamma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gamma distribution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Shape parameter &gt; 0</p></li>
+<li><p><strong>b</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Inverse scale parameter &gt; 0</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="pysip.core.prior.Gamma.dlog_pdf">
+<code class="sig-name descname">dlog_pdf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/prior.html#Gamma.dlog_pdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.prior.Gamma.dlog_pdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Partial derivative of the logarithm of the probability density function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> – Quantiles</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.prior.Gamma.log_pdf">
+<code class="sig-name descname">log_pdf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/prior.html#Gamma.log_pdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.prior.Gamma.log_pdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the logarithm of the  probability density function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> – Quantiles</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.prior.Gamma.mean">
+<em class="property">property </em><code class="sig-name descname">mean</code><a class="headerlink" href="#pysip.core.prior.Gamma.mean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.prior.Gamma.mode">
+<em class="property">property </em><code class="sig-name descname">mode</code><a class="headerlink" href="#pysip.core.prior.Gamma.mode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.prior.Gamma.random">
+<code class="sig-name descname">random</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">hpd</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/prior.html#Gamma.random"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.prior.Gamma.random" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw random samples from the prior distribution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> – Number of draws</p></li>
+<li><p><strong>hpd</strong> – Highest Prior Density for drawing sample from (true for unimodal distribution)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.prior.Gamma.variance">
+<em class="property">property </em><code class="sig-name descname">variance</code><a class="headerlink" href="#pysip.core.prior.Gamma.variance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pysip.core.prior.InverseGamma">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.core.prior.</code><code class="sig-name descname">InverseGamma</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">a</span><span class="o">=</span><span class="default_value">3.0</span></em>, <em class="sig-param"><span class="n">b</span><span class="o">=</span><span class="default_value">1.0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/prior.html#InverseGamma"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.prior.InverseGamma" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inverse Gamma distribution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Shape parameter &gt; 0</p></li>
+<li><p><strong>b</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Scale parameter &gt; 0</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="pysip.core.prior.InverseGamma.dlog_pdf">
+<code class="sig-name descname">dlog_pdf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/prior.html#InverseGamma.dlog_pdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.prior.InverseGamma.dlog_pdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Partial derivative of the logarithm of the probability density function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> – Quantiles</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.prior.InverseGamma.find_hyperparameters">
+<code class="sig-name descname">find_hyperparameters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lb</span></em>, <em class="sig-param"><span class="n">ub</span></em>, <em class="sig-param"><span class="n">lb_prob</span><span class="o">=</span><span class="default_value">0.01</span></em>, <em class="sig-param"><span class="n">ub_prob</span><span class="o">=</span><span class="default_value">0.01</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/prior.html#InverseGamma.find_hyperparameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.prior.InverseGamma.find_hyperparameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find hyperparameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lb</strong> – Lower value</p></li>
+<li><p><strong>ub</strong> – Upper value</p></li>
+<li><p><strong>lb_prob</strong> – Expected prior mass below <cite>lb</cite></p></li>
+<li><p><strong>ub_prob</strong> – Expected prior mass above <cite>ub</cite></p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If a solution is found, the values of the shape and scale
+hyperparameters are updated internally</p>
+<p class="rubric">References</p>
+<p>Michael Betancourt, Robust Gaussian Processes in Stan, Part 3,
+<a class="reference external" href="https://betanalpha.github.io/assets/case_studies/gp_part3/part3.html">https://betanalpha.github.io/assets/case_studies/gp_part3/part3.html</a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.prior.InverseGamma.log_pdf">
+<code class="sig-name descname">log_pdf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/prior.html#InverseGamma.log_pdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.prior.InverseGamma.log_pdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the logarithm of the  probability density function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> – Quantiles</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.prior.InverseGamma.mean">
+<em class="property">property </em><code class="sig-name descname">mean</code><a class="headerlink" href="#pysip.core.prior.InverseGamma.mean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.prior.InverseGamma.mode">
+<em class="property">property </em><code class="sig-name descname">mode</code><a class="headerlink" href="#pysip.core.prior.InverseGamma.mode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.prior.InverseGamma.random">
+<code class="sig-name descname">random</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">hpd</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/prior.html#InverseGamma.random"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.prior.InverseGamma.random" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw random samples from the prior distribution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> – Number of draws</p></li>
+<li><p><strong>hpd</strong> – Highest Prior Density for drawing sample from (true for unimodal distribution)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.prior.InverseGamma.variance">
+<em class="property">property </em><code class="sig-name descname">variance</code><a class="headerlink" href="#pysip.core.prior.InverseGamma.variance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="pysip.core.prior.Beta">
+<em class="property">class </em><code class="sig-prename descclassname">pysip.core.prior.</code><code class="sig-name descname">Beta</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">a</span><span class="o">=</span><span class="default_value">3.0</span></em>, <em class="sig-param"><span class="n">b</span><span class="o">=</span><span class="default_value">3.0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/prior.html#Beta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.prior.Beta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Beta distribution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Prior sample sizes &gt; 0</p></li>
+<li><p><strong>b</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>) – Prior sample sizes &gt; 0</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="pysip.core.prior.Beta.dlog_pdf">
+<code class="sig-name descname">dlog_pdf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/prior.html#Beta.dlog_pdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.prior.Beta.dlog_pdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Partial derivative of the logarithm of the probability density function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> – Quantiles</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.prior.Beta.log_pdf">
+<code class="sig-name descname">log_pdf</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/prior.html#Beta.log_pdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.prior.Beta.log_pdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the logarithm of the  probability density function</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> – Quantiles</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.prior.Beta.mean">
+<em class="property">property </em><code class="sig-name descname">mean</code><a class="headerlink" href="#pysip.core.prior.Beta.mean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.prior.Beta.mode">
+<em class="property">property </em><code class="sig-name descname">mode</code><a class="headerlink" href="#pysip.core.prior.Beta.mode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.prior.Beta.random">
+<code class="sig-name descname">random</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">hpd</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pysip/core/prior.html#Beta.random"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pysip.core.prior.Beta.random" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw random samples from the prior distribution</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n</strong> – Number of draws</p></li>
+<li><p><strong>hpd</strong> – Highest Prior Density for drawing sample from (true for unimodal distribution)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pysip.core.prior.Beta.variance">
+<em class="property">property </em><code class="sig-name descname">variance</code><a class="headerlink" href="#pysip.core.prior.Beta.variance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../state_estimator/kalman_qr.html" class="btn btn-neutral float-right" title="Robust Kalman filtering and sensitivity equations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="parameters.html" class="btn btn-neutral float-left" title="Parameters" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2018, Loic Raillon, Maxime Janvier
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
