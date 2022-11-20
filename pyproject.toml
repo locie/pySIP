@@ -1,4 +1,56 @@
-[tool.black]
-line-length = 100
-target-version = ['py37']
-skip-string-normalization = true
+[tool.poetry]
+name = "pysip"
+version = "0.8.0"
+description = "PySIP"
+authors = []
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+numpy = "^1.23.4"
+scipy = "^1.9.3"
+pandas = "^1.5.1"
+matplotlib = "^3.6.2"
+joblib = "^1.2.0"
+pylfsr = "^1.0.6"
+networkx = "^2.8.8"
+tqdm = "^4.64.1"
+numdifftools = "^0.9.41"
+arviz = "^0.14.0"
+
+
+[tool.poetry.group.docs.dependencies]
+Sphinx = "^5.3.0"
+sphinx-rtd-theme = "^1.1.1"
+sphinxcontrib-tikz = "^0.4.16"
+sphinx-autodoc-typehints = "^1.19.5"
+pydot = "^1.4.2"
+
+
+[tool.poetry.group.tests.dependencies]
+pytest = "^7.2.0"
+pytest-cov = "^4.0.0"
+xdoctest = "^1.1.0"
+
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^2.20.0"
+
+
+[tool.poetry.group.interactive.dependencies]
+ipykernel = "^6.17.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.coverage.run]
+omit = ["tests/*"]
+
+[tool.pytest.ini_options]
+addopts = "--cov=pysip --xdoctest --doctest-glob='docs/*.rst'"
+doctest_optionflags = ["NORMALIZE_WHITESPACE", "ELLIPSIS"]
+testpaths = ["tests", "."]
+
+[tool.isort]
+profile = "black"

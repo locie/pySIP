@@ -1,8 +1,0 @@
-pytest>=5.0.0
-pytest-cov # Coverage report
-
-black # Formatter
-flake8 # Checker
-
-dvc[all]
-awscli

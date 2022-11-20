@@ -10,3 +10,6 @@ data/*
 *.npz
 build/*
 dist/*
+
+# Place to prototype and interactive test code
+_proto
