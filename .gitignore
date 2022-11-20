@@ -11,5 +11,8 @@ data/*
 build/*
 dist/*
 
+# Ignore vscode settings
+.vscode/*
+
 # Place to prototype and interactive test code
 _proto
