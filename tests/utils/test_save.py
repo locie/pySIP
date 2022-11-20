@@ -48,9 +48,9 @@ def test_save_model_to_pickle(reg):
     dP0 = reg.ss.dP0
 
     with TemporaryDirectory() as tmpdir:
-        tempdir = Path(tmpdir)
-        save_model(tempdir / "test", reg)
-        load_reg = load_model(tempdir / "test")
+        test_file = str(Path(tmpdir) / "test")
+        save_model(test_file, reg)
+        load_reg = load_model(test_file)
 
         for k in dA.keys():
             assert np.allclose(dA[k], load_reg.ss.dA[k])
