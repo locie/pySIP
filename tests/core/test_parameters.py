@@ -5,23 +5,23 @@ from pysip.core import Parameters
 
 @pytest.fixture
 def parameters():
-    return Parameters(['a', 'b', 'c'], name='alpha')
+    return Parameters(["a", "b", "c"], name="alpha")
 
 
 @pytest.fixture
 def parameters_beta():
-    return Parameters(['c', 'd', 'e'], name='beta')
+    return Parameters(["c", "d", "e"], name="beta")
 
 
 @pytest.fixture
 def parameters_with_transforms():
 
     parameters = [
-        {'name': 'a', 'value': 1.0, 'transform': 'log'},
-        {'name': 'b', 'value': 2.0, 'transform': 'logit', 'bounds': (1.0, 3.0)},
+        {"name": "a", "value": 1.0, "transform": "log"},
+        {"name": "b", "value": 2.0, "transform": "logit", "bounds": (1.0, 3.0)},
     ]
 
-    return Parameters(parameters=parameters, name='transform')
+    return Parameters(parameters=parameters, name="transform")
 
 
 def test_parameters(parameters):
@@ -64,10 +64,10 @@ def test_transform(parameters_with_transforms):
 
 
 def test_set_parameter(parameters):
-    assert parameters.parameters[0].name == 'a'
+    assert parameters.parameters[0].name == "a"
     assert parameters.parameters[0].value == 0.0
 
-    parameters.set_parameter('a', value=3.0)
+    parameters.set_parameter("a", value=3.0)
 
     assert parameters.parameters[0].value == 3.0
 
@@ -110,15 +110,15 @@ def test_add_set_theta(parameters, parameters_beta):
 def test_add_set_parameters(parameters, parameters_with_transforms):
     parameters = parameters + parameters_with_transforms
 
-    assert parameters.parameters[0].name == 'a'
+    assert parameters.parameters[0].name == "a"
     assert parameters.parameters[0].value == 0.0
 
-    parameters.set_parameter('alpha', 'a', value=3.0)
+    parameters.set_parameter("alpha", "a", value=3.0)
 
     assert parameters.parameters[0].value == 3.0
 
 
 def test_unknown_parameter(parameters):
-    parameters.set_parameter('lol', value=-1.0)
+    parameters.set_parameter("lol", value=-1.0)
 
-    assert 'lol' not in parameters._parameters
+    assert "lol" not in parameters._parameters

@@ -1,5 +1,6 @@
 import numpy as np
-from scipy.linalg import LinAlgError, cholesky, cho_solve
+from scipy.linalg import LinAlgError, cho_solve, cholesky
+
 from ..utils.math import cholesky_inverse
 
 
@@ -52,13 +53,13 @@ class Diagonal(EuclideanMetric):
             inverse_metric: Inverse of the metric
         """
         if not isinstance(inverse_metric, np.ndarray):
-            raise TypeError('`inverse_metric` must be an numpy ndarray')
+            raise TypeError("`inverse_metric` must be an numpy ndarray")
 
         if not inverse_metric.ndim == 1:
-            raise ValueError('`inverse_metric` must be 1-dimensional')
+            raise ValueError("`inverse_metric` must be 1-dimensional")
 
         if not np.all(inverse_metric > 0.0):
-            raise ValueError('All `inverse_metric` elements must be positive')
+            raise ValueError("All `inverse_metric` elements must be positive")
 
         self._inv_metric = inverse_metric
         self._sqrt_metric = np.sqrt(np.reciprocal(inverse_metric))
@@ -101,13 +102,13 @@ class Dense(EuclideanMetric):
             inverse_metric: Inverse of the metric
         """
         if not isinstance(inverse_metric, np.ndarray):
-            raise TypeError('`inverse_metric` must be an numpy ndarray')
+            raise TypeError("`inverse_metric` must be an numpy ndarray")
 
         if not inverse_metric.ndim == 2:
-            raise ValueError('`inverse_metric` must be 2-dimensional')
+            raise ValueError("`inverse_metric` must be 2-dimensional")
 
         if not np.allclose(inverse_metric, inverse_metric.T):
-            raise ValueError('`inverse_metric` must be symmetric')
+            raise ValueError("`inverse_metric` must be symmetric")
 
         self._inv_metric = inverse_metric
         self._sqrt_metric = cholesky_inverse(inverse_metric)

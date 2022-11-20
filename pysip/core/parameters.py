@@ -44,7 +44,7 @@ class Parameters:
                 name=b value=2.000e+00 transform=logit bounds=(1.0, 3.0) prior=None
     """
 
-    def __init__(self, parameters: list, name: str = ''):
+    def __init__(self, parameters: list, name: str = ""):
 
         self._name = name
 
@@ -53,19 +53,19 @@ class Parameters:
         elif isinstance(parameters[0], str):
             self._parameters = {name: Parameter(name) for name in parameters}
         else:
-            self._parameters = {k['name']: Parameter(**k) for k in parameters}
+            self._parameters = {k["name"]: Parameter(**k) for k in parameters}
 
     def __repr__(self):
         def _repr(d, level=0):
-            s = ''
+            s = ""
             if level == 0:
-                s += 'Parameters ' + self._name + '\n'
+                s += "Parameters " + self._name + "\n"
             for k, v in d.items():
-                s += '    ' * level
+                s += "    " * level
                 if isinstance(v, Parameter):
-                    s += v.__repr__() + '\n'
+                    s += v.__repr__() + "\n"
                 else:
-                    s += f'* {k}\n'
+                    s += f"* {k}\n"
                     s += _repr(v, level + 1)
             return s
 
@@ -83,11 +83,11 @@ class Parameters:
         return result
 
     def __add__(self, other):
-        left_name = self._name if self._name else 'left'
-        right_name = other._name if other._name else 'right'
+        left_name = self._name if self._name else "left"
+        right_name = other._name if other._name else "right"
         return Parameters(
             parameters={left_name: self._parameters, right_name: other._parameters},
-            name='__'.join((left_name, right_name)),
+            name="__".join((left_name, right_name)),
         )
 
     def __eq__(self, other):
@@ -150,7 +150,9 @@ class Parameters:
         """
 
         if len(x) != len(self.parameters):
-            raise ValueError(f'theta has {len(self.parameters)} parameters but {len(x)} are given')
+            raise ValueError(
+                f"theta has {len(self.parameters)} parameters but {len(x)} are given"
+            )
 
         for p, value in zip(self.parameters, x):
             p.theta = value
@@ -169,7 +171,9 @@ class Parameters:
         """
 
         if len(x) != self.n_par:
-            raise ValueError(f'theta has {self.n_par} free parameters but {len(x)} are given')
+            raise ValueError(
+                f"theta has {self.n_par} free parameters but {len(x)} are given"
+            )
 
         for p, value in zip(self.parameters_free, x):
             p.theta = value
@@ -188,7 +192,9 @@ class Parameters:
         """
 
         if len(x) != self.n_par:
-            raise ValueError(f'theta_sd has {self.n_par} free parameters but {len(x)} are given')
+            raise ValueError(
+                f"theta_sd has {self.n_par} free parameters but {len(x)} are given"
+            )
 
         for p, value in zip(self.parameters_free, x):
             p.theta_sd = value
@@ -275,7 +281,9 @@ class Parameters:
         """
 
         if len(x) != self.n_par:
-            raise ValueError(f'eta has {self.n_par} free parameters but {len(x)} are given')
+            raise ValueError(
+                f"eta has {self.n_par} free parameters but {len(x)} are given"
+            )
 
         for p, value in zip(self.parameters_free, x):
             p.eta = value
@@ -309,14 +317,19 @@ class Parameters:
     def prior(self) -> float:
         """Get the logarithm of the prior distribution :math:`\\log p(\\theta)`"""
         return np.sum(
-            [p.prior.log_pdf(p.value) for p in self.parameters_free if p.prior is not None]
+            [
+                p.prior.log_pdf(p.value)
+                for p in self.parameters_free
+                if p.prior is not None
+            ]
         )
 
     @property
     def d_prior(self) -> List:
         """Get the partial derivative of logarithm of the prior distribution :math:`\\partial \\log p(\\theta) \\,/\\, \\partial \\theta`"""
         return [
-            p.prior.dlog_pdf(p.value) if p.prior is not None else 0.0 for p in self.parameters_free
+            p.prior.dlog_pdf(p.value) if p.prior is not None else 0.0
+            for p in self.parameters_free
         ]
 
     @property

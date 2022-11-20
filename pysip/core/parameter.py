@@ -44,7 +44,7 @@ class Parameter(object):
         prior: Prior distribution
     """
 
-    __transforms__ = ['fixed', 'none', 'log', 'lower', 'upper', 'logit']
+    __transforms__ = ["fixed", "none", "log", "lower", "upper", "logit"]
 
     def __init__(
         self,
@@ -59,76 +59,76 @@ class Parameter(object):
     ):
 
         if not isinstance(name, str):
-            raise TypeError('`name` should be a string')
+            raise TypeError("`name` should be a string")
         self.name = name
 
         if not isinstance(loc, Real):
-            raise TypeError('`loc` must be a real number')
+            raise TypeError("`loc` must be a real number")
         self.loc = loc
 
         if not isinstance(scale, Real):
-            raise TypeError('`scale` must be a real number')
+            raise TypeError("`scale` must be a real number")
 
         if scale <= 0:
-            raise ValueError('`scale` must be a real positive number')
+            raise ValueError("`scale` must be a real positive number")
         self.scale = scale
 
         if not isinstance(bounds, tuple):
-            raise TypeError('`bounds` should be a tuple')
+            raise TypeError("`bounds` should be a tuple")
         lb, ub = bounds
 
         if lb is not None:
             if not isinstance(lb, Real):
-                TypeError('`bounds` values must be real numbers')
+                TypeError("`bounds` values must be real numbers")
             lb = float(lb)
 
         if ub is not None:
             if not isinstance(ub, Real):
-                TypeError('`bounds` values must be real numbers')
+                TypeError("`bounds` values must be real numbers")
             ub = float(ub)
 
         if lb is not None and ub is not None and lb >= ub:
-            raise ValueError('lower bound > upper bound')
+            raise ValueError("lower bound > upper bound")
 
         if transform is None:
             if lb is None and ub is None:
-                transform = 'none'
+                transform = "none"
             elif lb == 0.0 and ub is None:
-                transform = 'log'
+                transform = "log"
             elif ub is None and lb > 0.0:
-                transform = 'lower'
+                transform = "lower"
             elif lb is None and ub > 0.0:
-                transform = 'upper'
+                transform = "upper"
             elif lb is not None and ub is not None:
-                transform = 'logit'
+                transform = "logit"
 
         if not (isinstance(transform, str) and transform in self.__transforms__):
-            raise TypeError(f'Available tranform: {self.__transforms__}')
+            raise TypeError(f"Available tranform: {self.__transforms__}")
         self.transform = transform
 
         self.bounds = (lb, ub)
 
         if value is not None:
             if not isinstance(value, Real):
-                raise TypeError('`value` must be a real number')
+                raise TypeError("`value` must be a real number")
             self.theta = self.loc + self.scale * float(value)
         else:
             self.eta = 0.0
 
-        if transform in ['lower', 'logit'] and self.value <= lb:
-            raise ValueError('`value` is outside the bounds')
+        if transform in ["lower", "logit"] and self.value <= lb:
+            raise ValueError("`value` is outside the bounds")
 
-        if transform in ['upper', 'logit'] and self.value >= ub:
-            raise ValueError('`value` is outside the bounds')
+        if transform in ["upper", "logit"] and self.value >= ub:
+            raise ValueError("`value` is outside the bounds")
 
         if prior is not None and not isinstance(prior, Prior):
-            raise ValueError('`prior` must be an instance of Prior')
+            raise ValueError("`prior` must be an instance of Prior")
         self.prior = prior
 
     def __repr__(self):
         return (
-            f'name={self.name} value={self.value:.3e} transform={self.transform}'
-            f' bounds={self.bounds} prior={self.prior}'
+            f"name={self.name} value={self.value:.3e} transform={self.transform}"
+            f" bounds={self.bounds} prior={self.prior}"
         )
 
     def __eq__(self, other):
@@ -178,42 +178,44 @@ class Parameter(object):
     @property
     def free(self) -> bool:
         """Returns True if the parameter is not fixed"""
-        return not self.transform == 'fixed'
+        return not self.transform == "fixed"
 
     def _transform(self):
         """Do transformation :math:`\\eta = f(\\theta_{sd})`"""
 
-        if self.transform in ['none', 'fixed']:
+        if self.transform in ["none", "fixed"]:
             self._eta = self.value
 
-        elif self.transform == 'log':
+        elif self.transform == "log":
             self._eta = np.log(self.value)
 
-        elif self.transform == 'lower':
+        elif self.transform == "lower":
             self._eta = np.log(self.value - self.bounds[0])
 
-        elif self.transform == 'upper':
+        elif self.transform == "upper":
             self._eta = np.log(self.bounds[1] - self.value)
 
-        elif self.transform == 'logit':
-            self._eta = np.log((self.value - self.bounds[0]) / (self.bounds[1] - self.value))
+        elif self.transform == "logit":
+            self._eta = np.log(
+                (self.value - self.bounds[0]) / (self.bounds[1] - self.value)
+            )
 
     def _transform_jacobian(self):
         """Get the jacobian of :math:`\\eta = f(\\theta_{sd})`"""
 
-        if self.transform in ['none', 'fixed']:
+        if self.transform in ["none", "fixed"]:
             return 1.0
 
-        elif self.transform == 'log':
+        elif self.transform == "log":
             return 1.0 / self.value
 
-        elif self.transform == 'lower':
+        elif self.transform == "lower":
             return 1.0 / (self.value - self.bounds[0])
 
-        elif self.transform == 'upper':
+        elif self.transform == "upper":
             return -1.0 / (self.bounds[1] - self.value)
 
-        elif self.transform == 'logit':
+        elif self.transform == "logit":
             return (self.bounds[1] - self.bounds[0]) / (
                 (self.value - self.bounds[0]) * (self.bounds[1] - self.value)
             )
@@ -221,19 +223,19 @@ class Parameter(object):
     def _inv_transform(self):
         """Do inverse transformation :math:`\\theta_{sd} = f^{-1}(\\eta)`"""
 
-        if self.transform in ['none', 'fixed']:
+        if self.transform in ["none", "fixed"]:
             self.value = self._eta
 
-        elif self.transform == 'log':
+        elif self.transform == "log":
             self.value = np.exp(self._eta)
 
-        elif self.transform == 'lower':
+        elif self.transform == "lower":
             self.value = np.exp(self._eta) + self.bounds[0]
 
-        elif self.transform == 'upper':
+        elif self.transform == "upper":
             self.value = self.bounds[1] - np.exp(self._eta)
 
-        elif self.transform == 'logit':
+        elif self.transform == "logit":
             self.value = self.bounds[0] + (self.bounds[1] - self.bounds[0]) / (
                 1 + np.exp(-self._eta)
             )
@@ -241,34 +243,34 @@ class Parameter(object):
     def _inv_transform_jacobian(self) -> float:
         """Get the jacobian of :math:`\\theta_{sd} = f^{-1}(\\eta)`"""
 
-        if self.transform in ['none', 'fixed']:
+        if self.transform in ["none", "fixed"]:
             return 1.0
 
-        elif self.transform == 'log':
+        elif self.transform == "log":
             return self.value
 
-        elif self.transform == 'lower':
+        elif self.transform == "lower":
             return np.exp(self._eta)
 
-        elif self.transform == 'upper':
+        elif self.transform == "upper":
             return -np.exp(self._eta)
 
-        elif self.transform == 'logit':
+        elif self.transform == "logit":
             x = np.exp(-self._eta)
             return (self.bounds[1] - self.bounds[0]) * x / (1.0 + x) ** 2
 
     def _inv_transform_dlog_jacobian(self) -> float:
         """Get the jacobian of the logarithm of the inverse transform
 
-         :math:`\\frac{\\partial \\ln(\\theta_{sd})}{\\partial \\eta}`
+        :math:`\\frac{\\partial \\ln(\\theta_{sd})}{\\partial \\eta}`
         """
-        if self.transform in ['none', 'fixed']:
+        if self.transform in ["none", "fixed"]:
             return 0.0
 
-        elif self.transform in ['log', 'lower', 'upper']:
+        elif self.transform in ["log", "lower", "upper"]:
             return 1.0
 
-        elif self.transform == 'logit':
+        elif self.transform == "logit":
             return -np.tanh(self._eta / 2.0)
 
     def _penalty(self) -> float:
@@ -277,16 +279,16 @@ class Parameter(object):
         if self.transform in ["none", "fixed"]:
             return 0.0
 
-        elif self.transform == 'log':
+        elif self.transform == "log":
             return 1e-12 / (self.value - 1e-12)
 
-        elif self.transform == 'lower':
+        elif self.transform == "lower":
             return np.abs(self.bounds[0]) / (self.value - self.bounds[0])
 
-        elif self.transform == 'upper':
+        elif self.transform == "upper":
             return np.abs(self.bounds[1]) / (self.bounds[1] - self.value)
 
-        elif self.transform == 'logit':
+        elif self.transform == "logit":
             return np.abs(self.bounds[0]) / (self.value - self.bounds[0]) + np.abs(
                 self.bounds[1]
             ) / (self.bounds[1] - self.value)
@@ -297,16 +299,16 @@ class Parameter(object):
         if self.transform in ["none", "fixed"]:
             return 0.0
 
-        elif self.transform == 'log':
+        elif self.transform == "log":
             return -1e-12 / (self.value - 1e-12) ** 2
 
-        elif self.transform == 'lower':
+        elif self.transform == "lower":
             return -np.abs(self.bounds[0]) / (self.value - self.bounds[0]) ** 2
 
-        elif self.transform == 'upper':
+        elif self.transform == "upper":
             return np.abs(self.bounds[1]) / (self.bounds[1] - self.value) ** 2
 
-        elif self.transform == 'logit':
+        elif self.transform == "logit":
             return (
                 np.abs(self.bounds[1]) / (self.bounds[1] - self.value) ** 2
                 - np.abs(self.bounds[0]) / (self.value - self.bounds[0]) ** 2

@@ -1,9 +1,9 @@
 import warnings
-import numpy as np
-
 from typing import Tuple
-from scipy.linalg import LinAlgError, LinAlgWarning, ldl, solve_triangular
+
+import numpy as np
 from numpy.linalg import lstsq
+from scipy.linalg import LinAlgError, LinAlgWarning, ldl, solve_triangular
 
 
 def log1p_exp(a: float):
@@ -28,7 +28,9 @@ def cholesky_inverse(matrix):
     """Borrowed from numpyro at
     https://github.com/pyro-ppl/numpyro/blob/master/numpyro/distributions/util.py
     """
-    tril_inv = np.swapaxes(np.linalg.cholesky(matrix[..., ::-1, ::-1])[..., ::-1, ::-1], -2, -1)
+    tril_inv = np.swapaxes(
+        np.linalg.cholesky(matrix[..., ::-1, ::-1])[..., ::-1, ::-1], -2, -1
+    )
     identity = np.broadcast_to(np.identity(matrix.shape[-1]), tril_inv.shape)
     return solve_triangular(tril_inv, identity, lower=True)
 
@@ -63,7 +65,7 @@ def fit(y, yhat):
     return 1.0 - np.linalg.norm(y - yhat, 2) / np.linalg.norm(y - np.mean(y), 2)
 
 
-def nearest_cholesky(m, method='ldl') -> np.ndarray:
+def nearest_cholesky(m, method="ldl") -> np.ndarray:
     """nearest positive semi definite Cholesky decomposition
 
     Returns:
@@ -73,13 +75,15 @@ def nearest_cholesky(m, method='ldl') -> np.ndarray:
         return m
 
     x = (m + m.T) / 2.0
-    if method == 'ldl':
+    if method == "ldl":
         lu, d, _ = ldl(x, lower=True, hermitian=True)
         return np.diag([np.sqrt(w) if w > 0 else 0 for w in d.diagonal()]) @ lu.T
-    elif method == 'eigen':
+    elif method == "eigen":
         eigvals, v = np.linalg.eigh(x)
-        return np.linalg.qr(np.diag([np.sqrt(w) if w > 0 else 0 for w in eigvals]) @ v.T, 'r')
-    elif method == 'jitter':
+        return np.linalg.qr(
+            np.diag([np.sqrt(w) if w > 0 else 0 for w in eigvals]) @ v.T, "r"
+        )
+    elif method == "jitter":
         Ix = np.eye(x.shape[0])
         jitter = 1e-9
         while jitter < 1.0:
@@ -89,7 +93,7 @@ def nearest_cholesky(m, method='ldl') -> np.ndarray:
             except (LinAlgError, LinAlgWarning):
                 jitter *= 10.0
     else:
-        raise ValueError('`method` must be set to `ldl`, `eigen` or `jitter`')
+        raise ValueError("`method` must be set to `ldl`, `eigen` or `jitter`")
 
 
 def diff_upper_cholesky(R: np.ndarray, dS: np.ndarray) -> np.ndarray:
@@ -117,12 +121,12 @@ def diff_upper_cholesky(R: np.ndarray, dS: np.ndarray) -> np.ndarray:
         return x
 
     try:
-        right_ = solve_triangular(R, dS.T, trans='T').T
+        right_ = solve_triangular(R, dS.T, trans="T").T
     except (LinAlgError, LinAlgWarning):
         right_ = np.transpose(lstsq(R.T, dS.T, rcond=-1)[0])
     finally:
         try:
-            left_ = solve_triangular(R, right_, trans='T')
+            left_ = solve_triangular(R, right_, trans="T")
         except (LinAlgError, LinAlgWarning):
             left_ = lstsq(R.T, right_, rcond=-1)[0]
     return Phi(left_) @ R

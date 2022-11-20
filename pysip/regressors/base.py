@@ -116,7 +116,12 @@ class BaseRegressor:
         return self.filter.filtering(ssm, index, u, u1, y, x0, P0)[:2]
 
     def _eval_log_likelihood(
-        self, dt: np.ndarray, u: np.ndarray, u1: np.ndarray, y: np.ndarray, pointwise: bool = False
+        self,
+        dt: np.ndarray,
+        u: np.ndarray,
+        u1: np.ndarray,
+        y: np.ndarray,
+        pointwise: bool = False,
     ) -> Union[float, np.ndarray]:
         """Evaluate the negative log-likelihood
 
@@ -155,7 +160,12 @@ class BaseRegressor:
         return self.filter.dlog_likelihood(ssm, dssm, index, u, u1, y)
 
     def _eval_log_posterior(
-        self, eta: np.ndarray, dt: np.ndarray, u: np.ndarray, u1: np.ndarray, y: np.ndarray
+        self,
+        eta: np.ndarray,
+        dt: np.ndarray,
+        u: np.ndarray,
+        u1: np.ndarray,
+        y: np.ndarray,
     ) -> float:
         """Evaluate the negative log-posterior
 
@@ -183,7 +193,12 @@ class BaseRegressor:
         return log_posterior
 
     def _eval_dlog_posterior(
-        self, eta: np.ndarray, dt: np.ndarray, u: np.ndarray, u1: np.ndarray, y: np.ndarray
+        self,
+        eta: np.ndarray,
+        dt: np.ndarray,
+        u: np.ndarray,
+        u1: np.ndarray,
+        y: np.ndarray,
     ) -> Union[float, np.ndarray]:
         """Evaluate the negative log-posterior and the gradient
 
@@ -203,7 +218,9 @@ class BaseRegressor:
         self.ss.parameters.eta = eta
         log_likelihood, dlog_likelihood = self._eval_dlog_likelihood(dt, u, u1, y)
         log_posterior = log_likelihood - self.ss.parameters.prior
-        dlog_posterior = dlog_likelihood * self.ss.parameters.scale - self.ss.parameters.d_prior
+        dlog_posterior = (
+            dlog_likelihood * self.ss.parameters.scale - self.ss.parameters.d_prior
+        )
         dlog_posterior *= self.ss.parameters.theta_jacobian
 
         if self._use_jacobian:
@@ -246,17 +263,21 @@ class BaseRegressor:
         """
 
         if not isinstance(df, pd.DataFrame):
-            raise TypeError('`df` must be a dataframe')
+            raise TypeError("`df` must be a dataframe")
 
         if inputs is not None:
             if not isinstance(inputs, (str, list)):
-                raise TypeError('the input name(s) must be a string or a list of strings')
+                raise TypeError(
+                    "the input name(s) must be a string or a list of strings"
+                )
 
             if isinstance(inputs, str):
                 inputs = [inputs]
 
             if self.ss.nu != len(inputs):
-                raise ValueError(f'The model {self.ss.name} requires {self.ss.nu} inputs')
+                raise ValueError(
+                    f"The model {self.ss.name} requires {self.ss.nu} inputs"
+                )
 
         if tnew is None:
             if isinstance(df.index, pd.DatetimeIndex):
@@ -286,10 +307,10 @@ class BaseRegressor:
             dt = np.append(dt, dt[-1])
 
         if not np.isfinite(dt).all():
-            raise ValueError('The time vector contains undefinite values')
+            raise ValueError("The time vector contains undefinite values")
 
         if np.any(dt < 0):
-            raise ValueError('The time vector is not monotonically increasing')
+            raise ValueError("The time vector is not monotonically increasing")
 
         # Input array
         u1 = np.zeros((self.ss.nu, n))
@@ -297,7 +318,7 @@ class BaseRegressor:
             u = np.atleast_2d(df[inputs].T)
 
             if not np.isfinite(u).all():
-                raise ValueError('The input vector contains undefinite values')
+                raise ValueError("The input vector contains undefinite values")
 
             if self.ss.hold_order == 1:
                 if tnew is None:
@@ -306,8 +327,8 @@ class BaseRegressor:
                     u1 = np.zeros((self.ss.nu, tbase.shape[0]))
                     u1[:, :-1] = np.diff(u) / np.diff(tbase)
             if tnew is not None:
-                u = interp1d(tbase, u, kind='previous')(t)
-                u1 = interp1d(tbase, u1, kind='previous')(t)
+                u = interp1d(tbase, u, kind="previous")(t)
+                u1 = interp1d(tbase, u1, kind="previous")(t)
         else:
             u = u1
 
@@ -322,20 +343,26 @@ class BaseRegressor:
                 outputs = [outputs]
 
             if self.ss.ny != len(outputs):
-                raise TypeError(f'The model {self.ss.name} requires {self.ss.ny} outputs')
+                raise TypeError(
+                    f"The model {self.ss.name} requires {self.ss.ny} outputs"
+                )
 
             y = np.atleast_2d(df[outputs].T)
             if not np.isnan(y[~np.isfinite(y)]).all():
-                raise TypeError('The output vector must contains numerical values or numpy.nan')
+                raise TypeError(
+                    "The output vector must contains numerical values or numpy.nan"
+                )
 
             if tnew is not None:
-                y = np.append(y, np.full((self.ss.ny, tp.shape[0]), np.nan, np.float), axis=1)
+                y = np.append(
+                    y, np.full((self.ss.ny, tp.shape[0]), np.nan, np.float), axis=1
+                )
                 y = y[:, index]
 
         return dt, u, u1, y, index_back
 
     def _init_parameters(
-        self, n_init: int = 1, method: str = 'unconstrained', hpd: float = 0.95
+        self, n_init: int = 1, method: str = "unconstrained", hpd: float = 0.95
     ) -> np.ndarray:
         """Random initialization of the parameters
 
@@ -355,26 +382,28 @@ class BaseRegressor:
         """
 
         if not isinstance(n_init, int) or n_init <= 0:
-            raise TypeError('`n_init` must an integer greater or equal to 1')
+            raise TypeError("`n_init` must an integer greater or equal to 1")
 
-        available_methods = ['unconstrained', 'prior', 'zero', 'fixed', 'value']
+        available_methods = ["unconstrained", "prior", "zero", "fixed", "value"]
         if method not in available_methods:
-            raise ValueError(f'`method` must be one of the following {available_methods}')
+            raise ValueError(
+                f"`method` must be one of the following {available_methods}"
+            )
 
         if not isinstance(hpd, Real) or not 0.0 < hpd <= 1.0:
-            raise ValueError('`hpd` must be between ]0, 1]')
+            raise ValueError("`hpd` must be between ]0, 1]")
 
         n_par = len(self.ss.parameters.eta_free)
-        if method == 'unconstrained':
+        if method == "unconstrained":
             eta0 = np.random.uniform(-1, 1, (n_par, n_init))
-        elif method == 'zero':
+        elif method == "zero":
             eta0 = np.zeros((n_par, n_init))
         else:
             eta0 = np.zeros((n_par, n_init))
             for n in range(n_init):
-                if method == 'prior':
+                if method == "prior":
                     self.ss.parameters.prior_init(hpd=hpd)
-                elif method == 'value':
+                elif method == "value":
                     value = np.asarray(self.ss.parameters.theta_sd)
                     lb = value - 0.25 * value
                     ub = value + 0.25 * value

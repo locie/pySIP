@@ -9,7 +9,9 @@ from pysip.statespace import model_registry
 from pysip.utils import generate_random_binary, generate_sine, ned
 
 rc_models = {
-    k: v for k, v in model_registry.items() if 'pysip.statespace.thermal_network' in v.__module__
+    k: v
+    for k, v in model_registry.items()
+    if "pysip.statespace.thermal_network" in v.__module__
 }
 
 
@@ -29,13 +31,13 @@ def artificial_data_rc():
     dt = 3600  # sampling time
     df = pd.DataFrame(
         {
-            'Ti': generate_sine(n=n, amplitude=3.0, phase=np.pi / 3.0, offset=20.0)[1],
-            'To': generate_sine(n=n)[1],
-            'Tb': generate_sine(n=n, amplitude=2.0, phase=np.pi / 4.0, offset=14.0)[1],
-            'Qgh': generate_sine(n=n, amplitude=800.0, clip_to_0=True)[1],
-            'Qh': generate_random_binary(n=n),
-            'Qv': generate_sine(n=n, amplitude=200.0, offset=100.0)[1],
-            'Ql': 100.0 + 25.0 * np.random.randn(n),
+            "Ti": generate_sine(n=n, amplitude=3.0, phase=np.pi / 3.0, offset=20.0)[1],
+            "To": generate_sine(n=n)[1],
+            "Tb": generate_sine(n=n, amplitude=2.0, phase=np.pi / 4.0, offset=14.0)[1],
+            "Qgh": generate_sine(n=n, amplitude=800.0, clip_to_0=True)[1],
+            "Qh": generate_random_binary(n=n),
+            "Qv": generate_sine(n=n, amplitude=200.0, offset=100.0)[1],
+            "Ql": 100.0 + 25.0 * np.random.randn(n),
         }
     )
     df.index *= dt
@@ -44,18 +46,18 @@ def artificial_data_rc():
 
 def random_parameters(statespace):
     parameters = []
-    transforms = ['log', 'lower', 'upper', 'logit']
+    transforms = ["log", "lower", "upper", "logit"]
     priors = [Normal(), LogNormal(), InverseGamma(), Gamma(), Beta()]
     scale_dict = {
-        'THERMAL_RESISTANCE': 1e-2,
-        'THERMAL_TRANSMITTANCE': 1e2,
-        'THERMAL_CAPACITY': 1e8,
-        'SOLAR_APERTURE': 1.0,
-        'COEFFICIENT': 1.0,
-        'STATE_DEVIATION': 1e-2,
-        'MEASURE_DEVIATION': 1e-2,
-        'INITIAL_MEAN': 1e2,
-        'INITIAL_DEVIATION': 1.0,
+        "THERMAL_RESISTANCE": 1e-2,
+        "THERMAL_TRANSMITTANCE": 1e2,
+        "THERMAL_CAPACITY": 1e8,
+        "SOLAR_APERTURE": 1.0,
+        "COEFFICIENT": 1.0,
+        "STATE_DEVIATION": 1e-2,
+        "MEASURE_DEVIATION": 1e-2,
+        "INITIAL_MEAN": 1e2,
+        "INITIAL_DEVIATION": 1.0,
     }
     ntrfm = len(transforms) - 1
     nprior = len(priors) - 1
@@ -83,10 +85,10 @@ def get_inputs(statespace):
     if not statespace.inputs == []:
         for _input in statespace.inputs:
             name = _input[1]
-            if name in ['To', 'Tb', 'Qgh', 'Qh', 'Qv', 'Ql']:
+            if name in ["To", "Tb", "Qgh", "Qh", "Qv", "Ql"]:
                 inputs.append(name)
             else:
-                raise ValueError('Unknown input name')
+                raise ValueError("Unknown input name")
     return inputs
 
 
@@ -94,7 +96,7 @@ def get_outputs(statespace):
     """Create list of outputs for the regressor"""
     if len(statespace.outputs) > 1:
         raise NotImplementedError
-    _outputs = 'Ti'
+    _outputs = "Ti"
 
     return _outputs
 
@@ -110,7 +112,9 @@ def gen_regressor(statespaces):
         yield Regressor(ss=ssm(parameters=p, hold_order=h)), inputs, outputs
 
 
-@pytest.mark.parametrize('reg, inputs, outputs', gen_regressor([m for m in rc_models.values()]))
+@pytest.mark.parametrize(
+    "reg, inputs, outputs", gen_regressor([m for m in rc_models.values()])
+)
 def test_gradient_RCModel(artificial_data_rc, reg, inputs, outputs):
     """Compare regressor gradient with numerical differentiation"""
     reg._use_penalty = False

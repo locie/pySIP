@@ -24,4 +24,3 @@ Prior
 .. autoclass:: pysip.core.prior.Beta
    :members:
    :private-members:
-

@@ -1,7 +1,12 @@
 """Module for Hamiltonian Monte Carlo Adaptation"""
 import numpy as np
 
-__ALL__ = ['DualAveraging', 'WelfordCovEstimator', 'WindowedAdaptation', 'CovAdaptation']
+__ALL__ = [
+    "DualAveraging",
+    "WelfordCovEstimator",
+    "WindowedAdaptation",
+    "CovAdaptation",
+]
 
 
 class DualAveraging:
@@ -17,24 +22,24 @@ class DualAveraging:
     ):
 
         if not isinstance(acc_prob_target, float):
-            raise TypeError('`acc_prob_target must a float`')
+            raise TypeError("`acc_prob_target must a float`")
         if acc_prob_target < 0.6:
-            raise ValueError('`acc_prob_target` must be >= 0.6')
+            raise ValueError("`acc_prob_target` must be >= 0.6")
 
         if not isinstance(t0, (int, float)):
-            raise TypeError('`t0 must an integer or a float`')
+            raise TypeError("`t0 must an integer or a float`")
         if t0 < 0:
-            raise ValueError('`t0` must be > 0')
+            raise ValueError("`t0` must be > 0")
 
         if not isinstance(gamma, (int, float)):
-            raise TypeError('`gamma must an integer or a float`')
+            raise TypeError("`gamma must an integer or a float`")
         if gamma <= 0:
-            raise ValueError('`gamma` must be > 0')
+            raise ValueError("`gamma` must be > 0")
 
         if not isinstance(kappa, float):
-            raise TypeError('`kappa must a float`')
+            raise TypeError("`kappa must a float`")
         if not 0.0 < kappa < 1.0:
-            raise ValueError('`kappa` must be between ]0, 1[')
+            raise ValueError("`kappa` must be between ]0, 1[")
 
         self._target = acc_prob_target
         self._t0 = t0
@@ -71,7 +76,7 @@ class DualAveraging:
         self._log_ebar = 0.0
         if mu is not None:
             if not isinstance(mu, (int, float)):
-                raise TypeError('`mu must an integer or a float`')
+                raise TypeError("`mu must an integer or a float`")
             self._mu = mu
 
 
@@ -90,7 +95,7 @@ class WelfordCovEstimator:
     def __init__(self, dimension: int = 1, dense: bool = True, shrinkage: bool = True):
         """Initialize the estimator with the samples dimension"""
         if not isinstance(dense, bool):
-            raise TypeError('`dense` must be a boolean')
+            raise TypeError("`dense` must be a boolean")
 
         self._dim = dimension
         self._dense = dense
@@ -155,27 +160,31 @@ class WindowedAdaptation:
     """
 
     def __init__(
-        self, n_adapt: int = 1000, init_buffer: int = 75, term_buffer: int = 50, window: int = 25
+        self,
+        n_adapt: int = 1000,
+        init_buffer: int = 75,
+        term_buffer: int = 50,
+        window: int = 25,
     ):
 
         if not isinstance(n_adapt, int) and n_adapt <= 0:
-            raise TypeError('`n_adapt` must be a positive integer')
+            raise TypeError("`n_adapt` must be a positive integer")
 
         if not isinstance(init_buffer, int) and init_buffer > 0:
-            raise TypeError('`init_buffer` must be a positive integer')
+            raise TypeError("`init_buffer` must be a positive integer")
 
         if not isinstance(term_buffer, int) and term_buffer > 0:
-            raise TypeError('`term_buffer` must be a positive integer')
+            raise TypeError("`term_buffer` must be a positive integer")
 
         if not isinstance(window, int) and window > 0:
-            raise TypeError('`window` must be a positive integer')
+            raise TypeError("`window` must be a positive integer")
 
         if init_buffer + window + term_buffer > n_adapt:
             raise ValueError(
-                f'There are not enougth adaptation iterations `n_adapt` to'
-                f' fit the three stages of adaptation as currently, e.g.'
-                f' `init_buffer` + `window` + `term_buffer` ='
-                f' {init_buffer + window + term_buffer}'
+                f"There are not enougth adaptation iterations `n_adapt` to"
+                f" fit the three stages of adaptation as currently, e.g."
+                f" `init_buffer` + `window` + `term_buffer` ="
+                f" {init_buffer + window + term_buffer}"
             )
         self._n_adapt = n_adapt
         self._init_buffer = init_buffer

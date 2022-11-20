@@ -1,16 +1,18 @@
-import pytest
+from time import time
+
 import numpy as np
-from scipy.linalg import inv, eigvals, eig, expm, expm_frechet
+import pytest
+from scipy.linalg import eig, eigvals, expm, expm_frechet, inv
+
 from pysip.statespace.discretization import (
-    inv_2x2,
-    inv_3x3,
+    dexpm_2x2,
+    eig_2x2,
     eigvals_2x2,
     eigvals_3x3,
-    eig_2x2,
     expm_2x2,
-    dexpm_2x2,
+    inv_2x2,
+    inv_3x3,
 )
-from time import time
 
 
 def random_real_eig(n):

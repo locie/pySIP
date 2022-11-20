@@ -17,7 +17,9 @@ def test_ccf():
     lags, correlation_coeffs, confidence = ccf([1, 2, 3], [4, 5, 6])
     np.testing.assert_array_equal(lags, np.array([0, 1, 2]))
     np.testing.assert_array_equal(correlation_coeffs, np.array([1.0, 0.0, -0.5]))
-    np.testing.assert_allclose(confidence, np.array([1.13158573, 1.13158573, 1.13158573]))
+    np.testing.assert_allclose(
+        confidence, np.array([1.13158573, 1.13158573, 1.13158573])
+    )
 
 
 def test_ccf_raises():

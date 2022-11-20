@@ -4,23 +4,31 @@ import numpy as np
 import pytest
 
 from pysip.regressors import FreqRegressor as Regressor
-from pysip.statespace import Matern12, Matern52, Periodic, TwTi_RoRiAwAicv, TwTiTm_RoRiRmRbAwAicv
+from pysip.statespace import (
+    Matern12,
+    Matern52,
+    Periodic,
+    TwTi_RoRiAwAicv,
+    TwTiTm_RoRiRmRbAwAicv,
+)
 from pysip.utils import load_model, save_model
 
 
 @pytest.mark.parametrize(
-    'reg',
+    "reg",
     [
         pytest.param(TwTi_RoRiAwAicv(), id="rc_model"),
         pytest.param(Matern12(), id="gp_model"),
         pytest.param(Periodic() * Matern12(), id="gp_product"),
         pytest.param(Periodic() + Matern12(), id="gp_sum"),
-        pytest.param(TwTi_RoRiAwAicv(latent_forces='Qv') <= Matern12(), id="lfm_rc_gp"),
+        pytest.param(TwTi_RoRiAwAicv(latent_forces="Qv") <= Matern12(), id="lfm_rc_gp"),
         pytest.param(
-            TwTi_RoRiAwAicv(latent_forces='Qv') <= Periodic() * Matern12(), id="lfm_rc_gp_product"
+            TwTi_RoRiAwAicv(latent_forces="Qv") <= Periodic() * Matern12(),
+            id="lfm_rc_gp_product",
         ),
         pytest.param(
-            TwTi_RoRiAwAicv(latent_forces='Qv') <= Periodic() + Matern12(), id="lfm_rc_gp_sum"
+            TwTi_RoRiAwAicv(latent_forces="Qv") <= Periodic() + Matern12(),
+            id="lfm_rc_gp_sum",
         ),
     ],
 )
@@ -37,8 +45,8 @@ def test_save_model_to_pickle(reg):
     dx0 = reg.ss.dx0
     dP0 = reg.ss.dP0
 
-    save_model('test', reg)
-    load_reg = load_model('test')
+    save_model("test", reg)
+    load_reg = load_model("test")
 
     for k in dA.keys():
         assert np.allclose(dA[k], load_reg.ss.dA[k])
@@ -54,26 +62,27 @@ def test_save_model_to_pickle(reg):
     for a, b in zip(reg.ss.parameters, load_reg.ss.parameters):
         assert a == b
 
-    os.remove('test.pickle')
+    os.remove("test.pickle")
 
 
 def test_save_version_number():
     from pysip import __version__
 
-    save_model('test', Regressor(None))
-    load_reg = load_model('test')
+    save_model("test", Regressor(None))
+    load_reg = load_model("test")
 
     assert load_reg.__version__ == __version__
 
 
 @pytest.mark.parametrize(
-    'ss,size_kb',
+    "ss,size_kb",
     [
         pytest.param(TwTi_RoRiAwAicv(), 4, id="rc_model"),
         pytest.param(Matern12(), 17, id="gp_model"),
         pytest.param(Periodic() * Matern12(), 32, id="gp_product"),
         pytest.param(
-            TwTiTm_RoRiRmRbAwAicv(latent_forces='Qv') <= Periodic() * Matern52() + Matern52(),
+            TwTiTm_RoRiRmRbAwAicv(latent_forces="Qv")
+            <= Periodic() * Matern52() + Matern52(),
             237,
             id="lfm_model",
         ),
@@ -81,11 +90,13 @@ def test_save_version_number():
 )
 def test_model_pickle_file_size_limit(ss, size_kb):
     model = Regressor(ss)
-    model.ss.parameters.theta = np.random.uniform(1e-1, 1, len(model.ss.parameters.theta))
+    model.ss.parameters.theta = np.random.uniform(
+        1e-1, 1, len(model.ss.parameters.theta)
+    )
     model.ss.update_continuous_dssm()
 
-    save_model('big', model)
-    size = os.path.getsize('big.pickle')
-    os.remove('big.pickle')
+    save_model("big", model)
+    size = os.path.getsize("big.pickle")
+    os.remove("big.pickle")
 
     assert size <= size_kb * 1000

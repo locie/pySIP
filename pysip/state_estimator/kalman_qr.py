@@ -2,8 +2,9 @@ from copy import deepcopy
 from typing import NamedTuple, Tuple, Union
 
 import numpy as np
+from numpy.linalg import lstsq, solve
 from scipy.linalg import LinAlgError, LinAlgWarning, solve_triangular
-from numpy.linalg import solve, lstsq
+
 from .base import BayesianFilter
 
 
@@ -45,7 +46,7 @@ class Kalman_QR(BayesianFilter):
                 - **x**: Prior state mean
                 - **P**: Prior state deviation
         """
-        P = np.linalg.qr(np.vstack([P @ Ad.T, Qd]), 'r')
+        P = np.linalg.qr(np.vstack([P @ Ad.T, Qd]), "r")
         x = Ad @ x + B0d @ u + B1d @ u1
 
         return x, P
@@ -141,7 +142,7 @@ class Kalman_QR(BayesianFilter):
         Arru[:ny, :ny] = R
         Arru[ny:, :ny] = P @ C.T
         Arru[ny:, ny:] = P
-        Post = np.linalg.qr(Arru, 'r')
+        Post = np.linalg.qr(Arru, "r")
         S = Post[:ny, :ny]
 
         if ny > 1:
@@ -282,16 +283,25 @@ class Kalman_QR(BayesianFilter):
         do_update = ~np.isnan(y).any(axis=0)
         for t in range(T):
             if do_update[t]:
-                x, P, e, S = self.update(ssm.C, ssm.D, ssm.R, x, P, u[:, t : t + 1], y[:, t])
+                x, P, e, S = self.update(
+                    ssm.C, ssm.D, ssm.R, x, P, u[:, t : t + 1], y[:, t]
+                )
 
                 if ny > 1:
                     loglik[t] += np.linalg.slogdet(S)[1] + 0.5 * e.T @ e
                 else:
-                    loglik[t] += np.log(np.abs(S)) + 0.5 * e ** 2
+                    loglik[t] += np.log(np.abs(S)) + 0.5 * e**2
 
             i = index[t]
             x, P = self.predict(
-                ssm.A[i], ssm.B0[i], ssm.B1[i], ssm.Q[i], x, P, u[:, t : t + 1], u1[:, t : t + 1]
+                ssm.A[i],
+                ssm.B0[i],
+                ssm.B1[i],
+                ssm.Q[i],
+                x,
+                P,
+                u[:, t : t + 1],
+                u1[:, t : t + 1],
             )
 
         if not point_wise:
@@ -355,7 +365,7 @@ class Kalman_QR(BayesianFilter):
                     tmp = np.linalg.solve(S, dS)
                     gradient += tmp.trace(0, 1, 2) + np.squeeze(e.T @ de)
                 else:
-                    loglik += np.log(np.abs(S)) + 0.5 * e ** 2
+                    loglik += np.log(np.abs(S)) + 0.5 * e**2
                     gradient += np.squeeze(dS / S + e * de)
 
             i = index[t]
@@ -418,19 +428,21 @@ class Kalman_QR(BayesianFilter):
             x = deepcopy(ssm.x0)
         else:
             if x0.shape != (nx, 1):
-                raise ValueError(f'the dimensions of `x0` must be {(nx, 1)}')
+                raise ValueError(f"the dimensions of `x0` must be {(nx, 1)}")
             x = x0
 
         if P0 is None:
             P = deepcopy(ssm.P0)
         else:
             if P0.shape != (nx, nx):
-                raise ValueError(f'the dimensions of `P0` must be {(nx, nx)}')
+                raise ValueError(f"the dimensions of `P0` must be {(nx, nx)}")
             P = P0
 
         for t in range(T):
             if do_update[t]:
-                x, P, e, S = self.update(ssm.C, ssm.D, ssm.R, x, P, u[:, t : t + 1], y[:, t])
+                x, P, e, S = self.update(
+                    ssm.C, ssm.D, ssm.R, x, P, u[:, t : t + 1], y[:, t]
+                )
                 res[t, :, :] = e
                 dev_res[t, :, :] = S
 
@@ -439,7 +451,14 @@ class Kalman_QR(BayesianFilter):
 
             i = index[t]
             x, P = self.predict(
-                ssm.A[i], ssm.B0[i], ssm.B1[i], ssm.Q[i], x, P, u[:, t : t + 1], u1[:, t : t + 1]
+                ssm.A[i],
+                ssm.B0[i],
+                ssm.B1[i],
+                ssm.Q[i],
+                x,
+                P,
+                u[:, t : t + 1],
+                u1[:, t : t + 1],
             )
 
         return xf, Pf, res, dev_res
@@ -482,14 +501,14 @@ class Kalman_QR(BayesianFilter):
             x = deepcopy(ssm.x0)
         else:
             if x0.shape != (nx, 1):
-                raise ValueError(f'the dimensions of `x0` must be {(nx, 1)}')
+                raise ValueError(f"the dimensions of `x0` must be {(nx, 1)}")
             x = x0
 
         if P0 is None:
             P = deepcopy(ssm.P0)
         else:
             if P0.shape != (nx, nx):
-                raise ValueError(f'the dimensions of `P0` must be {(nx, nx)}')
+                raise ValueError(f"the dimensions of `P0` must be {(nx, nx)}")
             P = P0
 
         # Run forward Kalman filter
@@ -499,7 +518,9 @@ class Kalman_QR(BayesianFilter):
             Pp[t, :, :] = P.T @ P
 
             if do_update[t]:
-                x, P, *_ = self.update(ssm.C, ssm.D, ssm.R, x, P, u[:, t : t + 1], y[:, t])
+                x, P, *_ = self.update(
+                    ssm.C, ssm.D, ssm.R, x, P, u[:, t : t + 1], y[:, t]
+                )
 
             # Save filtered state distribution
             xs[t, :, :] = x
@@ -507,7 +528,14 @@ class Kalman_QR(BayesianFilter):
 
             i = index[t]
             x, P = self.predict(
-                ssm.A[i], ssm.B0[i], ssm.B1[i], ssm.Q[i], x, P, u[:, t : t + 1], u1[:, t : t + 1]
+                ssm.A[i],
+                ssm.B0[i],
+                ssm.B1[i],
+                ssm.Q[i],
+                x,
+                P,
+                u[:, t : t + 1],
+                u1[:, t : t + 1],
             )
 
         # Run backward RTS smoother
@@ -516,7 +544,9 @@ class Kalman_QR(BayesianFilter):
             try:
                 G = solve(Pp[t + 1, :, :], ssm.A[index[t], :, :] @ Ps[t, :, :]).T
             except (LinAlgWarning, LinAlgError):
-                G = lstsq(Pp[t + 1, :, :], ssm.A[index[t], :, :] @ Ps[t, :, :], rcond=-1)[0].T
+                G = lstsq(
+                    Pp[t + 1, :, :], ssm.A[index[t], :, :] @ Ps[t, :, :], rcond=-1
+                )[0].T
 
             # smoothed state mean and covariance
             xs[t, :, :] += G @ (xs[t + 1, :, :] - xp[t + 1, :, :])
@@ -557,7 +587,7 @@ class Kalman_QR(BayesianFilter):
             x = deepcopy(ssm.x0)
         else:
             if x0.shape != (nx, 1):
-                raise ValueError(f'the dimensions of `x0` must be {(nx, 1)}')
+                raise ValueError(f"the dimensions of `x0` must be {(nx, 1)}")
             x = x0
 
         for t in range(T):
@@ -609,26 +639,35 @@ class Kalman_QR(BayesianFilter):
             x = deepcopy(ssm.x0)
         else:
             if x0.shape != (nx, 1):
-                raise ValueError(f'the dimensions of `x0` must be {(nx, 1)}')
+                raise ValueError(f"the dimensions of `x0` must be {(nx, 1)}")
             x = x0
 
         if P0 is None:
             P = deepcopy(ssm.P0)
         else:
             if P0.shape != (nx, nx):
-                raise ValueError(f'the dimensions of `P0` must be {(nx, nx)}')
+                raise ValueError(f"the dimensions of `P0` must be {(nx, nx)}")
             P = P0
 
         for t in range(T):
             if do_update[t]:
-                x, P, *_ = self.update(ssm.C, ssm.D, ssm.R, x, P, u[:, t : t + 1], y[:, t])
+                x, P, *_ = self.update(
+                    ssm.C, ssm.D, ssm.R, x, P, u[:, t : t + 1], y[:, t]
+                )
 
             ym[t, :, :] = ssm.C @ x
             ysd[t, :, :] = np.sqrt(ssm.C @ P.T @ P @ ssm.C.T) + ssm.R
 
             i = index[t]
             x, P = self.predict(
-                ssm.A[i], ssm.B0[i], ssm.B1[i], ssm.Q[i], x, P, u[:, t : t + 1], u1[:, t : t + 1]
+                ssm.A[i],
+                ssm.B0[i],
+                ssm.B1[i],
+                ssm.Q[i],
+                x,
+                P,
+                u[:, t : t + 1],
+                u1[:, t : t + 1],
             )
 
         return ym, ysd

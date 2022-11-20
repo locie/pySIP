@@ -1,15 +1,15 @@
-import numpy as np
-
 from typing import Tuple
+
+import numpy as np
+from numpy.linalg import LinAlgError, lstsq, solve
 from scipy.linalg import (
+    LinAlgWarning,
+    block_diag,
     expm,
     expm_frechet,
-    solve_sylvester,
-    block_diag,
     solve_continuous_lyapunov,
-    LinAlgWarning,
+    solve_sylvester,
 )
-from numpy.linalg import solve, lstsq, LinAlgError
 
 
 def inv_2x2(X: np.ndarray) -> np.ndarray:
@@ -27,7 +27,7 @@ def inv_2x2(X: np.ndarray) -> np.ndarray:
     x11 = X[1, 1]
     det = x00 * x11 - x01 * x10
     if det == 0.0:
-        raise ValueError('The matrix cannot be inverted')
+        raise ValueError("The matrix cannot be inverted")
 
     return np.array([[x11, -x01], [-x10, x00]]) / det
 
@@ -47,7 +47,7 @@ def inv_3x3(X: np.ndarray) -> np.ndarray:
     det2 = x12 * x01 - x11 * x02
     det = x00 * det0 - x10 * det1 + x20 * det2
     if det == 0.0:
-        raise ValueError('The matrix cannot be inverted')
+        raise ValueError("The matrix cannot be inverted")
 
     return (
         np.array(
@@ -100,13 +100,13 @@ def eig_2x2(X: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     x10 = X[1, 0]
     x11 = X[1, 1]
     d = x00 - x11
-    tmp = np.sign(d) * trunc_sqrt(d ** 2 + 4.0 * x01 * x10)
+    tmp = np.sign(d) * trunc_sqrt(d**2 + 4.0 * x01 * x10)
     w1 = 0.5 * (x00 + x11 + tmp)
     w2 = 0.5 * (x00 + x11 - tmp)
     y1 = (w1 - x00) / x01
     y2 = (w2 - x00) / x01
-    z1 = np.sqrt(1.0 + y1 ** 2)
-    z2 = np.sqrt(1.0 + y2 ** 2)
+    z1 = np.sqrt(1.0 + y1**2)
+    z2 = np.sqrt(1.0 + y2**2)
 
     return np.array([w1, w2]), np.array([[1.0 / z1, 1.0 / z2], [y1 / z1, y2 / z2]])
 
@@ -152,14 +152,14 @@ def eigvals_3x3(X: np.ndarray) -> np.ndarray:
         - x02 * x10 * x21
         + x02 * x11 * x20
     )
-    p = b ** 2 - 3.0 * c
+    p = b**2 - 3.0 * c
     if p == 0.0:
         return (b / 3.0) * np.ones(3)
 
-    q = 2.0 * b ** 3 - 9.0 * b * c - 27.0 * d
-    if q ** 2 > 4.0 * p ** 3:
-        raise ValueError('This symbolic expression works only for real eigenvalues')
-    delta = trunc_arccos(q / (2.0 * trunc_sqrt(p ** 3)))
+    q = 2.0 * b**3 - 9.0 * b * c - 27.0 * d
+    if q**2 > 4.0 * p**3:
+        raise ValueError("This symbolic expression works only for real eigenvalues")
+    delta = trunc_arccos(q / (2.0 * trunc_sqrt(p**3)))
     tmp = 2.0 * trunc_sqrt(p)
 
     return np.array(
@@ -208,7 +208,11 @@ def dexpm_2x2(X: np.ndarray, dX: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
 
 
 def disc_state_input(
-    A: np.ndarray, B: np.ndarray, dt: float = 1.0, order_hold: int = 0, method: str = 'expm'
+    A: np.ndarray,
+    B: np.ndarray,
+    dt: float = 1.0,
+    order_hold: int = 0,
+    method: str = "expm",
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Discretize the state and input matrices
 
@@ -229,14 +233,14 @@ def disc_state_input(
             - B0d: Discrete input matrix (zero order hold)
             - B1d: Discrete input matrix (first order hold)
     """
-    if method == 'expm':
+    if method == "expm":
         return disc_state_input_expm(A, B, dt, order_hold)
-    elif method == 'analytic':
+    elif method == "analytic":
         Ad = disc_state(A, dt)
         B0d, B1d = disc_input_analytic(A, B, Ad, dt, order_hold)
         return Ad, B0d, B1d
     else:
-        raise ValueError('`method must be `expm` or `analytic`')
+        raise ValueError("`method must be `expm` or `analytic`")
 
 
 def disc_d_state_input(
@@ -246,7 +250,7 @@ def disc_d_state_input(
     dB: np.ndarray,
     dt: float = 1.0,
     order_hold: int = 0,
-    method: str = 'expm',
+    method: str = "expm",
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Discretize the state and input matrices, and their derivatives
 
@@ -273,14 +277,16 @@ def disc_d_state_input(
             - dB0d: Derivative discrete input matrix (zero order hold)
             - dB1d: Derivative discrete input matrix (first order hold)
     """
-    if method == 'expm':
+    if method == "expm":
         return disc_d_state_input_expm(A, B, dA, dB, dt, order_hold)
-    elif method == 'analytic':
+    elif method == "analytic":
         Ad, dAd = disc_d_state(A, dA, dt)
-        B0d, B1d, dB0d, dB1d = disc_d_input_analytic(A, B, Ad, dA, dB, dAd, dt, order_hold)
+        B0d, B1d, dB0d, dB1d = disc_d_input_analytic(
+            A, B, Ad, dA, dB, dAd, dt, order_hold
+        )
         return Ad, B0d, B1d, dAd, dB0d, dB1d
     else:
-        raise ValueError('`method must be `expm` or `analytic`')
+        raise ValueError("`method must be `expm` or `analytic`")
 
 
 def disc_state(A: np.ndarray, dt: float = 1.0) -> np.ndarray:
@@ -292,11 +298,13 @@ def disc_state(A: np.ndarray, dt: float = 1.0) -> np.ndarray:
 
     Returns:
         Discrete state matrix
-        """
+    """
     return expm(A * dt)
 
 
-def disc_d_state(A: np.ndarray, dA: np.ndarray, dt: float = 1.0) -> Tuple[np.ndarray, np.ndarray]:
+def disc_d_state(
+    A: np.ndarray, dA: np.ndarray, dt: float = 1.0
+) -> Tuple[np.ndarray, np.ndarray]:
     """Discretize the state matrix and its derivative
 
     Args:
@@ -308,7 +316,7 @@ def disc_d_state(A: np.ndarray, dA: np.ndarray, dt: float = 1.0) -> Tuple[np.nda
         2-elements tuple containing
             - Ad: Discrete state matrix
             - dAd: Derivative discrete state matrix
-        """
+    """
     nj, nx, _ = dA.shape
     dAd = np.zeros((nj, nx, nx))
     for n in range(nj):
@@ -388,13 +396,20 @@ def disc_state_input_expm(
         F[:nx, :nx] = A
         F[:nx, nx : nx + nu] = B
         F[nx : nx + nu, nx + nu :] = np.eye(nu)
-        Ad, B0d, B1d = np.split(expm(F * dt)[:nx, :], indices_or_sections=[nx, nx + nu], axis=1)
+        Ad, B0d, B1d = np.split(
+            expm(F * dt)[:nx, :], indices_or_sections=[nx, nx + nu], axis=1
+        )
 
     return Ad, B0d, B1d
 
 
 def expm_triu(
-    a11: np.ndarray, a12: np.ndarray, a22: np.ndarray, dt: float, f11: np.ndarray, f22: np.ndarray,
+    a11: np.ndarray,
+    a12: np.ndarray,
+    a22: np.ndarray,
+    dt: float,
+    f11: np.ndarray,
+    f22: np.ndarray,
 ) -> np.ndarray:
     """Compute the exponential of the upper triangular matrix A using the Parlett's method
 
@@ -632,7 +647,9 @@ def disc_d_state_input_expm(
                 Fd, dFd[n] = expm_frechet(F * dt, dF[n] * dt)
 
         Ad, B0d, B1d = np.split(Fd[:nx, :], indices_or_sections=[nx, nx + nu], axis=1)
-        dAd, dB0d, dB1d = np.split(dFd[:, :nx, :], indices_or_sections=[nx, nx + nu], axis=2)
+        dAd, dB0d, dB1d = np.split(
+            dFd[:, :nx, :], indices_or_sections=[nx, nx + nu], axis=2
+        )
 
     return Ad, B0d, B1d, dAd, dB0d, dB1d
 
@@ -699,7 +716,12 @@ def dexpm_triu(
 
 
 def disc_d_diffusion_lyap(
-    A: np.ndarray, Q: np.ndarray, Ad: np.ndarray, dA: np.ndarray, dQ: np.ndarray, dAd: np.ndarray
+    A: np.ndarray,
+    Q: np.ndarray,
+    Ad: np.ndarray,
+    dA: np.ndarray,
+    dQ: np.ndarray,
+    dAd: np.ndarray,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """Discretize diffusion matrix and its derivative with the Lyapunov equation
 
@@ -805,7 +827,12 @@ def disc_d_diffusion_mfd(
 
 
 def disc_d_diffusion_kron(
-    A: np.ndarray, Q: np.ndarray, Ad: np.ndarray, dA: np.ndarray, dQ: np.ndarray, dAd: np.ndarray
+    A: np.ndarray,
+    Q: np.ndarray,
+    Ad: np.ndarray,
+    dA: np.ndarray,
+    dQ: np.ndarray,
+    dAd: np.ndarray,
 ) -> np.ndarray:
     """Discretize diffusion matrix and its derivative by solving indirectly the Lyapunov equation
 

@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
-
 from numpy.testing import assert_allclose
-from pysip.mcmc.adaptation import WelfordCovEstimator, WindowedAdaptation, CovAdaptation
+
+from pysip.mcmc.adaptation import CovAdaptation, WelfordCovEstimator, WindowedAdaptation
 
 
 @pytest.fixture
@@ -15,7 +15,7 @@ def mvn_samples(n_dim=3, n_samples=2000):
     return samples, cov
 
 
-@pytest.mark.parametrize('shrinkage', [False, True])
+@pytest.mark.parametrize("shrinkage", [False, True])
 def test_var_adaptation(mvn_samples, shrinkage):
     samples, cov = mvn_samples
     n_dim, n_samples = samples.shape
@@ -28,7 +28,7 @@ def test_var_adaptation(mvn_samples, shrinkage):
     assert_allclose(var_truth, var_hat, rtol=0.07)
 
 
-@pytest.mark.parametrize('shrinkage', [False, True])
+@pytest.mark.parametrize("shrinkage", [False, True])
 def test_covar_adaptation(mvn_samples, shrinkage):
     samples, cov = mvn_samples
     n_dim, n_samples = samples.shape
@@ -42,7 +42,9 @@ def test_covar_adaptation(mvn_samples, shrinkage):
 
 def test_windowed_schedule():
     n_adapt = 1000
-    schedule = WindowedAdaptation(n_adapt=n_adapt, init_buffer=75, term_buffer=50, window=25)
+    schedule = WindowedAdaptation(
+        n_adapt=n_adapt, init_buffer=75, term_buffer=50, window=25
+    )
     index = []
     for _ in range(n_adapt):
         if schedule.end_adaptation_window:
@@ -53,12 +55,14 @@ def test_windowed_schedule():
     assert index == [100, 150, 250, 450, 950]
 
 
-@pytest.mark.parametrize('shrinkage', [False, True])
+@pytest.mark.parametrize("shrinkage", [False, True])
 def test_windowed_var_adaptation(mvn_samples, shrinkage):
     samples, cov = mvn_samples
     n_dim, n_samples = samples.shape
     estimator = WelfordCovEstimator(dimension=n_dim, dense=False, shrinkage=shrinkage)
-    schedule = WindowedAdaptation(n_adapt=n_samples, init_buffer=75, term_buffer=100, window=25)
+    schedule = WindowedAdaptation(
+        n_adapt=n_samples, init_buffer=75, term_buffer=100, window=25
+    )
     adapter = CovAdaptation(estimator, schedule)
     index = []
     for n in range(n_samples):
@@ -72,12 +76,14 @@ def test_windowed_var_adaptation(mvn_samples, shrinkage):
     assert_allclose(cov.diagonal(), var_hat, rtol=0.07)
 
 
-@pytest.mark.parametrize('shrinkage', [False, True])
+@pytest.mark.parametrize("shrinkage", [False, True])
 def test_windowed_covar_adaptation(mvn_samples, shrinkage):
     samples, cov = mvn_samples
     n_dim, n_samples = samples.shape
     estimator = WelfordCovEstimator(dimension=n_dim, dense=True, shrinkage=shrinkage)
-    schedule = WindowedAdaptation(n_adapt=n_samples, init_buffer=75, term_buffer=100, window=25)
+    schedule = WindowedAdaptation(
+        n_adapt=n_samples, init_buffer=75, term_buffer=100, window=25
+    )
     adapter = CovAdaptation(estimator, schedule)
     index = []
     for n in range(n_samples):

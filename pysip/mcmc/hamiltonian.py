@@ -1,8 +1,9 @@
 from typing import Callable, Tuple
-from .metrics import EuclideanMetric
 
 import numpy as np
 import scipy.linalg as sla
+
+from .metrics import EuclideanMetric
 
 
 class EuclideanHamiltonian:
@@ -83,7 +84,7 @@ class EuclideanHamiltonian:
         self._metric = metric
 
         if not isinstance(metric, EuclideanMetric):
-            raise TypeError('`metric` must be an EuclideanMetric')
+            raise TypeError("`metric` must be an EuclideanMetric")
 
     def V(self, q: np.array) -> float:
         """Evaluate the potential energy function :math:`V(q)`at the position `q`

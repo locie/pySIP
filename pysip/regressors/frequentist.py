@@ -22,7 +22,10 @@ class FreqRegressor(BaseRegressor):
     """
 
     def __init__(
-        self, ss: StateSpace, bayesian_filter: BayesianFilter = Kalman_QR, time_scale: str = 's'
+        self,
+        ss: StateSpace,
+        bayesian_filter: BayesianFilter = Kalman_QR,
+        time_scale: str = "s",
     ):
         super().__init__(ss, bayesian_filter, time_scale, False, True)
 
@@ -63,11 +66,11 @@ class FreqRegressor(BaseRegressor):
         else:
             options = dict(options)
 
-        options.setdefault('disp', True)
-        options.setdefault('gtol', 1e-4)
+        options.setdefault("disp", True)
+        options.setdefault("gtol", 1e-4)
 
-        init = options.pop('init', 'fixed')
-        hpd = options.pop('hpd', 0.95)
+        init = options.pop("init", "fixed")
+        hpd = options.pop("hpd", 0.95)
         self.ss.parameters.eta = self._init_parameters(1, init, hpd)
         data = self._prepare_data(df, inputs, outputs, None)[:-1]
 
@@ -75,7 +78,7 @@ class FreqRegressor(BaseRegressor):
             fun=self._eval_dlog_posterior,
             x0=self.ss.parameters.eta_free,
             args=data,
-            method='BFGS',
+            method="BFGS",
             jac=True,
             options=options,
         )
@@ -92,14 +95,22 @@ class FreqRegressor(BaseRegressor):
 
         # correlation matrix of the constrained parameters
         corr_matrix = inv_sig_theta @ cov_theta @ inv_sig_theta
-        pd.set_option('display.float_format', '{:.3e}'.format)
+        pd.set_option("display.float_format", "{:.3e}".format)
         df = pd.DataFrame(
             index=self.ss.parameters.names_free,
-            columns=['\u03B8', '\u03C3(\u03B8)', 'pvalue', '|g(\u03B7)|', '|dpen(\u03B8)|'],
+            columns=[
+                "\u03B8",
+                "\u03C3(\u03B8)",
+                "pvalue",
+                "|g(\u03B7)|",
+                "|dpen(\u03B8)|",
+            ],
         )
         df.iloc[:, 0] = self.ss.parameters.theta_free
         df.iloc[:, 1] = sig_theta
-        df.iloc[:, 2] = ttest(self.ss.parameters.theta_free, sig_theta, data[2].shape[1])
+        df.iloc[:, 2] = ttest(
+            self.ss.parameters.theta_free, sig_theta, data[2].shape[1]
+        )
         df.iloc[:, 3] = np.abs(results.jac)
         df.iloc[:, 4] = np.abs(self.ss.parameters.d_penalty)
 

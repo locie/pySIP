@@ -6,25 +6,25 @@ from typing import NamedTuple, Tuple, Union
 import numpy as np
 
 from ..core import Parameters
+from ..utils.draw import TikzStateSpace
+from ..utils.math import diff_upper_cholesky, nearest_cholesky
 from .discretization import (
-    disc_state,
-    disc_state_input,
-    disc_diffusion_mfd,
-    disc_diffusion_stationary,
-    disc_diffusion_lyap,
-    disc_d_state,
-    disc_d_state_input,
+    disc_d_diffusion_lyap,
     disc_d_diffusion_mfd,
     disc_d_diffusion_stationary,
-    disc_d_diffusion_lyap,
+    disc_d_state,
+    disc_d_state_input,
+    disc_diffusion_lyap,
+    disc_diffusion_mfd,
+    disc_diffusion_stationary,
+    disc_state,
+    disc_state_input,
 )
-from ..utils.draw import TikzStateSpace
-from ..utils.math import nearest_cholesky, diff_upper_cholesky
 from .meta import MetaStateSpace
 from .nodes import Node
 
-ssm = namedtuple('ssm', 'A, B0, B1, C, D, Q, R, x0, P0')
-dssm = namedtuple('dssm', 'dA, dB0, dB1, dC, dD, dQ, dR, dx0, dP0')
+ssm = namedtuple("ssm", "A, B0, B1, C, D, Q, R, x0, P0")
+dssm = namedtuple("dssm", "dA, dB0, dB1, dC, dD, dQ, dR, dx0, dP0")
 
 
 def zeros(m, n):
@@ -33,7 +33,7 @@ def zeros(m, n):
 
 @dataclass
 class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
-    '''Linear Gaussian Continuous-Time State-Space Model'''
+    """Linear Gaussian Continuous-Time State-Space Model"""
 
     parameters: list = field(default=None)
     _names: list = field(init=False)
@@ -41,27 +41,27 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
     nu: int = field(init=False)
     ny: int = field(init=False)
     hold_order: int = field(default=0)
-    method: str = 'mfd'
-    name: str = field(default='')
+    method: str = "mfd"
+    name: str = field(default="")
 
     def __post_init__(self):
 
         if self.hold_order not in [0, 1]:
             raise TypeError("`hold_order` must be either 0 or 1")
 
-        if self.name == '':
+        if self.name == "":
             self.name = self.__class__.__name__
 
-        if hasattr(self, 'states'):
+        if hasattr(self, "states"):
             self.nx = len(self.states)
             self.states = [Node(*s) for s in self.states]
-        if hasattr(self, 'params'):
+        if hasattr(self, "params"):
             self.params = [Node(*s) for s in self.params]
             self._names = [p.name for p in self.params]
-        if hasattr(self, 'inputs'):
+        if hasattr(self, "inputs"):
             self.nu = len(self.inputs)
             self.inputs = [Node(*s) for s in self.inputs]
-        if hasattr(self, 'outputs'):
+        if hasattr(self, "outputs"):
             self.ny = len(self.outputs)
             self.outputs = [Node(*s) for s in self.outputs]
 
@@ -111,7 +111,7 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
     def _delete_continuous_dssm(self):
         """Delete the jacobians of the continuous state-space model"""
 
-        jacobians = ['dA', 'dB', 'dC', 'dD', 'dQ', 'dR', 'dx0', 'dP0']
+        jacobians = ["dA", "dB", "dC", "dD", "dQ", "dR", "dx0", "dP0"]
         for j in jacobians:
             delattr(self, j)
 
@@ -147,7 +147,9 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
         index, Ad, B0d, B1d, Qd, *_ = self.discretization(dt, False)
         return ssm(Ad, B0d, B1d, self.C, self.D, Qd, self.R, self.x0, self.P0), index
 
-    def get_discrete_dssm(self, dt: np.ndarray) -> Tuple[NamedTuple, NamedTuple, np.ndarray]:
+    def get_discrete_dssm(
+        self, dt: np.ndarray
+    ) -> Tuple[NamedTuple, NamedTuple, np.ndarray]:
         """Return the updated discrete state-space model with the discrete jacobians
 
         Args:
@@ -177,7 +179,9 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
             index,
         )
 
-    def _lti_disc(self, dt: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    def _lti_disc(
+        self, dt: float
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """Discretization of LTI state-space model
 
         Args:
@@ -196,7 +200,7 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
             B0d = np.zeros((self.nx, self.nu))
             B1d = B0d
         else:
-            Ad, B0d, B1d = disc_state_input(self.A, self.B, dt, self.hold_order, 'expm')
+            Ad, B0d, B1d = disc_state_input(self.A, self.B, dt, self.hold_order, "expm")
 
         Qd = nearest_cholesky(disc_diffusion_mfd(self.A, self.Q.T @ self.Q, dt))
 
@@ -245,7 +249,7 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
             dB1d = dB0d
         else:
             Ad, B0d, B1d, dAd, dB0d, dB1d = disc_d_state_input(
-                self.A, self.B, dA, dB, dt, self.hold_order, 'expm'
+                self.A, self.B, dA, dB, dt, self.hold_order, "expm"
             )
 
         Qc = self.Q.T @ self.Q
@@ -334,7 +338,7 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
 class RCModel(StateSpace):
     """Dynamic thermal model"""
 
-    latent_forces: str = field(default='')
+    latent_forces: str = field(default="")
 
     def __post_init__(self):
         super().__post_init__()
@@ -348,7 +352,9 @@ class RCModel(StateSpace):
 
         return LatentForceModel(self, gp, self.latent_forces)
 
-    def _lti_disc(self, dt: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    def _lti_disc(
+        self, dt: float
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """Discretization of RC model
 
         Args:
@@ -364,10 +370,12 @@ class RCModel(StateSpace):
         eig = np.real(np.linalg.eigvals(self.A))
 
         if np.all(eig < 0) and eig.max() / eig.min() > 1e-10:
-            Ad, B0d, B1d = disc_state_input(self.A, self.B, dt, self.hold_order, 'analytic')
+            Ad, B0d, B1d = disc_state_input(
+                self.A, self.B, dt, self.hold_order, "analytic"
+            )
             Qd = nearest_cholesky(disc_diffusion_lyap(self.A, self.Q.T @ self.Q, Ad))
         else:
-            Ad, B0d, B1d = disc_state_input(self.A, self.B, dt, self.hold_order, 'expm')
+            Ad, B0d, B1d = disc_state_input(self.A, self.B, dt, self.hold_order, "expm")
             Qd = nearest_cholesky(disc_diffusion_mfd(self.A, self.Q.T @ self.Q, dt))
 
         return Ad, B0d, B1d, Qd
@@ -410,12 +418,12 @@ class RCModel(StateSpace):
 
         if np.all(eig < 0) and eig.max() / eig.min() > 1e-10:
             Ad, B0d, B1d, dAd, dB0d, dB1d = disc_d_state_input(
-                self.A, self.B, dA, dB, dt, self.hold_order, 'analytic'
+                self.A, self.B, dA, dB, dt, self.hold_order, "analytic"
             )
             Qcd, dQcd = disc_d_diffusion_lyap(self.A, Qc, Ad, dA, dQc, dAd)
         else:
             Ad, B0d, B1d, dAd, dB0d, dB1d = disc_d_state_input(
-                self.A, self.B, dA, dB, dt, self.hold_order, 'expm'
+                self.A, self.B, dA, dB, dt, self.hold_order, "expm"
             )
             Qcd, dQcd = disc_d_diffusion_mfd(self.A, Qc, dA, dQc, dt)
 
@@ -434,7 +442,7 @@ class GPModel(StateSpace):
     """Gaussian Process"""
 
     def __post_init__(self):
-        if hasattr(self, 'J'):
+        if hasattr(self, "J"):
             self.states = self.states_block * int(self.J + 1)
         super().__post_init__()
 
@@ -451,7 +459,7 @@ class GPModel(StateSpace):
             product of the two GP model
         """
         if not isinstance(gp, GPModel):
-            raise TypeError('`gp` must be an GPModel instance')
+            raise TypeError("`gp` must be an GPModel instance")
 
         from .gaussian_process import GPProduct
 
@@ -467,13 +475,15 @@ class GPModel(StateSpace):
             sum of the two GP model
         """
         if not isinstance(gp, GPModel):
-            raise TypeError('`gp` must be an GPModel instance')
+            raise TypeError("`gp` must be an GPModel instance")
 
         from .gaussian_process import GPSum
 
         return GPSum(self, gp)
 
-    def _lti_disc(self, dt: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    def _lti_disc(
+        self, dt: float
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """Discretization of temporal Gaussian Process
 
         Args:

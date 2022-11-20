@@ -7,8 +7,8 @@ from joblib import Parallel, delayed
 from tqdm import tqdm
 
 from ..mcmc.hamiltonian import EuclideanHamiltonian
-from ..mcmc.metrics import Diagonal, Dense
 from ..mcmc.hmc import DynamicHMC, Fit_Bayes
+from ..mcmc.metrics import Dense, Diagonal
 from ..state_estimator import BayesianFilter, Kalman_QR
 from ..statespace.base import StateSpace
 from .base import BaseRegressor
@@ -25,7 +25,10 @@ class BayesRegressor(BaseRegressor):
     """
 
     def __init__(
-        self, ss: StateSpace, bayesian_filter: BayesianFilter = Kalman_QR, time_scale: str = 's'
+        self,
+        ss: StateSpace,
+        bayesian_filter: BayesianFilter = Kalman_QR,
+        time_scale: str = "s",
     ):
         super().__init__(ss, bayesian_filter, time_scale, True, False)
 
@@ -91,20 +94,20 @@ class BayesRegressor(BaseRegressor):
             options = dict(options)
 
         # options is saved in Fit_bayes for reproducible experiments
-        options.setdefault('n_draws', 2000)
-        options.setdefault('n_chains', 4)
-        options.setdefault('n_warmup', 1000)
-        options.setdefault('init', 'unconstrained')
-        options.setdefault('hpd', 0.95)
-        options.setdefault('dense_mass_matrix', False)
-        if not isinstance(options['dense_mass_matrix'], bool):
-            raise TypeError('`dense_mass_matrix` must be a boolean')
+        options.setdefault("n_draws", 2000)
+        options.setdefault("n_chains", 4)
+        options.setdefault("n_warmup", 1000)
+        options.setdefault("init", "unconstrained")
+        options.setdefault("hpd", 0.95)
+        options.setdefault("dense_mass_matrix", False)
+        if not isinstance(options["dense_mass_matrix"], bool):
+            raise TypeError("`dense_mass_matrix` must be a boolean")
 
-        n_draws = options.get('n_draws')
-        n_chains = options.get('n_chains')
-        n_warmup = options.get('n_warmup')
-        init = options.get('init')
-        hpd = options.get('hpd')
+        n_draws = options.get("n_draws")
+        n_chains = options.get("n_chains")
+        n_warmup = options.get("n_warmup")
+        init = options.get("init")
+        hpd = options.get("hpd")
 
         dt, u, u1, y, *_ = self._prepare_data(df, inputs, outputs, None)
 
@@ -114,7 +117,7 @@ class BayesRegressor(BaseRegressor):
         def dV(q):
             return self._eval_dlog_posterior(q, dt, u, u1, y)
 
-        if options['dense_mass_matrix'] is True:
+        if options["dense_mass_matrix"] is True:
             metric = Dense(inverse_metric=np.identity(q0.shape[0]))
         else:
             metric = Diagonal(inverse_metric=np.ones(q0.shape[0]))
@@ -151,13 +154,13 @@ class BayesRegressor(BaseRegressor):
                 - **ppc**: Prior predictive samples
         """
         if self.ss.ny > 1:
-            raise ValueError('Multiple outputs is not yet supported')
+            raise ValueError("Multiple outputs is not yet supported")
 
         if not isinstance(n_sim, int) or n_sim <= 0:
-            raise TypeError('`n_sim` must be a positive integer')
+            raise TypeError("`n_sim` must be a positive integer")
 
         if not isinstance(n_cpu, int) or (n_cpu != -1 and n_cpu <= 0):
-            raise TypeError('`n_cpu` must be a strictly positive integer or set to -1')
+            raise TypeError("`n_cpu` must be a strictly positive integer or set to -1")
 
         dt, u, u1, *_ = self._prepare_data(df, inputs, None, None)
 
@@ -168,7 +171,7 @@ class BayesRegressor(BaseRegressor):
             self.ss.parameters.prior_init(hpd)
             return self.ss.parameters.theta_free, self._simulate_output(dt, u, u1, None)
 
-        pbar = tqdm(range(n_sim), desc='Sampling')
+        pbar = tqdm(range(n_sim), desc="Sampling")
         out = Parallel(n_jobs=n_cpu)(delayed(prior_pd)() for _ in pbar)
 
         for n in range(n_sim):
@@ -178,7 +181,9 @@ class BayesRegressor(BaseRegressor):
         # Safety against duplication of parameter names. Do not use self.ss.parameters.names
         names = [k for i, k in enumerate(self.ss._names) if self.ss.parameters.free[i]]
         draws = {k: ps[:, i][np.newaxis, :] for i, k in enumerate(names)}
-        ppc = {k.name: ppd[:, :, i][np.newaxis, :] for i, k in enumerate(self.ss.outputs)}
+        ppc = {
+            k.name: ppd[:, :, i][np.newaxis, :] for i, k in enumerate(self.ss.outputs)
+        }
 
         return draws, ppc
 
@@ -205,10 +210,10 @@ class BayesRegressor(BaseRegressor):
                 - **ysd**: Standard deviation of the predictive distribution
         """
         if self.ss.ny > 1:
-            raise ValueError('Multiple outputs is not yet supported')
+            raise ValueError("Multiple outputs is not yet supported")
 
         if not isinstance(n_cpu, int) or (n_cpu != -1 and n_cpu <= 0):
-            raise TypeError('`n_cpu` must be a strictly positive integer or set to -1')
+            raise TypeError("`n_cpu` must be a strictly positive integer or set to -1")
 
         dt, u, u1, y, *_ = self._prepare_data(df, inputs, outputs, None)
 
@@ -221,7 +226,7 @@ class BayesRegressor(BaseRegressor):
             self.ss.parameters.theta_free = samples[:, index]
             return self._estimate_output(dt, u, u1, y, None, None)
 
-        pbar = tqdm(range(n_draws), desc='Sampling')
+        pbar = tqdm(range(n_draws), desc="Sampling")
         out = Parallel(n_jobs=n_cpu)(delayed(posterior_pd)(i) for i in pbar)
 
         ym = np.empty((n_draws, dt.shape[0]))
@@ -252,7 +257,7 @@ class BayesRegressor(BaseRegressor):
             Positive log-likelihood evaluated point-wise
         """
         if not isinstance(n_cpu, int) or (n_cpu != -1 and n_cpu <= 0):
-            raise TypeError('`n_cpu` must be a strictly positive integer or set to -1')
+            raise TypeError("`n_cpu` must be a strictly positive integer or set to -1")
 
         dt, u, u1, y, *_ = self._prepare_data(df, inputs, outputs, None)
         chain, draw = list(trace.values())[0].shape
@@ -263,14 +268,14 @@ class BayesRegressor(BaseRegressor):
             self.ss.parameters.theta_free = samples[:, index]
             return self._eval_log_likelihood(dt, u, u1, y, pointwise=True)
 
-        pbar = tqdm(range(chain * draw), desc='Sampling')
+        pbar = tqdm(range(chain * draw), desc="Sampling")
         out = Parallel(n_jobs=n_cpu)(delayed(eval_loglik_pw)(i) for i in pbar)
 
         pw_loglik = np.empty((chain * draw, y.shape[1]))
         for n in range(chain * draw):
             pw_loglik[n, :] = -out[n]
 
-        return {'log_likelihood': pw_loglik.reshape(chain, draw, y.shape[1])}
+        return {"log_likelihood": pw_loglik.reshape(chain, draw, y.shape[1])}
 
     def posterior_state_distribution(
         self,
@@ -297,7 +302,7 @@ class BayesRegressor(BaseRegressor):
                 - **xsd**: State filtered/smoothed distribution standard deviation
         """
         if not isinstance(n_cpu, int) or (n_cpu != -1 and n_cpu <= 0):
-            raise TypeError('`n_cpu` must be a strictly positive integer or set to -1')
+            raise TypeError("`n_cpu` must be a strictly positive integer or set to -1")
 
         dt, u, u1, y, *_ = self._prepare_data(df, inputs, outputs, None)
 
@@ -310,7 +315,7 @@ class BayesRegressor(BaseRegressor):
             x, P = self._estimate_states(dt, u, u1, y, smooth=smooth)
             return x, np.sqrt(P.diagonal(0, 1, 2))
 
-        pbar = tqdm(range(n_draws), desc='Sampling')
+        pbar = tqdm(range(n_draws), desc="Sampling")
         out = Parallel(n_jobs=n_cpu)(delayed(state_pd)(i) for i in pbar)
 
         xm = np.empty((n_draws, dt.shape[0], self.ss.nx))
@@ -331,11 +336,13 @@ class BayesRegressor(BaseRegressor):
             theta_traces: Constrained Markov chain traces of shape (n_chains, n_par, n_draws)
         """
         if not isinstance(eta_traces, np.ndarray):
-            raise TypeError('`eta_traces` must be a numpy array')
+            raise TypeError("`eta_traces` must be a numpy array")
 
         sizes = eta_traces.shape
         if len(sizes) != 3:
-            raise ValueError('`eta_traces` must be an array of shape (n_chains, n_par, n_draws)')
+            raise ValueError(
+                "`eta_traces` must be an array of shape (n_chains, n_par, n_draws)"
+            )
         theta_traces = np.zeros(sizes)
 
         for c in range(sizes[0]):
@@ -356,16 +363,16 @@ class BayesRegressor(BaseRegressor):
             Markov chains traces, [n_par keys](n_chains, n_draws)
         """
         if not isinstance(chains, np.ndarray):
-            raise TypeError('`chains` must be a numpy array')
+            raise TypeError("`chains` must be a numpy array")
 
         if not isinstance(names, (str, list)):
-            raise TypeError('`names` must be a string of a list of strings')
+            raise TypeError("`names` must be a string of a list of strings")
 
         if isinstance(names, str):
             names = [names]
 
         if len(names) != chains.shape[1]:
-            raise ValueError('The length of `names` does not match `chains.shape[1]`')
+            raise ValueError("The length of `names` does not match `chains.shape[1]`")
 
         return {k: chains[:, i, :] for i, k in enumerate(names)}
 
@@ -380,10 +387,10 @@ class BayesRegressor(BaseRegressor):
             Markov Chain traces (n_par, chain * draw)
         """
         if not isinstance(chains, dict):
-            raise TypeError('`chains` must be a dictionary')
+            raise TypeError("`chains` must be a dictionary")
 
         if not isinstance(names, (str, list)):
-            raise TypeError('`names` must be a string of a list of strings')
+            raise TypeError("`names` must be a string of a list of strings")
 
         if isinstance(names, str):
             names = [names]

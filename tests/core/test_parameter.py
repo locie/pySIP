@@ -4,23 +4,28 @@ import pytest
 
 from pysip.core import Normal, Parameter
 
-defaults = namedtuple('Defaults', 'name value scale bounds prior theta')(
-    name='name', value=0.6, scale=0.5, bounds=(0.0, 1.0), prior=Normal(0, 1), theta=0.6 * 0.5
+defaults = namedtuple("Defaults", "name value scale bounds prior theta")(
+    name="name",
+    value=0.6,
+    scale=0.5,
+    bounds=(0.0, 1.0),
+    prior=Normal(0, 1),
+    theta=0.6 * 0.5,
 )
 
 
 def parameter_fixture(transform, **kwargs):
-    kwargs = {**{'transform': transform}, **defaults._asdict(), **kwargs}
+    kwargs = {**{"transform": transform}, **defaults._asdict(), **kwargs}
     parameter = Parameter(**kwargs)
     return pytest.fixture(lambda: parameter)
 
 
-hp_none = parameter_fixture('none')
-hp_log = parameter_fixture('log')
-hp_logit = parameter_fixture('logit')
-hp_fixed = parameter_fixture('fixed')
-hp_lower = parameter_fixture('lower', bounds=(0.1, None))
-hp_upper = parameter_fixture('upper', bounds=(None, 0.9))
+hp_none = parameter_fixture("none")
+hp_log = parameter_fixture("log")
+hp_logit = parameter_fixture("logit")
+hp_fixed = parameter_fixture("fixed")
+hp_lower = parameter_fixture("lower", bounds=(0.1, None))
+hp_upper = parameter_fixture("upper", bounds=(None, 0.9))
 
 
 def test_init_none(hp_none):
@@ -94,12 +99,12 @@ def test_parameter_init_error_value_should_be_a_float():
 
 def test_parameter_init_error_unvalid_transform():
     with pytest.raises(TypeError):
-        Parameter(defaults.name, defaults.value, transform='_')
+        Parameter(defaults.name, defaults.value, transform="_")
 
 
 def test_parameter_init_error_unvalid_prior():
     with pytest.raises(ValueError):
-        Parameter(defaults.name, defaults.value, prior='_')
+        Parameter(defaults.name, defaults.value, prior="_")
 
 
 def test_parameter_none_transform(hp_none):
@@ -175,8 +180,8 @@ def test_parameter_upper_transform(hp_upper):
 
 
 def test_infer_transform_from_bounds():
-    assert Parameter('', bounds=(None, None)).transform == 'none'
-    assert Parameter('', bounds=(0.0, None)).transform == 'log'
-    assert Parameter('', bounds=(5.0, None)).transform == 'lower'
-    assert Parameter('', bounds=(None, 5.0)).transform == 'upper'
-    assert Parameter('', bounds=(0.0, 5.0)).transform == 'logit'
+    assert Parameter("", bounds=(None, None)).transform == "none"
+    assert Parameter("", bounds=(0.0, None)).transform == "log"
+    assert Parameter("", bounds=(5.0, None)).transform == "lower"
+    assert Parameter("", bounds=(None, 5.0)).transform == "upper"
+    assert Parameter("", bounds=(0.0, 5.0)).transform == "logit"

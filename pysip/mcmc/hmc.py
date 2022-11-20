@@ -12,10 +12,15 @@ from joblib import Parallel, delayed
 from scipy.linalg import LinAlgError
 
 from ..utils.math import cholesky_inverse, log_sum_exp
-from .adaptation import CovAdaptation, DualAveraging, WelfordCovEstimator, WindowedAdaptation
+from .adaptation import (
+    CovAdaptation,
+    DualAveraging,
+    WelfordCovEstimator,
+    WindowedAdaptation,
+)
 from .hamiltonian import EuclideanHamiltonian
 
-State = namedtuple('State', 'q, p V dV dK H')
+State = namedtuple("State", "q, p V dV dK H")
 
 
 class IntegrationError(RuntimeError):
@@ -97,29 +102,33 @@ class DynamicHMC:
         """
 
         if not isinstance(q, np.ndarray):
-            raise TypeError('The initial position variable `q` must be a numpy array')
+            raise TypeError("The initial position variable `q` must be a numpy array")
 
         if not isinstance(n_draws, int) and n_draws <= 0:
-            raise TypeError('The number of samples `n_draws` must be an integer greater than 0')
+            raise TypeError(
+                "The number of samples `n_draws` must be an integer greater than 0"
+            )
 
         if not isinstance(n_chains, int) and n_chains <= 0:
-            raise TypeError('The number of chains `n_chains` must be an integer greater than 0')
+            raise TypeError(
+                "The number of chains `n_chains` must be an integer greater than 0"
+            )
 
         if not isinstance(n_warmup, int):
-            raise TypeError('`n_warmup` must be an integer')
+            raise TypeError("`n_warmup` must be an integer")
 
         if options is not None and not isinstance(options, dict):
-            raise TypeError('`options must be a dictionary`')
+            raise TypeError("`options must be a dictionary`")
 
         if len(q.shape) == 1:
             if n_chains != 1:
-                raise ValueError(f'The position array `q` must be an 1d array')
+                raise ValueError(f"The position array `q` must be an 1d array")
         else:
             if q.shape[1] != n_chains:
-                raise ValueError(f'The position array `q` must have {n_chains} columns')
+                raise ValueError(f"The position array `q` must have {n_chains} columns")
 
         if n_warmup < 1000:
-            raise ValueError(f'`n_warmup` must be at least 1000 iterations')
+            raise ValueError(f"`n_warmup` must be at least 1000 iterations")
         self._n_warmup = n_warmup
 
         # Check and  unpack options
@@ -129,67 +138,78 @@ class DynamicHMC:
             options = dict(options)
 
         # Set default values and return the dict of options
-        options.setdefault('stepsize', 0.25 / q.shape[0] ** 0.25)
-        options.setdefault('dH_max', 1000)
-        options.setdefault('max_tree_depth', 10)
-        options.setdefault('n_cpu', -1)
+        options.setdefault("stepsize", 0.25 / q.shape[0] ** 0.25)
+        options.setdefault("dH_max", 1000)
+        options.setdefault("max_tree_depth", 10)
+        options.setdefault("n_cpu", -1)
 
-        stepsize = options.get('stepsize')
+        stepsize = options.get("stepsize")
         if not isinstance(stepsize, Real) or stepsize <= 0:
-            raise TypeError('`stepsize` must be a strictly positive real number')
+            raise TypeError("`stepsize` must be a strictly positive real number")
 
-        self._dH_max = options.get('dH_max')
+        self._dH_max = options.get("dH_max")
         if not isinstance(self._dH_max, Real) or self._dH_max <= 0:
-            raise TypeError('`dH_max` must be a strictly positive real number')
+            raise TypeError("`dH_max` must be a strictly positive real number")
 
-        self._max_tree_depth = options.get('max_tree_depth')
+        self._max_tree_depth = options.get("max_tree_depth")
         if not isinstance(self._max_tree_depth, int) or self._max_tree_depth <= 0:
-            raise TypeError('`max_tree_depth` must a strictly positive integer')
+            raise TypeError("`max_tree_depth` must a strictly positive integer")
 
-        n_cpu = options.get('n_cpu')
+        n_cpu = options.get("n_cpu")
         if not isinstance(n_cpu, int) or (n_cpu != -1 and n_cpu <= 0):
-            raise TypeError('`n_cpu` must be a strictly positive integer or set to -1')
+            raise TypeError("`n_cpu` must be a strictly positive integer or set to -1")
 
         # The dictionary of options is saved in the returned fit object
-        options.setdefault('accp_target', 0.8)
-        options.setdefault('t0', 10)
-        options.setdefault('gamma', 0.05)
-        options.setdefault('kappa', 0.75)
-        options.setdefault('mu', np.log(2.0 * stepsize))
-        options.setdefault('init_buffer', 75)
-        options.setdefault('term_buffer', 100)
-        options.setdefault('window', 25)
-        options.setdefault('dense_mass_matrix', False)
-        options.setdefault('shrinkage', True)
-        self._accp_target = options['accp_target']
+        options.setdefault("accp_target", 0.8)
+        options.setdefault("t0", 10)
+        options.setdefault("gamma", 0.05)
+        options.setdefault("kappa", 0.75)
+        options.setdefault("mu", np.log(2.0 * stepsize))
+        options.setdefault("init_buffer", 75)
+        options.setdefault("term_buffer", 100)
+        options.setdefault("window", 25)
+        options.setdefault("dense_mass_matrix", False)
+        options.setdefault("shrinkage", True)
+        self._accp_target = options["accp_target"]
 
         # Adaptation methods
         step_adapter = DualAveraging(
-            self._accp_target, options['t0'], options['gamma'], options['kappa'], options['mu']
+            self._accp_target,
+            options["t0"],
+            options["gamma"],
+            options["kappa"],
+            options["mu"],
         )
         estimator = WelfordCovEstimator(
-            q.shape[0], options['dense_mass_matrix'], options['shrinkage']
+            q.shape[0], options["dense_mass_matrix"], options["shrinkage"]
         )
         schedule = WindowedAdaptation(
-            self._n_warmup, options['init_buffer'], options['term_buffer'], options['window']
+            self._n_warmup,
+            options["init_buffer"],
+            options["term_buffer"],
+            options["window"],
         )
         cov_adapter = CovAdaptation(estimator, schedule)
 
         # Sampling
         if n_chains == 1:
-            pbar = tqdm.trange(n_draws, desc='Sampling', dynamic_ncols=True)
-            samples, _stats = self._sample_chain(q, pbar, stepsize, step_adapter, cov_adapter)
+            pbar = tqdm.trange(n_draws, desc="Sampling", dynamic_ncols=True)
+            samples, _stats = self._sample_chain(
+                q, pbar, stepsize, step_adapter, cov_adapter
+            )
             # The number of chains must be a dimension
             samples = samples[None, :, :]
             stats = {k: np.asarray(v)[None, :] for k, v in _stats.items()}
         else:
             pbar = [
-                tqdm.trange(n_draws, desc=f'Chain {n}', dynamic_ncols=True, position=n)
+                tqdm.trange(n_draws, desc=f"Chain {n}", dynamic_ncols=True, position=n)
                 for n in range(n_chains)
             ]
 
             job = Parallel(n_jobs=n_cpu)(
-                delayed(self._sample_chain)(q[:, n], pbar[n], stepsize, step_adapter, cov_adapter)
+                delayed(self._sample_chain)(
+                    q[:, n], pbar[n], stepsize, step_adapter, cov_adapter
+                )
                 for n in range(n_chains)
             )
 
@@ -244,7 +264,7 @@ class DynamicHMC:
 
             # do adaptation
             if i <= self._n_warmup - 1:
-                stepsize = step_adapter.learn(s['accept_prob'])
+                stepsize = step_adapter.learn(s["accept_prob"])
                 update, cov = cov_adapter.learn(q)
                 if update:
                     self._hamiltonian.inverse_mass_matrix = cov
@@ -298,7 +318,9 @@ class DynamicHMC:
 
         return state_n.q, stats
 
-    def _transition(self, state: NamedTuple, stepsize: float) -> Tuple[NamedTuple, dict]:
+    def _transition(
+        self, state: NamedTuple, stepsize: float
+    ) -> Tuple[NamedTuple, dict]:
         """Dynamic Hamiltonian Monte Carlo transition with multinomial sampling
 
         Args:
@@ -324,12 +346,12 @@ class DynamicHMC:
         sum_p = state.p.copy()
         sum_w = 0.0
         stats = {
-            'leapfrog_steps': 0,
-            'accept_prob': 0.0,
-            'max_tree_depth': False,
-            'diverging': False,
-            'potential': state_n.V,
-            'stepsize': stepsize,
+            "leapfrog_steps": 0,
+            "accept_prob": 0.0,
+            "max_tree_depth": False,
+            "diverging": False,
+            "potential": state_n.V,
+            "stepsize": stepsize,
         }
 
         for depth in range(self._max_tree_depth):
@@ -360,14 +382,14 @@ class DynamicHMC:
             if np.dot(state_l.dK, sum_p) < 0 or np.dot(state_r.dK, sum_p) < 0:
                 break
         else:
-            stats['max_tree_depth'] = True
+            stats["max_tree_depth"] = True
 
-        if stats['leapfrog_steps'] > 0:
-            stats['accept_prob'] /= stats['leapfrog_steps']
+        if stats["leapfrog_steps"] > 0:
+            stats["accept_prob"] /= stats["leapfrog_steps"]
 
-        stats['energy'] = state_n.H
-        stats['potential'] = state_n.V
-        stats['tree_depth'] = depth
+        stats["energy"] = state_n.H
+        stats["potential"] = state_n.V
+        stats["tree_depth"] = depth
 
         return state_n, stats
 
@@ -416,17 +438,17 @@ class DynamicHMC:
                     dH = np.inf
 
                 if dH > self._dH_max:
-                    stats['diverging'] = True
+                    stats["diverging"] = True
                     state = None
                     terminate = True
                 else:
                     sum_p += state.p
                     sum_w = log_sum_exp(sum_w, -dH)
                     if -dH > 0.0:
-                        stats['accept_prob'] += 1
+                        stats["accept_prob"] += 1
                     else:
-                        stats['accept_prob'] += np.exp(-dH)
-                    stats['leapfrog_steps'] += 1
+                        stats["accept_prob"] += np.exp(-dH)
+                    stats["leapfrog_steps"] += 1
                     terminate = False
 
             except (LinAlgError, RuntimeError):
@@ -476,7 +498,9 @@ class DynamicHMC:
 
         return stop_s, state_i, state_o, state_p, sum_w
 
-    def _leapfrog_step(self, state: NamedTuple, direction: int, stepsize: float) -> NamedTuple:
+    def _leapfrog_step(
+        self, state: NamedTuple, direction: int, stepsize: float
+    ) -> NamedTuple:
         """Explicit leapfrog integrator for separable Hamiltonian systems
 
         Args:
@@ -514,43 +538,47 @@ class Fit_Bayes:
         model: Model name
     """
 
-    def __init__(self, chains: dict, stats: dict, options: dict, n_warmup: int, model: str = None):
+    def __init__(
+        self, chains: dict, stats: dict, options: dict, n_warmup: int, model: str = None
+    ):
 
         if not isinstance(chains, (dict, np.ndarray)):
-            raise TypeError('`chains` must be a dictionary or a numpy array')
+            raise TypeError("`chains` must be a dictionary or a numpy array")
 
         if isinstance(chains, np.ndarray):
             if len(chains.shape) < 3:
-                raise TypeError('`chains` must be 3-d numpy array')
-            self._chains = {'x' + str(i): chains[:, i, :] for i in range(chains.shape[1])}
+                raise TypeError("`chains` must be 3-d numpy array")
+            self._chains = {
+                "x" + str(i): chains[:, i, :] for i in range(chains.shape[1])
+            }
         else:
             self._chains = chains
 
         if not isinstance(stats, dict):
-            raise TypeError('`stats` must be a dictionary')
+            raise TypeError("`stats` must be a dictionary")
 
         if not isinstance(options, dict):
-            raise TypeError('`options` must be a dictionary')
+            raise TypeError("`options` must be a dictionary")
 
         if model is not None and not isinstance(model, str):
-            raise TypeError('`model` must be a string')
+            raise TypeError("`model` must be a string")
 
         self._stats = stats
         self._options = options
         self.n_warmup = n_warmup
-        self._n_chains, self._n_draws = stats['tree_depth'].shape
-        self._chains['lp_'] = self._stats.pop('potential')
+        self._n_chains, self._n_draws = stats["tree_depth"].shape
+        self._chains["lp_"] = self._stats.pop("potential")
         self._datetime = datetime.now()
         if model is None:
-            self._model = 'unknown'
+            self._model = "unknown"
         else:
             self._model = model
 
     def __repr__(self):
         """Return information of the fitting"""
         return (
-            f'\nmodel: {self._model}\nnumber of chains: {self._n_chains}\n'
-            f'number of draws: {self._n_draws}\nnumber of draws for warm-up: {self._n_warmup}'
+            f"\nmodel: {self._model}\nnumber of chains: {self._n_chains}\n"
+            f"number of draws: {self._n_draws}\nnumber of draws for warm-up: {self._n_warmup}"
             f'\ndate: {self._datetime.strftime("%d/%m/%Y")}\n'
             f'time: {self._datetime.strftime("%H:%M:%S")}\n'
         )
@@ -564,17 +592,17 @@ class Fit_Bayes:
     def n_warmup(self, x):
         """Set the number of iterations for the warm-up"""
         if not isinstance(x, int) or x < 0:
-            raise ValueError('`n_warmup` must be a strictly positive integer')
+            raise ValueError("`n_warmup` must be a strictly positive integer")
         self._n_warmup = x
 
     @property
     def posterior(self) -> dict:
-        '''Return the Markov chain traces with without warm-up'''
+        """Return the Markov chain traces with without warm-up"""
         return {k: v[:, self._n_warmup :] for k, v in self._chains.items()}
 
     @property
     def stats(self) -> dict:
-        '''Return the Markov chain traces with without warm-up'''
+        """Return the Markov chain traces with without warm-up"""
         return {k: v[:, self._n_warmup :] for k, v in self._stats.items()}
 
     def get_options(self, keys: Union[str, list] = None) -> dict:
@@ -587,7 +615,7 @@ class Fit_Bayes:
             d: Dictionary of options
         """
         if keys is not None and not isinstance(keys, (list, str)):
-            raise TypeError('`keys` must be a string or a list of strings')
+            raise TypeError("`keys` must be a string or a list of strings")
 
         if isinstance(keys, str):
             keys = [keys]
@@ -598,7 +626,7 @@ class Fit_Bayes:
             d = {}
             for k in keys:
                 if k not in self._options.keys():
-                    raise ValueError('{k} is not an available option')
+                    raise ValueError("{k} is not an available option")
                 d[k] = self._options[k]
         return d
 
@@ -614,16 +642,18 @@ class Fit_Bayes:
             that momentum resampling will ineffciently explore the energy level sets.
         """
         df = pd.DataFrame(
-            index=['Chain ' + str(i) for i in range(self._n_chains)],
+            index=["Chain " + str(i) for i in range(self._n_chains)],
             data={
-                'ebfmi': np.square(np.diff(self.stats['energy'], axis=1)).mean(axis=1)
-                / self.stats['energy'].var(axis=1),
-                'mean accept_prob': self.stats['accept_prob'].mean(axis=1),
-                'mean tree_depth': self.stats['tree_depth'].mean(axis=1),
-                'mean leapfrog_steps': self.stats['leapfrog_steps'].mean(axis=1),
-                'sum diverging': self.stats['diverging'].sum(axis=1).astype('int'),
-                'sum max_tree_depth': self.stats['max_tree_depth'].sum(axis=1).astype('int'),
-                'stepsize': self.stats['stepsize'].mean(axis=1),
+                "ebfmi": np.square(np.diff(self.stats["energy"], axis=1)).mean(axis=1)
+                / self.stats["energy"].var(axis=1),
+                "mean accept_prob": self.stats["accept_prob"].mean(axis=1),
+                "mean tree_depth": self.stats["tree_depth"].mean(axis=1),
+                "mean leapfrog_steps": self.stats["leapfrog_steps"].mean(axis=1),
+                "sum diverging": self.stats["diverging"].sum(axis=1).astype("int"),
+                "sum max_tree_depth": self.stats["max_tree_depth"]
+                .sum(axis=1)
+                .astype("int"),
+                "stepsize": self.stats["stepsize"].mean(axis=1),
             },
         )
         return df

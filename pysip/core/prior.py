@@ -4,7 +4,7 @@ from typing import Callable, Tuple
 import numpy as np
 from scipy import optimize, special, stats
 
-__ALL__ = ['Normal', 'Gamma', 'Beta', 'InverseGamma', 'LogNormal']
+__ALL__ = ["Normal", "Gamma", "Beta", "InverseGamma", "LogNormal"]
 
 
 class Prior:
@@ -61,7 +61,9 @@ class Prior:
         """
         raise NotImplementedError
 
-    def _random(self, n: int, hpd: float, f_rvs: Callable, f_ppf: Callable) -> np.ndarray:
+    def _random(
+        self, n: int, hpd: float, f_rvs: Callable, f_ppf: Callable
+    ) -> np.ndarray:
         """Draw random samples from a given distribution
 
         Args:
@@ -75,7 +77,7 @@ class Prior:
         """
 
         if not isinstance(n, int) or n <= 0:
-            raise TypeError('`n` must an integer greater or equal to 1')
+            raise TypeError("`n` must an integer greater or equal to 1")
 
         if hpd is not None and (hpd <= 0.0 or hpd > 1.0):
             raise ValueError("`hpd must be between ]0, 1]")
@@ -113,7 +115,7 @@ class Normal(Prior):
 
         self._m = float(mu)
         self._s = float(sigma)
-        self._s2 = self._s ** 2
+        self._s2 = self._s**2
         self._cst = -0.5 * np.log(2.0 * np.pi * self._s2)
 
     def __repr__(self):
@@ -173,14 +175,14 @@ class Normal(Prior):
             full_output=True,
         )
 
-        if np.max(info['fvec']) < 1e-6:
+        if np.max(info["fvec"]) < 1e-6:
             self._m, self._s = np.exp(x)
-            self._s2 = self._s ** 2
+            self._s2 = self._s**2
             self._cst = -0.5 * np.log(2.0 * np.pi * self._s2)
 
-            print(f'solution found: mu={self._m:.4f}, sigma={self._s:.4f}')
+            print(f"solution found: mu={self._m:.4f}, sigma={self._s:.4f}")
         else:
-            print('\nTry different initial values')
+            print("\nTry different initial values")
 
 
 class Gamma(Prior):
@@ -227,7 +229,7 @@ class Gamma(Prior):
 
     @property
     def variance(self):
-        return self._a / self._b ** 2
+        return self._a / self._b**2
 
     def log_pdf(self, x):
         return self._cst + (self._a - 1.0) * np.log(x) - self._b * x
@@ -265,7 +267,7 @@ class Beta(Prior):
         self._cst = special.betaln(self._a, self._b)
 
     def __repr__(self):
-        return 'B({:.2g}, {:.2g})'.format(self._a, self._b)
+        return "B({:.2g}, {:.2g})".format(self._a, self._b)
 
     def __eq__(self, other):
         return self._a == other._a and self._b == other._b
@@ -280,7 +282,9 @@ class Beta(Prior):
 
     @property
     def variance(self):
-        return self._a * self._b / ((self._a + self._b) ** 2 * (self._a + self._b + 1.0))
+        return (
+            self._a * self._b / ((self._a + self._b) ** 2 * (self._a + self._b + 1.0))
+        )
 
     def log_pdf(self, x):
         return (
@@ -349,13 +353,13 @@ class InverseGamma(Prior):
     def variance(self):
         if self._a <= 2:
             raise ValueError("The variance can't be computed for a <= 2 !")
-        return self._b ** 2 / ((self._a - 1.0) ** 2 * (self._a - 2.0))
+        return self._b**2 / ((self._a - 1.0) ** 2 * (self._a - 2.0))
 
     def log_pdf(self, x):
         return self._cst - (self._a + 1.0) * np.log(x) - self._b / x
 
     def dlog_pdf(self, x):
-        return -(self._a + 1.0) / x + self._b / x ** 2
+        return -(self._a + 1.0) / x + self._b / x**2
 
     def random(self, n=1, hpd=None):
         def f_rvs(n):
@@ -399,13 +403,13 @@ class InverseGamma(Prior):
             full_output=True,
         )
 
-        if np.max(info['fvec']) < 1e-6:
+        if np.max(info["fvec"]) < 1e-6:
             self._a, self._b = np.exp(x)
             self._cst = self._a * np.log(self._b) - special.gammaln(self._a)
 
-            print(f'solution found: shape={self._a:.4f}, scale={self._b:.4f}')
+            print(f"solution found: shape={self._a:.4f}, scale={self._b:.4f}")
         else:
-            print('\nTry different initial values')
+            print("\nTry different initial values")
 
 
 class LogNormal(Prior):
@@ -432,7 +436,7 @@ class LogNormal(Prior):
 
         self._m = float(mu)
         self._s = float(sigma)
-        self._s2 = self._s ** 2
+        self._s2 = self._s**2
         self._cst = -0.5 * np.log(2.0 * np.pi * self._s2)
 
     def __repr__(self):

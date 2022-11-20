@@ -4,7 +4,9 @@ import scipy as sp
 from scipy.signal import correlate
 
 
-def lrtest(loglik: float, loglik_sub: float, n_par: int, n_par_sub: int, negative: bool = True):
+def lrtest(
+    loglik: float, loglik_sub: float, n_par: int, n_par_sub: int, negative: bool = True
+):
     """Compute the pvalue of the likelihood ratio test
 
     The likelihood ratio test compares two nested models, M_sub and M,
@@ -19,22 +21,24 @@ def lrtest(loglik: float, loglik_sub: float, n_par: int, n_par_sub: int, negativ
     negative: True if negative log-likelihood is used
     """
     if not isinstance(loglik, float):
-        raise TypeError('`loglik` must be a float')
+        raise TypeError("`loglik` must be a float")
 
     if not isinstance(loglik_sub, float):
-        raise TypeError('`loglik_sub` must be a float')
+        raise TypeError("`loglik_sub` must be a float")
 
     if not isinstance(n_par, int):
-        raise TypeError('`n_par` must be an integer')
+        raise TypeError("`n_par` must be an integer")
 
     if not isinstance(n_par_sub, int):
-        raise TypeError('`n_par_sub` must be an integer')
+        raise TypeError("`n_par_sub` must be an integer")
 
     if not isinstance(negative, bool):
-        raise TypeError('`negative` must be a boolean')
+        raise TypeError("`negative` must be a boolean")
 
     if n_par_sub > n_par:
-        raise ValueError('The sub-model must have less parameters ' 'than the larger model')
+        raise ValueError(
+            "The sub-model must have less parameters " "than the larger model"
+        )
 
     if negative:
         lrt = loglik - loglik_sub
@@ -47,13 +51,13 @@ def lrtest(loglik: float, loglik_sub: float, n_par: int, n_par_sub: int, negativ
 def aic(loglik: float, n_par: int, negative: bool = True) -> float:
     """Akaike information criterion"""
     if not isinstance(loglik, float):
-        raise TypeError('`loglik` must be a float')
+        raise TypeError("`loglik` must be a float")
 
     if not isinstance(n_par, int):
-        raise TypeError('`n_par` must be an integer')
+        raise TypeError("`n_par` must be an integer")
 
     if not isinstance(negative, bool):
-        raise TypeError('`negative` must be a boolean')
+        raise TypeError("`negative` must be a boolean")
 
     if negative:
         return 2.0 * n_par + 2.0 * loglik
@@ -111,14 +115,16 @@ def ccf(x, y=None, n_lags=None, ci=0.95):
     n_lags = int(n_lags) if n_lags else N - 1
 
     if len(x) != len(y):
-        raise ValueError('x and y must have equal length')
+        raise ValueError("x and y must have equal length")
 
     if n_lags >= N or n_lags < 0:
-        raise ValueError(f'maxlags must belong to [1 {n_lags - 1}]')
+        raise ValueError(f"maxlags must belong to [1 {n_lags - 1}]")
 
     lags = np.arange(0, N)
 
-    correlation_coeffs = correlate(x - np.mean(x), y - np.mean(y)) / (np.std(x) * np.std(y) * N)
+    correlation_coeffs = correlate(x - np.mean(x), y - np.mean(y)) / (
+        np.std(x) * np.std(y) * N
+    )
 
     cut = range(N - 1, N + n_lags)
 
@@ -158,7 +164,7 @@ def cpgram(ts):
     """
     spectrum = np.fft.fft(ts)
     n = len(ts)
-    y = (np.sqrt(spectrum.real ** 2 + spectrum.imag ** 2)) ** 2 / n
+    y = (np.sqrt(spectrum.real**2 + spectrum.imag**2)) ** 2 / n
     if n % 2 == 0:
         n -= 1
         y = y[:n]
