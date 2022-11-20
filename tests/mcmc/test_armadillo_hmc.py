@@ -8,7 +8,7 @@ from pysip.regressors import BayesRegressor as Regressor
 from pysip.statespace import TwTi_RoRi
 
 
-@pytest.mark.skip(reason="Too log for the Gitlab CI")
+@pytest.mark.skip(reason="Too long for the Gitlab CI")
 @pytest.mark.parametrize("dense_mass_matrix", [False, True])
 def test_armadillo_hmc(dense_mass_matrix):
     n_cpu = 1

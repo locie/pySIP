@@ -8,6 +8,7 @@ from pysip.regressors import BayesRegressor as Regressor
 from pysip.statespace import Matern32
 
 
+@pytest.mark.skip(reason="Too long for the Gitlab CI")
 def test_fit_hmc_m32():
     """Generate samples from the posterior distribution"""
     n_cpu = 1

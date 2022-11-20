@@ -1,4 +1,6 @@
 import os
+from pathlib import Path
+from tempfile import TemporaryDirectory, TemporaryFile
 
 import numpy as np
 import pytest
@@ -45,24 +47,24 @@ def test_save_model_to_pickle(reg):
     dx0 = reg.ss.dx0
     dP0 = reg.ss.dP0
 
-    save_model("test", reg)
-    load_reg = load_model("test")
+    with TemporaryDirectory() as tmpdir:
+        tempdir = Path(tmpdir)
+        save_model(tempdir / "test", reg)
+        load_reg = load_model(tempdir / "test")
 
-    for k in dA.keys():
-        assert np.allclose(dA[k], load_reg.ss.dA[k])
-        assert np.allclose(dB[k], load_reg.ss.dB[k])
-        assert np.allclose(dC[k], load_reg.ss.dC[k])
-        assert np.allclose(dD[k], load_reg.ss.dD[k])
-        assert np.allclose(dQ[k], load_reg.ss.dQ[k])
-        assert np.allclose(dR[k], load_reg.ss.dR[k])
-        assert np.allclose(dx0[k], load_reg.ss.dx0[k])
-        assert np.allclose(dP0[k], load_reg.ss.dP0[k])
+        for k in dA.keys():
+            assert np.allclose(dA[k], load_reg.ss.dA[k])
+            assert np.allclose(dB[k], load_reg.ss.dB[k])
+            assert np.allclose(dC[k], load_reg.ss.dC[k])
+            assert np.allclose(dD[k], load_reg.ss.dD[k])
+            assert np.allclose(dQ[k], load_reg.ss.dQ[k])
+            assert np.allclose(dR[k], load_reg.ss.dR[k])
+            assert np.allclose(dx0[k], load_reg.ss.dx0[k])
+            assert np.allclose(dP0[k], load_reg.ss.dP0[k])
 
-    assert id(reg) != id(load_reg)
-    for a, b in zip(reg.ss.parameters, load_reg.ss.parameters):
-        assert a == b
-
-    os.remove("test.pickle")
+        assert id(reg) != id(load_reg)
+        for a, b in zip(reg.ss.parameters, load_reg.ss.parameters):
+            assert a == b
 
 
 def test_save_version_number():
