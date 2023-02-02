@@ -527,7 +527,7 @@ class RCModel(StateSpace):
         super().__post_init__()
 
     def __repr__(self):
-        return f"\n{self.__class__.__name__}" + "-" * len(self.__class__.__name__)
+        return f"\n{self.__name__}" + "-" * abs(20-len(self.__name__))
 
     def __le__(self, gp):
         """Create a Latent Force Model"""
