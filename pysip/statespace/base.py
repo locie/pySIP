@@ -1,14 +1,27 @@
-from dataclasses import dataclass, field
 from collections import defaultdict, namedtuple
+from dataclasses import dataclass, field
 from functools import partial
-from typing import NamedTuple, Union, Tuple
+from typing import NamedTuple, Tuple, Union
+
 import numpy as np
-from scipy.linalg import expm, expm_frechet, solve_continuous_lyapunov, LinAlgError
-from .nodes import Node
-from .meta import MetaStateSpace
+
 from ..core import Parameters
-from ..utils.math import nearest_cholesky
+from .discretization import (
+    disc_state,
+    disc_state_input,
+    disc_diffusion_mfd,
+    disc_diffusion_stationary,
+    disc_diffusion_lyap,
+    disc_d_state,
+    disc_d_state_input,
+    disc_d_diffusion_mfd,
+    disc_d_diffusion_stationary,
+    disc_d_diffusion_lyap,
+)
 from ..utils.draw import TikzStateSpace
+from ..utils.math import nearest_cholesky, diff_upper_cholesky
+from .meta import MetaStateSpace
+from .nodes import Node
 
 ssm = namedtuple('ssm', 'A, B0, B1, C, D, Q, R, x0, P0')
 dssm = namedtuple('dssm', 'dA, dB0, dB1, dC, dD, dQ, dR, dx0, dP0')
@@ -179,41 +192,13 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
         """
 
         if self.nu == 0:
-            Ad = expm(self.A * dt)
+            Ad = disc_state(self.A, dt)
             B0d = np.zeros((self.nx, self.nu))
             B1d = B0d
         else:
-            if self.hold_order == 0:
-                AA = np.zeros((self.nx + self.nu, self.nx + self.nu))
-                AA[: self.nx, : self.nx] = self.A
-                AA[: self.nx, self.nx :] = self.B
-                AAd = expm(AA * dt)
-                Ad = AAd[: self.nx, : self.nx]
-                B0d = AAd[: self.nx, self.nx :]
-                B1d = np.zeros((self.nx, self.nu))
+            Ad, B0d, B1d = disc_state_input(self.A, self.B, dt, self.hold_order, 'expm')
 
-            elif self.hold_order == 1:
-                AA = np.zeros((self.nx + 2 * self.nu, self.nx + 2 * self.nu))
-                AA[: self.nx, : self.nx] = self.A
-                AA[: self.nx, self.nx : self.nx + self.nu] = self.B
-                AA[self.nx : self.nx + self.nu, self.nx + self.nu :] = np.eye(self.nu)
-                AAd = expm(AA * dt)
-                Ad = AAd[: self.nx, : self.nx]
-                B0d = AAd[: self.nx, self.nx : self.nx + self.nu]
-                B1d = AAd[: self.nx, self.nx + self.nu :]
-
-        if np.any(self.Q):
-
-            if self.method == 'mfd':
-                QQd = self._disc_Q_mfd(dt, self.Q.T @ self.Q)
-            elif self.method == 'lyapunov':
-                QQd = self._disc_Q_lyapunov(self.Q.T @ self.Q, Ad)
-            else:
-                raise ValueError('`Invalid discretization method`')
-
-            Qd = nearest_cholesky(QQd)
-        else:
-            Qd = np.zeros((self.nx, self.nx))
+        Qd = nearest_cholesky(disc_diffusion_mfd(self.A, self.Q.T @ self.Q, dt))
 
         return Ad, B0d, B1d, Qd
 
@@ -248,207 +233,32 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
                 - **dB1d**: Jacobian discrete input matrix (first order hold)
                 - **dQd**: Jacobian of the upper Cholesky factor of the process noise covariance
         """
-
-        N = dA.shape[0]
+        nj = dA.shape[0]
 
         if self.nu == 0:
+            Ad, dAd = disc_d_state(self.A, dA, dt)
+
             B0d = np.zeros((self.nx, self.nu))
+            dB0d = np.zeros((nj, self.nx, self.nu))
+
             B1d = B0d
-
-            Ad = expm(self.A * dt)
-            dAd = np.zeros((N, self.nx, self.nx))
-            for n in range(N):
-                if np.any(dA[n]):
-                    dAd[n] = expm_frechet(self.A * dt, dA[n] * dt, compute_expm=False)
-
-            dB0d = np.zeros((N, self.nx, self.nu))
             dB1d = dB0d
-
         else:
-            if self.hold_order == 0:
+            Ad, B0d, B1d, dAd, dB0d, dB1d = disc_d_state_input(
+                self.A, self.B, dA, dB, dt, self.hold_order, 'expm'
+            )
 
-                AA = np.zeros((self.nx + self.nu, self.nx + self.nu))
-                AA[: self.nx, : self.nx] = self.A
-                AA[: self.nx, self.nx :] = self.B
+        Qc = self.Q.T @ self.Q
+        dQc = dQ.swapaxes(1, 2) @ self.Q + self.Q.T @ dQ
+        Qcd, dQcd = disc_d_diffusion_mfd(self.A, Qc, dA, dQc, dt)
 
-                dAA = np.zeros((N, self.nx + self.nu, self.nx + self.nu))
-                dAA[:, : self.nx, : self.nx] = dA
-                dAA[:, : self.nx, self.nx :] = dB
-
-                dAAd = np.zeros_like(dAA)
-                for n in range(N):
-                    if np.any(dAA[n]):
-                        AAd, dAAd[n] = expm_frechet(AA * dt, dAA[n] * dt)
-
-                Ad = AAd[: self.nx, : self.nx]
-                B0d = AAd[: self.nx, self.nx :]
-                dAd = dAAd[:, : self.nx, : self.nx]
-                dB0d = dAAd[:, : self.nx, self.nx :]
-                B1d = np.zeros((self.nx, self.nu))
-                dB1d = np.zeros((N, self.nx, self.nu))
-            else:
-                AA = np.zeros((self.nx + 2 * self.nu, self.nx + 2 * self.nu))
-                AA[: self.nx, : self.nx] = self.A
-                AA[: self.nx, self.nx : self.nx + self.nu] = self.B
-                AA[self.nx : self.nx + self.nu, self.nx + self.nu :] = np.eye(self.nu)
-
-                dAA = np.zeros((N, self.nx + 2 * self.nu, self.nx + 2 * self.nu))
-                dAA[:, : self.nx, : self.nx] = dA
-                dAA[:, : self.nx, self.nx : self.nx + self.nu] = dB
-
-                dAAd = np.zeros_like(dAA)
-                for n in range(N):
-                    if np.any(dAA[n]):
-                        AAd, dAAd[n] = expm_frechet(AA * dt, dAA[n] * dt)
-
-                Ad = AAd[: self.nx, : self.nx]
-                B0d = AAd[: self.nx, self.nx : self.nx + self.nu]
-                B1d = AAd[: self.nx, self.nx + self.nu :]
-
-                dAd = dAAd[:, : self.nx, : self.nx]
-                dB0d = dAAd[:, : self.nx, self.nx : self.nx + self.nu]
-                dB1d = dAAd[:, : self.nx, self.nx + self.nu :]
-
-        if np.any(self.Q):
-
-            # transform to covariance matrix
-            QQ = self.Q.T @ self.Q
-            dQQ = dQ.swapaxes(1, 2) @ self.Q + self.Q.T @ dQ
-
-            if self.method == 'mfd':
-                QQd, dQQd = self._disc_dQ_mfd(dt, QQ, dA, dQQ)
-            elif self.method == 'lyapunov':
-                QQd, dQQd = self._disc_dQ_lyapunov(dt, QQ, dA, dQQ, Ad, dAd)
-            else:
-                raise ValueError('`Invalid discretization method`')
-
-            Qd = nearest_cholesky(QQd)
-            try:
-                tmp = np.linalg.solve(Qd.T, np.linalg.solve(Qd.T, dQQd).swapaxes(1, 2))
-            except (LinAlgError, RuntimeError):
-                inv_Qd = np.linalg.pinv(Qd)
-                tmp = inv_Qd.T @ dQQd @ inv_Qd
-
-            dQd = (np.triu(tmp, 1) + np.eye(self.nx) / 2 * tmp.diagonal(0, 1, 2)[:, None, :]) @ Qd
-        else:
-            Qd = np.zeros((self.nx, self.nx))
-            dQd = np.zeros((N, self.nx, self.nx))
+        Qd = nearest_cholesky(Qcd)
+        dQd = np.zeros((nj, self.nx, self.nx))
+        for n in range(nj):
+            if dQcd[n].any():
+                dQd[n] = diff_upper_cholesky(Qd, dQcd[n])
 
         return Ad, B0d, B1d, Qd, dAd, dB0d, dB1d, dQd
-
-    def _disc_Q_mfd(self, dt: float, QQ: np.ndarray) -> np.ndarray:
-        """Discretization diffusion matrix by Matrix Fraction Decomposition
-
-        Args:
-            dt: Sampling time
-            QQ: Diffusion matrix
-
-        Returns:
-            Process noise covariance matrix
-        """
-
-        AA = np.zeros((2 * self.nx, 2 * self.nx))
-        AA[: self.nx, : self.nx] = self.A
-        AA[: self.nx, self.nx :] = QQ
-        AA[self.nx :, self.nx :] = -self.A.T
-        AAd = expm(AA * dt)
-
-        return AAd[: self.nx, self.nx :] @ AAd[: self.nx, : self.nx].T
-
-    def _disc_Q_lyapunov(self, QQ: np.ndarray, Ad: np.ndarray) -> np.ndarray:
-        """Discretization diffusion matrix by Lyapunov equation
-
-        Args:
-            QQ: Diffusion matrix
-            Ad: Discrete state matrix
-
-        Returns:
-            Process noise covariance matrix
-        """
-
-        return solve_continuous_lyapunov(self.A, -QQ + Ad @ QQ @ Ad.T)
-
-    def _disc_dQ_mfd(
-        self, dt: np.ndarray, QQ: np.ndarray, dA: np.ndarray, dQQ: np.ndarray
-    ) -> Tuple[np.ndarray, np.ndarray]:
-        """Discretization partial derivative of the diffusion matrix by MFD
-
-        Args:
-            dt: Sampling time
-            QQ: Diffusion matrix
-            dA: Jacobian state matrix
-            dQQ: Jacobian diffusion matrix
-
-        Returns:
-            2-elements tuple containing
-                - **QQd**: Process noise covariance matrix
-                - **dQQd**: Jacobian process noise covariance matrix
-        """
-
-        N = dA.shape[0]
-
-        AA = np.zeros((2 * self.nx, 2 * self.nx))
-        AA[: self.nx, : self.nx] = self.A
-        AA[: self.nx, self.nx :] = QQ
-        AA[self.nx :, self.nx :] = -self.A.T
-
-        dAA = np.zeros((N, 2 * self.nx, 2 * self.nx))
-        dAA[:, : self.nx, : self.nx] = dA
-        dAA[:, : self.nx, self.nx :] = dQQ
-        dAA[:, self.nx :, self.nx :] = -dA.swapaxes(1, 2)
-
-        dAAd = np.zeros_like(dAA)
-        for n in range(N):
-            if np.any(dAA[n]):
-                AAd, dAAd[n] = expm_frechet(AA * dt, dAA[n] * dt)
-
-        AdT = AAd[: self.nx, : self.nx].T
-        QQd = AAd[: self.nx, self.nx :] @ AdT
-
-        dAd = dAAd[:, : self.nx, : self.nx]
-        dQQd = dAAd[:, : self.nx, self.nx :] @ AdT + AAd[: self.nx, self.nx :] @ dAd.swapaxes(1, 2)
-
-        return QQd, dQQd
-
-    def _disc_dQ_lyapunov(
-        self,
-        dt: np.ndarray,
-        QQ: np.ndarray,
-        dA: np.ndarray,
-        dQQ: np.ndarray,
-        Ad: np.ndarray,
-        dAd: np.ndarray,
-    ) -> Tuple[np.ndarray, np.ndarray]:
-        """Discretization partial derivative of the diffusion matrix with the Lyapunov equation
-
-        Args:
-            dt: Sampling time
-            QQ: Diffusion matrix
-            dA: Jacobian state matrix
-            dQQ: Jacobian diffusion matrix
-            Ad: Discrete state matrix
-            dAd: Jacobian discrete state matrix
-
-        Returns:
-            2-elements tuple containing
-                - **QQd**: Process noise covariance matrix
-                - **dQQd**: Jacobian process noise covariance matrix
-        """
-
-        N = dA.shape[0]
-
-        QQd = self._disc_Q_lyapunov(QQ, Ad)
-        eq = (
-            -dA @ QQd
-            - QQd @ dA.swapaxes(1, 2)
-            - dQQ
-            + dAd @ QQ @ Ad.T
-            + Ad @ dQQ @ Ad.T
-            + Ad @ QQ @ dAd.swapaxes(1, 2)
-        )
-        dQQd = np.asarray([solve_continuous_lyapunov(self.A, eq[i, :, :]) for i in range(N)])
-
-        return QQd, dQQd
 
     def discretization(
         self, dt: np.ndarray, jacobian: bool = False
@@ -486,7 +296,10 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
 
             dA = np.array([self.dA[n] for n, f in zip(self._names, free) if f])
             dB = np.array([self.dB[n] for n, f in zip(self._names, free) if f])
-            dQ = np.array([self.dQ[n] for n, f in zip(self._names, free) if f])
+            if isinstance(self, GPModel):
+                dQ = np.array([self.dP0[n] for n, f in zip(self._names, free) if f])
+            else:
+                dQ = np.array([self.dQ[n] for n, f in zip(self._names, free) if f])
 
             Np = dA.shape[0]
             dAd = np.empty((N, Np, self.nx, self.nx))
@@ -535,6 +348,86 @@ class RCModel(StateSpace):
 
         return LatentForceModel(self, gp, self.latent_forces)
 
+    def _lti_disc(self, dt: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        """Discretization of RC model
+
+        Args:
+            dt: sampling time
+
+        Returns:
+            4-elements tuple containing
+                - **Ad**: Discrete state matrix
+                - **B0d**: Discrete input matrix (zero order hold)
+                - **B1d**: Discrete input matrix (first order hold)
+                - **Qd**: Upper Cholesky factor of the process noise covariance
+        """
+        eig = np.real(np.linalg.eigvals(self.A))
+
+        if np.all(eig < 0) and eig.max() / eig.min() > 1e-10:
+            Ad, B0d, B1d = disc_state_input(self.A, self.B, dt, self.hold_order, 'analytic')
+            Qd = nearest_cholesky(disc_diffusion_lyap(self.A, self.Q.T @ self.Q, Ad))
+        else:
+            Ad, B0d, B1d = disc_state_input(self.A, self.B, dt, self.hold_order, 'expm')
+            Qd = nearest_cholesky(disc_diffusion_mfd(self.A, self.Q.T @ self.Q, dt))
+
+        return Ad, B0d, B1d, Qd
+
+    def _lti_jacobian_disc(
+        self, dt: float, dA: np.ndarray, dB: np.ndarray, dQ: np.ndarray
+    ) -> Tuple[
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+    ]:
+        """Discretization of RC model and its derivatives
+
+        Args:
+            dt: Sampling time
+            dA: Derivative state matrix
+            dB: Derivative input matrix
+            dQ: Derivative Wiener process scaling matrix
+
+        Returns:
+            8-elements tuple containing
+                - **Ad**: Discrete state matrix
+                - **B0d**: Discrete input matrix (zero order hold)
+                - **B1d**: Discrete input matrix (first order hold)
+                - **Qd**: Upper Cholesky factor of the process noise covariance matrix
+                - **dAd**: Derivative discrete state matrix
+                - **dB0d**: Derivative discrete input matrix (zero order hold)
+                - **dB1d**: Derivative discrete input matrix (first order hold)
+                - **dQd**: Derivative of the upper Cholesky factor of the process noise covariance
+        """
+        Qc = self.Q.T @ self.Q
+        dQc = dQ.swapaxes(1, 2) @ self.Q + self.Q.T @ dQ
+
+        eig = np.real(np.linalg.eigvals(self.A))
+
+        if np.all(eig < 0) and eig.max() / eig.min() > 1e-10:
+            Ad, B0d, B1d, dAd, dB0d, dB1d = disc_d_state_input(
+                self.A, self.B, dA, dB, dt, self.hold_order, 'analytic'
+            )
+            Qcd, dQcd = disc_d_diffusion_lyap(self.A, Qc, Ad, dA, dQc, dAd)
+        else:
+            Ad, B0d, B1d, dAd, dB0d, dB1d = disc_d_state_input(
+                self.A, self.B, dA, dB, dt, self.hold_order, 'expm'
+            )
+            Qcd, dQcd = disc_d_diffusion_mfd(self.A, Qc, dA, dQc, dt)
+
+        nj = dQcd.shape[0]
+        Qd = nearest_cholesky(Qcd)
+        dQd = np.zeros((nj, self.nx, self.nx))
+        for n in range(nj):
+            if dQcd[n].any():
+                dQd[n] = diff_upper_cholesky(Qd, dQcd[n])
+
+        return Ad, B0d, B1d, Qd, dAd, dB0d, dB1d, dQd
+
 
 @dataclass
 class GPModel(StateSpace):
@@ -579,3 +472,70 @@ class GPModel(StateSpace):
         from .gaussian_process import GPSum
 
         return GPSum(self, gp)
+
+    def _lti_disc(self, dt: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        """Discretization of temporal Gaussian Process
+
+        Args:
+            dt: sampling time
+
+        Returns:
+            4-elements tuple containing
+                - **Ad**: Discrete state matrix
+                - **B0d**: Discrete input matrix (zero order hold)
+                - **B1d**: Discrete input matrix (first order hold)
+                - **Qd**: Upper Cholesky factor of the process noise covariance
+        """
+        Ad = disc_state(self.A, dt)
+        B0d = np.zeros((self.nx, self.nu))
+        Qd = nearest_cholesky(disc_diffusion_stationary(self.P0.T @ self.P0, Ad))
+
+        return Ad, B0d, B0d, Qd
+
+    def _lti_jacobian_disc(
+        self, dt: float, dA: np.ndarray, dB: np.ndarray, dPinf_upper: np.ndarray
+    ) -> Tuple[
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+    ]:
+        """Discretization of augmented temportal Gaussian Process
+
+        Args:
+            dt: Sampling time
+            dA: Jacobian state matrix
+            dB: Jacobian input matrix
+            dPinf: Jacobian upper Cholesky factor of the stationary covariance matrix
+
+        Returns:
+            8-elements tuple containing
+                - **Ad**: Discrete state matrix
+                - **B0d**: Discrete input matrix (zero order hold)
+                - **B1d**: Discrete input matrix (first order hold)
+                - **Qd**: Upper Cholesky factor of the process noise covariance matrix
+                - **dAd**: Jacobian discrete state matrix
+                - **dB0d**: Jacobian discrete input matrix (zero order hold)
+                - **dB1d**: Jacobian discrete input matrix (first order hold)
+                - **dQd**: Jacobian of the upper Cholesky factor of the process noise covariance
+        """
+        nj = dA.shape[0]
+        Ad, dAd = disc_d_state(self.A, dA, dt)
+
+        B0d = np.zeros((self.nx, self.nu))
+        dB0d = np.zeros((nj, self.nx, self.nu))
+
+        dPinf = dPinf_upper.swapaxes(1, 2) @ self.P0 + self.P0.T @ dPinf_upper
+        Qcd, dQcd = disc_d_diffusion_stationary(self.P0.T @ self.P0, Ad, dPinf, dAd)
+
+        Qd = nearest_cholesky(Qcd)
+        dQd = np.zeros((nj, self.nx, self.nx))
+        for n in range(nj):
+            if dQcd[n].any():
+                dQd[n] = diff_upper_cholesky(Qd, dQcd[n])
+
+        return Ad, B0d, B0d, Qd, dAd, dB0d, dB0d, dQd

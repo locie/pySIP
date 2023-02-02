@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
+
 import numpy as np
 from scipy.special import iv
+
 from ..base import GPModel
 
 

@@ -1,15 +1,16 @@
 """Warning !!!
 The algorithm may fail because of the random initialization, try to re-run the example.
 """
+import arviz as az
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import arviz as az
 import seaborn as sns
-from pysip.utils import percentile_plot
-from pysip.statespace import TwTi_RoRi
+
+from pysip.core import Gamma, Normal
 from pysip.regressors import BayesRegressor as Regressor
-from pysip.core import Normal, Gamma
+from pysip.statespace import TwTi_RoRi
+from pysip.utils import percentile_plot
 
 # Load and prepare the data
 df = pd.read_csv('data/armadillo/armadillo_data_H2.csv').set_index('Time')

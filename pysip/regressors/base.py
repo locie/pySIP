@@ -1,6 +1,7 @@
 """Regressor template"""
-from typing import Tuple, Union
 from numbers import Real
+from typing import Tuple, Union
+
 import numpy as np
 import pandas as pd
 from scipy.interpolate import interp1d

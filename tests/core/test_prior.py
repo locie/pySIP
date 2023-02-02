@@ -1,8 +1,9 @@
+import numdifftools as nd
 import numpy as np
 import pytest
-import numdifftools as nd
-from pysip.core import Beta, Gamma, InverseGamma, Normal, LogNormal
 from scipy import stats
+
+from pysip.core import Beta, Gamma, InverseGamma, LogNormal, Normal
 
 
 @pytest.fixture(name='N')

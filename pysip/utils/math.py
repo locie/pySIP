@@ -1,16 +1,19 @@
-import numpy as np
 import warnings
-from scipy.linalg import solve_triangular, LinAlgError, ldl
+import numpy as np
+
+from typing import Tuple
+from scipy.linalg import LinAlgError, LinAlgWarning, ldl, solve_triangular
+from numpy.linalg import lstsq
 
 
-def log1p_exp(a):
+def log1p_exp(a: float):
     """Calculates the log of 1 plus the exponential of the specified value without overflow"""
     if a > 0.0:
         return a + np.log1p(np.exp(-a))
     return np.log1p(np.exp(a))
 
 
-def log_sum_exp(a, b):
+def log_sum_exp(a: float, b: float):
     """Robust sum on log-scale"""
     if np.isneginf(a):
         return b
@@ -60,26 +63,69 @@ def fit(y, yhat):
     return 1.0 - np.linalg.norm(y - yhat, 2) / np.linalg.norm(y - np.mean(y), 2)
 
 
-def nearest_cholesky(A) -> np.ndarray:
+def nearest_cholesky(m, method='ldl') -> np.ndarray:
     """nearest positive semi definite Cholesky decomposition
 
     Returns:
         Upper triangular Cholesky factor of `A`
     """
-    l, d, _ = ldl(A, lower=False)
-    return np.diag([w ** 0.5 if w > 0 else 0 for w in d.diagonal()]) @ l.T
-    # X = (A + A.T) / 2.0
-    # n = X.shape[0]
-    # jitter = 1e-9
-    # while jitter < 1.0:
-    #     try:
-    #         chol = np.linalg.cholesky(X + jitter * np.eye(n)).T
-    #         return chol
-    #     except (LinAlgError, RuntimeError):
-    #         jitter *= 10.0
+    if not m.any():
+        return m
 
-    # w, v = np.linalg.eigh(X)
-    # return np.linalg.qr(np.diag([w ** 0.5 if w > 0 else 0 for w in w]) @ v.T, 'r')
+    x = (m + m.T) / 2.0
+    if method == 'ldl':
+        lu, d, _ = ldl(x, lower=True, hermitian=True)
+        return np.diag([np.sqrt(w) if w > 0 else 0 for w in d.diagonal()]) @ lu.T
+    elif method == 'eigen':
+        eigvals, v = np.linalg.eigh(x)
+        return np.linalg.qr(np.diag([np.sqrt(w) if w > 0 else 0 for w in eigvals]) @ v.T, 'r')
+    elif method == 'jitter':
+        Ix = np.eye(x.shape[0])
+        jitter = 1e-9
+        while jitter < 1.0:
+            try:
+                chol = np.linalg.cholesky(x + jitter * Ix).T
+                return chol
+            except (LinAlgError, LinAlgWarning):
+                jitter *= 10.0
+    else:
+        raise ValueError('`method` must be set to `ldl`, `eigen` or `jitter`')
+
+
+def diff_upper_cholesky(R: np.ndarray, dS: np.ndarray) -> np.ndarray:
+    """Forward differentiation of the upper Cholesky decomposition
+
+    .. math::
+
+        S = R^T R
+
+    Args:
+        R: Upper triangular Cholesky factor of the symmetric matrix S
+        dS: Derivative of the symmetric matrix S
+
+    Returns:
+        dR: Derivative of the upper triangular Cholesky factor R
+
+    Reference:
+        Iain Murray. Differentiation of the Cholesky decomposition, February 2016
+        https://homepages.inf.ed.ac.uk/imurray2/pub/16choldiff/choldiff.pdf
+    """
+
+    def Phi(x):
+        x = np.triu(x)
+        x[np.diag_indices_from(x)] *= 0.5
+        return x
+
+    try:
+        right_ = solve_triangular(R, dS.T, trans='T').T
+    except (LinAlgError, LinAlgWarning):
+        right_ = np.transpose(lstsq(R.T, dS.T, rcond=-1)[0])
+    finally:
+        try:
+            left_ = solve_triangular(R, right_, trans='T')
+        except (LinAlgError, LinAlgWarning):
+            left_ = lstsq(R.T, right_, rcond=-1)[0]
+    return Phi(left_) @ R
 
 
 def time_series_pca(X: np.ndarray, verbose: bool = False):

@@ -1,10 +1,11 @@
 import random
+
 import matplotlib.axes._subplots
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
-from pysip.utils import ccf, check_ccf, cpgram, check_cpgram, plot_ccf, plot_cpgram
+from pysip.utils import ccf, check_ccf, check_cpgram, cpgram, plot_ccf, plot_cpgram
 
 
 @pytest.mark.skip(reason="todo")

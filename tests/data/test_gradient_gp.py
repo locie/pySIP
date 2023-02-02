@@ -1,12 +1,18 @@
-import pytest
+import numdifftools as nd
 import numpy as np
 import pandas as pd
-import numdifftools as nd
+import pytest
 
-from pysip.utils import generate_sine, ned
 from pysip.regressors import FreqRegressor as Regressor
-from pysip.statespace import Matern12, Matern32, Matern52
-from pysip.statespace import Periodic, QuasiPeriodic12, QuasiPeriodic32
+from pysip.statespace import (
+    Matern12,
+    Matern32,
+    Matern52,
+    Periodic,
+    QuasiPeriodic12,
+    QuasiPeriodic32,
+)
+from pysip.utils import generate_sine, ned
 
 
 @pytest.fixture
@@ -89,8 +95,6 @@ def check_grad_fd(data, reg):
     grad = reg._eval_dlog_posterior(reg.ss.parameters.eta_free, dt, u, u1, y)[1]
     grad_fct = nd.Gradient(reg._eval_log_posterior)
     grad_fd = grad_fct(reg.ss.parameters.eta_free, dt, u, u1, y)
-    print(f'grad: {grad}')
-    print(f'R: {reg.ss.R}')
 
     assert ned(grad, grad_fd) < 1e-7
     assert np.all(np.sign(grad) == np.sign(grad_fd))

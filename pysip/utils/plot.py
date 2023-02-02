@@ -1,11 +1,11 @@
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 def percentile_plot(
     x,
     y,
-    n=10,
+    n=4,
     percentile_min=2.5,
     percentile_max=97.5,
     color='darkred',
@@ -26,7 +26,7 @@ def percentile_plot(
     if 'alpha' in kwargs:
         alpha = kwargs.pop('alpha')
     else:
-        alpha = 1 / n
+        alpha = 1 / (n / 2)
 
     # fill lower and upper percentile groups
     for p1, p2 in zip(perc1, perc2):

@@ -1,9 +1,10 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
-from pysip.statespace import Matern32
+
 from pysip.regressors import FreqRegressor as Regressor
+from pysip.statespace import Matern32
 
 # Generate artificial data
 np.random.seed(1)

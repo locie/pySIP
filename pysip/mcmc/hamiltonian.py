@@ -1,7 +1,8 @@
-"""Hamiltonian Definition"""
+from typing import Callable, Tuple
+from .metrics import EuclideanMetric
+
 import numpy as np
 import scipy.linalg as sla
-from typing import Callable
 
 
 class EuclideanHamiltonian:
@@ -33,7 +34,7 @@ class EuclideanHamiltonian:
         \\end{align*}
 
 
-    For Euclidean-Gaussian kinetic energie
+    For Euclidean-Gaussian kinetic energy
 
     .. math::
        :nowrap:
@@ -69,85 +70,111 @@ class EuclideanHamiltonian:
 
 
     Args:
-        V: Function for evaluating the potential energy
-        dV: Function for evaluating the gradient of the potential energy
-        M: Mass matrix
+        potential: Function which evaluate the potential energy and the gradient at a given position
+        metric: Diagonal or Dense Euclidean metric
 
     References:
         Betancourt, M., 2017. A conceptual introduction to Hamiltonian Monte Carlo.
         arXiv preprint arXiv:1701.02434.
-
-    Notes:
-        Specify if dV return the log-posterior and the gradient. It is the default in DynamicHMC,
-        a refactoring is required.
     """
 
-    def __init__(self, V: Callable, dV: Callable, M: np.ndarray):
-        self._V = V
-        self._dV = dV
-        self._M = None
-        self._cholM = None
-        self.M = M
-        self.dim = M.shape[0]
+    def __init__(self, potential: Callable, metric: EuclideanMetric):
+        self._V_dV = potential
+        self._metric = metric
+
+        if not isinstance(metric, EuclideanMetric):
+            raise TypeError('`metric` must be an EuclideanMetric')
 
     def V(self, q: np.array) -> float:
-        """Potential energy :math:`V(q)`"""
-        return self._V(q)
+        """Evaluate the potential energy function :math:`V(q)`at the position `q`
+
+        Args:
+            q: Position variable
+
+        Returns:
+            Potential energy
+        """
+        return self._V_dV(q)[0]
 
     def dV(self, q: np.array) -> np.ndarray:
-        """Gradient of potential energy :math:`\\frac{\\partial V(q)} {\\partial q}`"""
-        return self._dV(q)
+        """Evaluate the gradient of the potential energy function
+        :math:`\\frac{\\partial V(q)} {\\partial q}` at the position `q`
+
+        Args:
+            q: Position variable
+
+        Returns:
+            Gradient of the potential energy
+        """
+        return self._V_dV(q)[1]
+
+    def V_and_dV(self, q: np.array) -> Tuple[float, np.ndarray]:
+        """Evaluate the potential energy function :math:`V(q)` and the gradient of the potential
+        energy function :math:`\\frac{\\partial V(q)} {\\partial q}` at the position `q`
+
+        Args:
+            q: Position variable
+
+        Returns:
+            2-element tuple containing
+                - Potential energy
+                - Gradient of the potential energy
+        """
+        return self._V_dV(q)
 
     def K(self, p: np.array) -> float:
-        """Kinetic energy :math:`K(p)`"""
-        return 0.5 * np.sum(p * sla.cho_solve((self._cholM, True), p))
+        """Evaluate the kinetic energy function :math:`K(p)` at the momentum variable `p`
+
+        Args:
+            p: Momentum variable
+
+        Returns:
+            Kinetic energy
+        """
+        return self._metric.kinetic_energy(momentum=p)
 
     def dK(self, p: np.array) -> np.ndarray:
-        """Gradient of kinetic energy :math:`\\frac{\\partial K}{\\partial p}`"""
-        return sla.cho_solve((self._cholM, True), p)
+        """Evaluate the gradient of the kinetic energy function
+        :math:`\\frac{\\partial K}{\\partial p}` at the momentum variable `p`
+
+        Args:
+            p: Momentum variable
+
+        Returns:
+            Gradient of the kinetic energy
+        """
+        return self._metric.gradient_kinetic_energy(momentum=p)
 
     def sample_p(self) -> np.ndarray:
-        """Sample momentum"""
-        return self._cholM @ np.random.randn(self.dim)
+        """Sample momentum
+
+        Returns:
+            Momentum variables
+        """
+        return self._metric.sample_momentum()
 
     def H(self, q: np.array, p: np.array) -> float:
-        """The value of the Hamiltonian in phase space is called the energy at that point"""
+        """Evaluate the energy, i.e. the Hamiltonian in phase space :math:`H(q, p)`
+
+        Args:
+            q: Position variable
+            p: Momentum variable
+
+        Returns:
+            Energy
+        """
         return self.K(p) + self.V(q)
 
     @property
-    def M(self) -> np.ndarray:
-        """Return the mass matrix `M`"""
-        return self._M
+    def inverse_mass_matrix(self) -> np.ndarray:
+        """Return the inverse of the mass matrix `M`"""
+        return self._metric.get_inverse_metric()
 
-    @M.setter
-    def M(self, x):
-        """Change the mass matrix `M`
+    @inverse_mass_matrix.setter
+    def inverse_mass_matrix(self, M):
+        """Set the inverse of the mass matrix `M`
 
         Args:
-            mass_matrix: New mass matrix
+            M: Mass matrix (Full matrix or only diagonal elements)
         """
-        if not len(x.shape) == 2:
-            raise ValueError('The mass matrix must be 2-dimensional')
-
-        if not np.allclose(x, x.T):
-            raise ValueError('The mass matrix must be symmetric')
-
-        try:
-            self._M = x
-            self._cholM = sla.cholesky(x, lower=True)
-        except sla.LinAlgError as e:
-            if 'Singular matrix' in str(e):
-                raise ValueError('The mass matrix is not positive definite')
-
-    @property
-    def cholM(self) -> np.ndarray:
-        """Return the lower triangular Cholesky factor the mass matrix `M`"""
-        return self._cholM
-
-    @cholM.setter
-    def cholM(self, x):
-        """Change the lower triangular Cholesky factor the mass matrix `M`"""
-        if not len(x.shape) == 2:
-            raise ValueError('The mass matrix must be 2-dimensional')
-        self._cholM = x
-        self._M = x @ x.T
+        return self._metric.set_inverse_metric(M)

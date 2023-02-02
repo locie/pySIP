@@ -1,7 +1,9 @@
+from typing import List, Tuple, Union
+
 import numpy as np
-from typing import Union, Tuple, List
-from .prior import Prior
+
 from .parameter import Parameter
+from .prior import Prior
 
 
 class Parameters:
@@ -351,12 +353,11 @@ class Parameters:
         return [scaling * p._d_penalty() for p in self.parameters_free]
 
     def prior_init(self, hpd=None):
-        """Draw a random sample from the prior distribution, :math:`\\theta \sim p(\\theta)`
+        """Draw a random sample from the prior distribution, :math:`\\theta \\sim p(\\theta)`
 
         Args:
             hpd: Highest Prior Density to draw sample from (True for unimodal distribution)
         """
-
         for p in self.parameters:
             if p.prior is not None:
                 p.theta_sd = p.prior.random(hpd=hpd)[0]

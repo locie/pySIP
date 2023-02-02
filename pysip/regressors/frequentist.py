@@ -1,13 +1,14 @@
 """Frequentist regressor"""
 from typing import Tuple, Union
+
 import numpy as np
 import pandas as pd
 from scipy.optimize import minimize
 
-from .base import BaseRegressor
 from ..state_estimator import BayesianFilter, Kalman_QR
 from ..statespace.base import StateSpace
 from ..utils.statistics import ttest
+from .base import BaseRegressor
 
 
 class FreqRegressor(BaseRegressor):

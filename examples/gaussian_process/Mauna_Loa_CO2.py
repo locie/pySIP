@@ -24,10 +24,11 @@ differs from the book of Rasmussen & Williams [1], is used here.
     Intelligence and Statistics (AISTATS 2014). JMLR: W&CP, volume 33.
 """
 
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import seaborn as sns
+
 from pysip.regressors import FreqRegressor as Regressor
 from pysip.statespace import Matern32, Matern52, Periodic
 

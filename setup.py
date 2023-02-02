@@ -1,4 +1,5 @@
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
+
 from pysip import __version__
 
 with open('README.md', 'r') as f:
@@ -11,7 +12,7 @@ setup(
     name='pysip',
     version=__version__,
     description='PySIP',
-    url='https://gitlab.lancey.fr/ai/models/pysip',
+    url='https://github.com/locie/pySIP',
     long_description=long_description,
     long_description_content_type='text/markdown',
     packages=find_packages(),

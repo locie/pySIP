@@ -1,7 +1,8 @@
 from collections import namedtuple
-import pytest
-from pysip.core import Parameter, Normal
 
+import pytest
+
+from pysip.core import Normal, Parameter
 
 defaults = namedtuple('Defaults', 'name value scale bounds prior theta')(
     name='name', value=0.6, scale=0.5, bounds=(0.0, 1.0), prior=Normal(0, 1), theta=0.6 * 0.5

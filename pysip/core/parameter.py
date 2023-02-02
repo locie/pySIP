@@ -1,6 +1,8 @@
-import numpy as np
 from numbers import Real
 from typing import Tuple
+
+import numpy as np
+
 from .prior import Prior
 
 

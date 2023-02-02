@@ -1,6 +1,7 @@
 import math
-import networkx as nx
+
 import matplotlib.pyplot as plt
+import networkx as nx
 
 
 def find_angle(layout, start, end, unit=None):

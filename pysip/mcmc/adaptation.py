@@ -77,29 +77,34 @@ class DualAveraging:
 
 class WelfordCovEstimator:
     """Welford's accumulator for sequentially estimating the sample covariance matrix.
-    This method is used for estimating the inverse mass matrix in the HMC
+    This method is used for estimating the inverse mass matrix in the Hamiltonian Monte Carlo
+    sampler.
 
     Args:
-        diagonal: If True, only the sample variance is estimated (diagonal elements)
+        dimension: Number of dimension
+        dense: Estimate the full covariance matrix. By default, only the diagonal elements are
+        estimated
+        shrinkage: Shrink the estimate towards unity
     """
 
-    def __init__(self, dimension: int = 1, diagonal: bool = True):
+    def __init__(self, dimension: int = 1, dense: bool = True, shrinkage: bool = True):
         """Initialize the estimator with the samples dimension"""
-        if not isinstance(diagonal, bool):
-            raise TypeError('`covariance` must be a boolean')
+        if not isinstance(dense, bool):
+            raise TypeError('`dense` must be a boolean')
 
         self._dim = dimension
-        self._diagonal = diagonal
+        self._dense = dense
+        self._shrinkage = shrinkage
         self.restart()
 
     def restart(self):
         """Restart the sample estimator"""
         self._n = 0
-        self._m = np.zeros(self._dim)
-        if self._diagonal:
-            self._m2 = np.zeros(self._dim)
-        else:
+        self._mean = np.zeros(self._dim)
+        if self._dense:
             self._m2 = np.zeros((self._dim, self._dim))
+        else:
+            self._m2 = np.zeros(self._dim)
 
     @property
     def n_sample(self):
@@ -109,22 +114,7 @@ class WelfordCovEstimator:
     @property
     def sample_mean(self):
         """Sample mean"""
-        return self._m
-
-    def get_covariance(self, shrinkage=True):
-        """Sample covariance matrix"""
-        if self._n < 2:
-            raise ValueError('The sample variance is undefinite for `n_samples` < 2')
-        cov = self._m2 / (self._n - 1.0)
-        if shrinkage:
-            cov *= self._n / (self._n + 5.0)
-            shrink = 1e-3 * (5.0 / (self._n + 5.0))
-            if self._diagonal:
-                cov += shrinkage
-            else:
-                cov += shrink * np.eye(cov.shape[0])
-
-        return cov
+        return self._mean
 
     def add_sample(self, sample: np.ndarray):
         """Update the estimator with a new sample
@@ -133,12 +123,25 @@ class WelfordCovEstimator:
             sample: New sample
         """
         self._n += 1
-        delta = sample - self._m
-        self._m += delta / self._n
-        if self._diagonal:
-            self._m2 += delta * (sample - self._m)
+        pre_diff = sample - self._mean
+        self._mean = self._mean + pre_diff / self._n
+        post_diff = sample - self._mean
+        if self._dense:
+            self._m2 = self._m2 + np.outer(post_diff, pre_diff)
         else:
-            self._m2 += np.outer(sample - self._m, delta)
+            self._m2 = self._m2 + post_diff * pre_diff
+
+    def get_covariance(self):
+        """Sample covariance matrix"""
+        cov = self._m2 / (self._n - 1)
+        if self._shrinkage:
+            scaled_cov = cov * (self._n / (self._n + 5))
+            shrinkage = 1e-3 * (5 / (self._n + 5))
+            if self._dense:
+                cov = scaled_cov + shrinkage * np.identity(self._mean.shape[0])
+            else:
+                cov = scaled_cov + shrinkage
+        return cov
 
 
 class WindowedAdaptation:
@@ -174,7 +177,6 @@ class WindowedAdaptation:
                 f' `init_buffer` + `window` + `term_buffer` ='
                 f' {init_buffer + window + term_buffer}'
             )
-
         self._n_adapt = n_adapt
         self._init_buffer = init_buffer
         self._term_buffer = term_buffer
@@ -243,7 +245,7 @@ class CovAdaptation:
 
         if self._schedule.end_adaptation_window:
             self._schedule.compute_next_window()
-            cov = self._estimator.get_covariance(shrinkage=True)
+            cov = self._estimator.get_covariance()
             self._estimator.restart()
             self._schedule.increment_counter()
 

@@ -1,10 +1,11 @@
 import os
-import pytest
+
 import numpy as np
+import pytest
 
 from pysip.regressors import FreqRegressor as Regressor
-from pysip.statespace import TwTi_RoRiAwAicv, TwTiTm_RoRiRmRbAwAicv, Matern12, Matern52, Periodic
-from pysip.utils import save_model, load_model
+from pysip.statespace import Matern12, Matern52, Periodic, TwTi_RoRiAwAicv, TwTiTm_RoRiRmRbAwAicv
+from pysip.utils import load_model, save_model
 
 
 @pytest.mark.parametrize(

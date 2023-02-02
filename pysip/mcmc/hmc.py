@@ -1,18 +1,19 @@
 """Standalone file for Dynamic Hamiltonian Monte Carlo"""
-from typing import Tuple, Iterable, Union, NamedTuple
-from numbers import Real
-from collections import namedtuple, defaultdict
+from collections import defaultdict, namedtuple
 from copy import deepcopy
 from datetime import datetime
-from joblib import Parallel, delayed
-import tqdm.auto as tqdm
+from numbers import Real
+from typing import Iterable, NamedTuple, Tuple, Union
+
 import numpy as np
 import pandas as pd
+import tqdm.auto as tqdm
+from joblib import Parallel, delayed
 from scipy.linalg import LinAlgError
 
+from ..utils.math import cholesky_inverse, log_sum_exp
+from .adaptation import CovAdaptation, DualAveraging, WelfordCovEstimator, WindowedAdaptation
 from .hamiltonian import EuclideanHamiltonian
-from .adaptation import DualAveraging, WindowedAdaptation, WelfordCovEstimator, CovAdaptation
-from ..utils.math import log_sum_exp, cholesky_inverse
 
 State = namedtuple('State', 'q, p V dV dK H')
 
@@ -59,6 +60,11 @@ class DynamicHMC:
             options:
                 - **stepsize** (float, default=0.25 / n_par**0.25)
                     Step-size of the leapfrog integrator
+                - **dense_mass_matrix** (bool, default=False)
+                    Estimate the dense mass matrix during adaptation. By default, only the diagonal
+                    elements are estimated.
+                - **shrinkage** (bool, default=True)
+                    Shrink towards unity the diagonal elements of the estimated mass matrix
                 - **max_tree_depth** (int, default=10)
                     Maximum tree depth
                 - **dH_max** (float, default=1000)
@@ -79,7 +85,7 @@ class DynamicHMC:
                     otherwise valid values are between [1, +Inf[
                 - **init_buffer**: (int, default=75)
                     Width of initial fast adaptation interval
-                - **term_buffer**: (int, default=150)
+                - **term_buffer**: (int, default=100)
                     Width of final fast adaptation interval
                 - **window**: (int, default=25)
                     Initial width of slow adaptation interval
@@ -146,26 +152,27 @@ class DynamicHMC:
 
         # The dictionary of options is saved in the returned fit object
         options.setdefault('accp_target', 0.8)
-        self._accp_target = options.get('accp_target')
         options.setdefault('t0', 10)
-        t0 = options.get('t0')
         options.setdefault('gamma', 0.05)
-        gamma = options.get('gamma')
         options.setdefault('kappa', 0.75)
-        kappa = options.get('kappa')
-        options.setdefault('mu', np.log(10.0 * stepsize))
-        mu = options.get('mu')
+        options.setdefault('mu', np.log(2.0 * stepsize))
         options.setdefault('init_buffer', 75)
-        init_buffer = options.get('init_buffer')
-        options.setdefault('term_buffer', 150)
-        term_buffer = options.get('term_buffer')
+        options.setdefault('term_buffer', 100)
         options.setdefault('window', 25)
-        window = options.get('window')
+        options.setdefault('dense_mass_matrix', False)
+        options.setdefault('shrinkage', True)
+        self._accp_target = options['accp_target']
 
         # Adaptation methods
-        step_adapter = DualAveraging(self._accp_target, t0, gamma, kappa, mu)
-        estimator = WelfordCovEstimator(q.shape[0], False)
-        schedule = WindowedAdaptation(self._n_warmup, init_buffer, term_buffer, window)
+        step_adapter = DualAveraging(
+            self._accp_target, options['t0'], options['gamma'], options['kappa'], options['mu']
+        )
+        estimator = WelfordCovEstimator(
+            q.shape[0], options['dense_mass_matrix'], options['shrinkage']
+        )
+        schedule = WindowedAdaptation(
+            self._n_warmup, options['init_buffer'], options['term_buffer'], options['window']
+        )
         cov_adapter = CovAdaptation(estimator, schedule)
 
         # Sampling
@@ -218,10 +225,13 @@ class DynamicHMC:
             chain: Sampled chain
             stats: Transition statistics
         """
-
         samples = np.zeros((q.shape[0], len(pbar.iterable)))
         stats = defaultdict(list)
         # stepsize = self._find_reasonable_stepsize(q, stepsize)
+
+        # This is experimental
+        tree_depth = deepcopy(self._max_tree_depth)
+        self._max_tree_depth = 8
 
         for i in pbar:
             # HMC step
@@ -237,14 +247,15 @@ class DynamicHMC:
                 stepsize = step_adapter.learn(s['accept_prob'])
                 update, cov = cov_adapter.learn(q)
                 if update:
-                    self._hamiltonian.cholM = cholesky_inverse(cov)
+                    self._hamiltonian.inverse_mass_matrix = cov
                     stepsize = step_adapter.adapted_step_size
                     # stepsize = self._find_reasonable_stepsize(q, stepsize)
-                    # step_adapter.restart(mu=np.log(10.0 * stepsize))
+                    step_adapter.restart(mu=np.log(2.0 * stepsize))
 
                 # End of adaptation
                 if i == self._n_warmup - 1:
                     stepsize = step_adapter.adapted_step_size
+                    self._max_tree_depth = tree_depth
 
         return samples, stats
 
@@ -259,7 +270,7 @@ class DynamicHMC:
             Hamiltonian state
         """
 
-        V, dV = self._hamiltonian.dV(q)
+        V, dV = self._hamiltonian.V_and_dV(q)
         H = V + self._hamiltonian.K(p)
         dK = self._hamiltonian.dK(p)
 
@@ -279,7 +290,6 @@ class DynamicHMC:
 
         # Draw momentum
         p = self._hamiltonian.sample_p()
-
         # Compute Hamiltonian state
         state = self._hamiltonian_state(q, p)
 
@@ -483,7 +493,7 @@ class DynamicHMC:
         dt = direction * stepsize
         p -= 0.5 * dt * state.dV
         q += dt * self._hamiltonian.dK(p)
-        V, dV = self._hamiltonian.dV(q)
+        V, dV = self._hamiltonian.V_and_dV(q)
         p -= 0.5 * dt * dV
 
         # Required for u-turn criterion and building the binary tree
@@ -491,53 +501,6 @@ class DynamicHMC:
         H = V + self._hamiltonian.K(p)
 
         return State(q, p, V, dV, dK, H)
-
-    def _find_reasonable_stepsize(self, q: np.ndarray, stepsize: float) -> float:
-        """Find a reasonable step-size by heuristic tuning
-
-        Args:
-            q: Position variable in phase space
-            stepsize: Initial step-size
-
-        Returns:
-            stepsize: Heuristic adaptation of the step-size
-        """
-        if stepsize < 1e-16 or stepsize > 1e7:
-            return
-
-        log_target = np.log(self._accp_target)
-        V, dV = self._hamiltonian.dV(q)
-        p = self._hamiltonian.sample_p()
-        H = V + self._hamiltonian.K(p)
-        state0 = State(q, p, V, dV, None, H)
-        state1 = self._leapfrog_step(state0, 1, stepsize)
-        dH = state0.H - state1.H
-        if np.isnan(dH):
-            dH = -np.inf
-        direction = 2 * (dH > log_target) - 1
-
-        while True:
-            p = self._hamiltonian.sample_p()
-            H = V + self._hamiltonian.K(p)
-            state0 = State(q, p, V, dV, None, H)
-            state1 = self._leapfrog_step(state0, direction, stepsize)
-            dH = state0.H - state1.H
-            if np.isnan(dH):
-                dH = -np.inf
-
-            if direction == 1 and not dH > log_target:
-                break
-            elif direction == -1 and not dH < log_target:
-                break
-            else:
-                stepsize *= 2.0 ** direction
-
-            if stepsize < 1e-16:
-                raise RuntimeError('No acceptably small step-size could be found')
-            if stepsize > 1e7:
-                raise RuntimeError('The step-size diverged to an unacceptable large value')
-
-        return stepsize
 
 
 class Fit_Bayes:

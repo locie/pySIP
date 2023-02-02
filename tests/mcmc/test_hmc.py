@@ -1,5 +1,7 @@
-import pytest
 import numpy as np
+import pytest
+
+from pysip.mcmc.metrics import Dense, Diagonal
 from pysip.mcmc.hamiltonian import EuclideanHamiltonian
 from pysip.mcmc.hmc import DynamicHMC, Fit_Bayes
 
@@ -15,9 +17,11 @@ def mvn_data(n_dim=50):
     return mean, prec, n_dim, rng
 
 
-def test_mvn_dhmc(mvn_data):
+@pytest.mark.parametrize('dense_mass_matrix', [False, True])
+def test_mvn_dhmc(mvn_data, dense_mass_matrix):
     """Multivariate Normal distribution dHMC test"""
     mean, prec, n_dim, rng = mvn_data
+    n_chains = 4
 
     def dV(q):
         e = q - mean
@@ -25,12 +29,20 @@ def test_mvn_dhmc(mvn_data):
         dv = prec @ e
         return v, dv
 
-    dHMC = DynamicHMC(EuclideanHamiltonian(V=None, dV=dV, M=np.eye(n_dim)))
-    n_chains = 4
+    if dense_mass_matrix is True:
+        metric = Dense(np.identity(n_dim))
+    else:
+        metric = Diagonal(np.ones(n_dim))
+
+    dHMC = DynamicHMC(EuclideanHamiltonian(potential=dV, metric=metric))
     q0 = rng.normal(size=(n_dim, n_chains))
 
     chains, stats, options = dHMC.sample(
-        q=q0, n_chains=4, n_draws=2500, n_warmup=1000, options={'n_cpu': 1}
+        q=q0,
+        n_chains=n_chains,
+        n_draws=2500,
+        n_warmup=1000,
+        options={'n_cpu': 1, 'dense_mass_matrix': dense_mass_matrix},
     )
     fit = Fit_Bayes(chains=chains, stats=stats, options=options, n_warmup=1000)
     df = fit.diagnostic

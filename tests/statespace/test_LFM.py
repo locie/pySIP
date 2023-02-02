@@ -1,10 +1,12 @@
+from copy import deepcopy
+
+import numdifftools as nd
 import numpy as np
 import pandas as pd
-import numdifftools as nd
 import pytest
-from copy import deepcopy
+
 from pysip.regressors import FreqRegressor as Regressor
-from pysip.statespace import R2C2Qgh, Matern32, LatentForceModel, R2C2_Qgh_Matern32
+from pysip.statespace import LatentForceModel, Matern32, R2C2_Qgh_Matern32, R2C2Qgh
 from pysip.utils import generate_random_binary, generate_sine, ned
 
 sT = 24.0 * 60.0

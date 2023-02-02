@@ -1,8 +1,10 @@
-from typing import Tuple, Union, NamedTuple
-import numpy as np
-from .base import BayesianFilter
 from copy import deepcopy
-from scipy.linalg import LinAlgError
+from typing import NamedTuple, Tuple, Union
+
+import numpy as np
+from scipy.linalg import LinAlgError, LinAlgWarning, solve_triangular
+from numpy.linalg import solve, lstsq
+from .base import BayesianFilter
 
 
 class Kalman_QR(BayesianFilter):
@@ -43,11 +45,7 @@ class Kalman_QR(BayesianFilter):
                 - **x**: Prior state mean
                 - **P**: Prior state deviation
         """
-        nx = Ad.shape[0]
-        Arrp = np.zeros((2 * nx, nx))
-        Arrp[nx:, :] = Qd
-        Arrp[:nx, :] = P @ Ad.T
-        P = np.linalg.qr(Arrp, 'r')
+        P = np.linalg.qr(np.vstack([P @ Ad.T, Qd]), 'r')
         x = Ad @ x + B0d @ u + B1d @ u1
 
         return x, P
@@ -95,21 +93,13 @@ class Kalman_QR(BayesianFilter):
                 - **dP**: Derivative prior state deviation
         """
 
-        npar, nx, _ = dAd.shape
-        Arrp = np.zeros((2 * nx, nx))
-        dArrp = np.zeros((npar, 2 * nx, nx))
-
-        Arrp[nx:, :] = Qd
-        Arrp[:nx, :] = P @ Ad.T
-
-        dArrp[:, nx:, :] = dQd
-        dArrp[:, :nx, :] = dP @ Ad.T + P @ dAd.swapaxes(1, 2)
-
-        Q, P = np.linalg.qr(Arrp)
+        dArrp = np.hstack([dP @ Ad.T + P @ dAd.swapaxes(1, 2), dQd])
+        Q, P = np.linalg.qr(np.vstack([P @ Ad.T, Qd]))
+        inner = dArrp.swapaxes(1, 2) @ Q
         try:
-            tmp = np.linalg.solve(P.T, dArrp.swapaxes(1, 2) @ Q).swapaxes(1, 2)
-        except (LinAlgError, RuntimeError):
-            tmp = Q.T @ dArrp @ np.linalg.pinv(P)
+            tmp = solve(P.T, inner).swapaxes(1, 2)
+        except (LinAlgError, LinAlgWarning):
+            tmp = inner.swapaxes(1, 2) @ np.linalg.pinv(P)
         dP = (np.swapaxes(np.tril(tmp, -1), 1, 2) + np.triu(tmp)) @ P
 
         dx = dAd @ x + Ad @ dx + dB0d @ u + dB1d @ u1
@@ -156,9 +146,9 @@ class Kalman_QR(BayesianFilter):
 
         if ny > 1:
             try:
-                e = np.linalg.solve(S, y - C @ x - D @ u)
-            except (LinAlgError, RuntimeError):
-                e = np.linalg.pinv(S) @ (y - C @ x - D @ u)
+                e = solve(S, y - C @ x - D @ u)
+            except (LinAlgWarning, LinAlgError):
+                e = lstsq(S, y - C @ x - D @ u, rcond=-1)[0]
         else:
             e = (y - C @ x - D @ u) / S
 
@@ -231,10 +221,11 @@ class Kalman_QR(BayesianFilter):
         dArru[:, ny:, ny:] = dP
 
         Q, Post = np.linalg.qr(Arru)
+        inner = dArru.swapaxes(1, 2) @ Q
         try:
-            tmp = np.linalg.solve(Post.T, dArru.swapaxes(1, 2) @ Q).swapaxes(1, 2)
-        except (LinAlgError, RuntimeError):
-            tmp = Q.T @ dArru @ np.linalg.pinv(Post)
+            tmp = np.linalg.solve(Post.T, inner).swapaxes(1, 2)
+        except (LinAlgError, LinAlgWarning):
+            tmp = inner.swapaxes(1, 2) @ np.linalg.pinv(Post)
         dPost = (np.swapaxes(np.tril(tmp, -1), 1, 2) + np.triu(tmp)) @ Post
 
         K = Post[:ny, ny:].T
@@ -243,9 +234,9 @@ class Kalman_QR(BayesianFilter):
 
         if ny > 1:
             try:
-                e = np.linalg.solve(S, y - C @ x - D @ u)
-                de = np.linalg.solve(-S, dS @ e + dC @ x + C @ dx + dD @ u)
-            except (LinAlgError, RuntimeError):
+                e = solve(S, y - C @ x - D @ u)
+                de = solve(-S, dS @ e + dC @ x + C @ dx + dD @ u)
+            except (LinAlgWarning, LinAlgError):
                 invS = np.linalg.pinv(S)
                 e = invS @ (y - C @ x - D @ u)
                 de = -invS @ (dS @ e + dC @ x + C @ dx + dD @ u)
@@ -523,13 +514,15 @@ class Kalman_QR(BayesianFilter):
         for t in reversed(range(T - 1)):
             # smoother gain (note: Pp and Ps are symmetric)
             try:
-                G = np.linalg.solve(Pp[t + 1, :, :], ssm.A[index[t], :, :] @ Ps[t, :, :]).T
-            except (LinAlgError, RuntimeError):
-                G = Ps[t, :, :] @ ssm.A[index[t], :, :].T @ np.linalg.pinv(Pp[t + 1, :, :])
+                G = solve(Pp[t + 1, :, :], ssm.A[index[t], :, :] @ Ps[t, :, :]).T
+            except (LinAlgWarning, LinAlgError):
+                G = lstsq(Pp[t + 1, :, :], ssm.A[index[t], :, :] @ Ps[t, :, :], rcond=-1)[0].T
 
             # smoothed state mean and covariance
             xs[t, :, :] += G @ (xs[t + 1, :, :] - xp[t + 1, :, :])
             Ps[t, :, :] += G @ (Ps[t + 1, :, :] - Pp[t + 1, :, :]) @ G.T
+
+        del xp, Pp
 
         return xs, Ps
 

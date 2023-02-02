@@ -1,7 +1,26 @@
 from dataclasses import dataclass
+
 import numpy as np
-from .base import StateSpace, GPModel, RCModel
+from typing import Tuple
+from .base import GPModel, RCModel, StateSpace
 from .nodes import Par
+
+from .discretization import (
+    expm_triu,
+    dexpm_triu,
+    disc_state_input,
+    disc_d_state_input,
+    disc_state,
+    disc_d_state,
+    disc_diffusion_mfd,
+    disc_d_diffusion_mfd,
+    disc_diffusion_lyap,
+    disc_d_diffusion_lyap,
+)
+from ..utils.math import nearest_cholesky, diff_upper_cholesky
+
+from scipy.linalg import LinAlgError
+from numpy.linalg import cond
 
 
 @dataclass
@@ -162,6 +181,131 @@ class LatentForceModel(StateSpace):
             self.dx0[_gp + n][self._rc.nx :] = self._gp.dx0[n]
 
             self.dP0[_gp + n][self._rc.nx :, self._rc.nx :] = self._gp.dP0[n]
+
+    def _lti_disc(self, dt: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        """Discretization of Linear Time Invariant Latent Force Model
+
+        Given the block upper triangular form of the state matrix, the Parlett's method is used for
+        computing the discrete state matrix.
+
+        Args:
+            dt: sampling time
+
+        Returns:
+            4-elements tuple containing
+                - **Ad**: Discrete state matrix
+                - **B0d**: Discrete input matrix (zero order hold)
+                - **B1d**: Discrete input matrix (first order hold)
+                - **Qd**: Upper Cholesky factor of the process noise covariance
+        """
+        if cond(self._rc.A, 'fro') < 1e12:
+            method = 'analytic'
+        else:
+            method = 'expm'
+
+        F11, G0, G1 = disc_state_input(
+            self._rc.A, self.B[: self._rc.nx, :], dt, self.hold_order, method
+        )
+
+        F22 = disc_state(self._gp.A, dt)
+        A12 = self.A[: self._rc.nx, self._rc.nx :]
+        Ad = expm_triu(self._rc.A, A12, self._gp.A, dt, F11, F22)
+
+        Oxu = np.zeros((self._gp.nx, self.nu))
+        B0d = np.vstack([G0, Oxu])
+        B1d = np.vstack([G1, Oxu])
+
+        if np.all(np.real(np.linalg.eigvals(self.A)) < 0):
+            Q = disc_diffusion_lyap(self.A, self.Q.T @ self.Q, Ad)
+        else:
+            Q = disc_diffusion_mfd(self.A, self.Q.T @ self.Q, dt)
+
+        return Ad, B0d, B1d, nearest_cholesky(Q)
+
+    def _lti_jacobian_disc(
+        self, dt: float, dA: np.ndarray, dB: np.ndarray, dQ: np.ndarray
+    ) -> Tuple[
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+    ]:
+        """Discretization of augmented temportal Gaussian Process
+
+        Args:
+            dt: Sampling time
+            dA: Jacobian state matrix
+            dB: Jacobian input matrix
+            dQ: Derivative Wiener process scaling matrix
+
+        Returns:
+            8-elements tuple containing
+                - **Ad**: Discrete state matrix
+                - **B0d**: Discrete input matrix (zero order hold)
+                - **B1d**: Discrete input matrix (first order hold)
+                - **Qd**: Upper Cholesky factor of the process noise covariance matrix
+                - **dAd**: Jacobian discrete state matrix
+                - **dB0d**: Jacobian discrete input matrix (zero order hold)
+                - **dB1d**: Jacobian discrete input matrix (first order hold)
+                - **dQd**: Jacobian of the upper Cholesky factor of the process noise covariance
+        """
+        nj, nx, nu = dB.shape
+        n = self._rc.nx
+
+        if cond(self._rc.A, 'fro') < 1e12:
+            method = 'analytic'
+        else:
+            method = 'expm'
+
+        dA11 = dA[:, :n, :n]
+        dA22 = dA[:, n:, n:]
+
+        F11, G0, G1, dF11, dG0, dG1 = disc_d_state_input(
+            self._rc.A, self.B[:n, :], dA11, dB[:, :n, :], dt, self.hold_order, method
+        )
+
+        F22, dF22 = disc_d_state(self._gp.A, dA22, dt)
+
+        Ad, dAd = dexpm_triu(
+            self._rc.A,
+            self.A[:n, n:],
+            self._gp.A,
+            dA11,
+            dA[:, :n, n:],
+            dA22,
+            dt,
+            F11,
+            F22,
+            dF11,
+            dF22,
+        )
+
+        Oxu = np.zeros((self._gp.nx, nu))
+        B0d = np.vstack([G0, Oxu])
+        B1d = np.vstack([G1, Oxu])
+        dB0d = np.zeros((nj, nx, nu))
+        dB1d = np.zeros((nj, nx, nu))
+        dB0d[:, :n, :] = dG0
+        dB1d[:, :n, :] = dG1
+
+        Qc = self.Q.T @ self.Q
+        dQc = dQ.swapaxes(1, 2) @ self.Q + self.Q.T @ dQ
+        if np.all(np.real(np.linalg.eigvals(self.A)) < 0):
+            Qcd, dQcd = disc_d_diffusion_lyap(self.A, Qc, Ad, dA, dQc, dAd)
+        else:
+            Qcd, dQcd = disc_d_diffusion_mfd(self.A, Qc, dA, dQc, dt)
+
+        Qd = nearest_cholesky(Qcd)
+        dQd = np.zeros((nj, self.nx, self.nx))
+        for n in range(nj):
+            if dQcd[n].any():
+                dQd[n] = diff_upper_cholesky(Qd, dQcd[n])
+
+        return Ad, B0d, B1d, Qd, dAd, dB0d, dB1d, dQd
 
 
 @dataclass

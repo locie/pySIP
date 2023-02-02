@@ -1,15 +1,17 @@
-from typing import Tuple, Union
 from numbers import Real
+from typing import Tuple, Union
+
 import numpy as np
 import pandas as pd
 from joblib import Parallel, delayed
 from tqdm import tqdm
 
-from .base import BaseRegressor
-from ..state_estimator import BayesianFilter, Kalman_QR
 from ..mcmc.hamiltonian import EuclideanHamiltonian
+from ..mcmc.metrics import Diagonal, Dense
 from ..mcmc.hmc import DynamicHMC, Fit_Bayes
+from ..state_estimator import BayesianFilter, Kalman_QR
 from ..statespace.base import StateSpace
+from .base import BaseRegressor
 
 
 class BayesRegressor(BaseRegressor):
@@ -43,6 +45,9 @@ class BayesRegressor(BaseRegressor):
             options:
                 - **stepsize** (float, default=0.25 / n_par**0.25)
                     Step-size of the leapfrog integrator
+                - **dense_mass_matrix** (bool, default=False)
+                    Estimate the dense mass matrix during adaptation. By default, only the diagonal
+                    elements are estimated.
                 - **max_tree_depth** (int, default=10)
                     Maximum tree depth
                 - **dH_max** (float, default=1000)
@@ -91,6 +96,9 @@ class BayesRegressor(BaseRegressor):
         options.setdefault('n_warmup', 1000)
         options.setdefault('init', 'unconstrained')
         options.setdefault('hpd', 0.95)
+        options.setdefault('dense_mass_matrix', False)
+        if not isinstance(options['dense_mass_matrix'], bool):
+            raise TypeError('`dense_mass_matrix` must be a boolean')
 
         n_draws = options.get('n_draws')
         n_chains = options.get('n_chains')
@@ -102,11 +110,16 @@ class BayesRegressor(BaseRegressor):
 
         # An additional initial position is required for the adaptation
         q0 = self._init_parameters(n_chains, init, hpd)
-        V = lambda q: self._eval_log_posterior(q, dt, u, u1, y)
-        dV = lambda q: self._eval_dlog_posterior(q, dt, u, u1, y)
-        M = np.eye(len(self.ss.parameters.eta_free))
 
-        dhmc = DynamicHMC(EuclideanHamiltonian(V=V, dV=dV, M=M))
+        def dV(q):
+            return self._eval_dlog_posterior(q, dt, u, u1, y)
+
+        if options['dense_mass_matrix'] is True:
+            metric = Dense(inverse_metric=np.identity(q0.shape[0]))
+        else:
+            metric = Diagonal(inverse_metric=np.ones(q0.shape[0]))
+
+        dhmc = DynamicHMC(EuclideanHamiltonian(potential=dV, metric=metric))
         uchains, stats, options = dhmc.sample(q0, n_draws, n_chains, n_warmup, options)
 
         # Safety against duplication of parameter names. Do not use self.ss.parameters.names
@@ -201,7 +214,8 @@ class BayesRegressor(BaseRegressor):
 
         chain, draw = list(trace.values())[0].shape
         n_draws = chain * draw
-        samples = self._dict_to_array(trace, self.ss.parameters.names_free)
+        names = [n for n, f in zip(self.ss._names, self.ss.parameters.free) if f]
+        samples = self._dict_to_array(trace, names)
 
         def posterior_pd(index):
             self.ss.parameters.theta_free = samples[:, index]
@@ -242,7 +256,8 @@ class BayesRegressor(BaseRegressor):
 
         dt, u, u1, y, *_ = self._prepare_data(df, inputs, outputs, None)
         chain, draw = list(trace.values())[0].shape
-        samples = self._dict_to_array(trace, self.ss.parameters.names_free)
+        names = [n for n, f in zip(self.ss._names, self.ss.parameters.free) if f]
+        samples = self._dict_to_array(trace, names)
 
         def eval_loglik_pw(index):
             self.ss.parameters.theta_free = samples[:, index]
