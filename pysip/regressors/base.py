@@ -313,7 +313,7 @@ class BaseRegressor:
 
         # Output array
         if outputs is None:
-            y = np.full((self.ss.ny, n), np.nan, np.float)
+            y = np.full((self.ss.ny, n), np.nan, np.float64)
         else:
             if not isinstance(outputs, (str, list)):
                 raise TypeError("the output names must be a string or a list")
@@ -329,7 +329,7 @@ class BaseRegressor:
                 raise TypeError('The output vector must contains numerical values or numpy.nan')
 
             if tnew is not None:
-                y = np.append(y, np.full((self.ss.ny, tp.shape[0]), np.nan, np.float), axis=1)
+                y = np.append(y, np.full((self.ss.ny, tp.shape[0]), np.nan, np.float64), axis=1)
                 y = y[:, index]
 
         return dt, u, u1, y, index_back
