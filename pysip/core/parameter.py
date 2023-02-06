@@ -3,7 +3,7 @@ from typing import Tuple
 
 import numpy as np
 
-from .prior import Prior
+from .prior import BasePrior
 
 
 class Parameter(object):
@@ -54,7 +54,7 @@ class Parameter(object):
         scale: Real = 1.0,
         transform: str = None,
         bounds: Tuple[Real] = (None, None),
-        prior: Prior = None,
+        prior: BasePrior = None,
         **kwargs,
     ):
 
@@ -121,7 +121,7 @@ class Parameter(object):
         if transform in ["upper", "logit"] and self.value >= ub:
             raise ValueError("`value` is outside the bounds")
 
-        if prior is not None and not isinstance(prior, Prior):
+        if prior is not None and not isinstance(prior, BasePrior):
             raise ValueError("`prior` must be an instance of Prior")
         self.prior = prior
 

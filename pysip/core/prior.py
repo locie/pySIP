@@ -7,7 +7,7 @@ from scipy import optimize, special, stats
 __ALL__ = ["Normal", "Gamma", "Beta", "InverseGamma", "LogNormal"]
 
 
-class Prior:
+class BasePrior:
     """Prior class template
 
     The notation from the following book are used throughout the module:
@@ -92,7 +92,7 @@ class Prior:
         return rvs
 
 
-class Normal(Prior):
+class Normal(BasePrior):
     """Normal distribution
 
     Args:
@@ -186,7 +186,7 @@ class Normal(Prior):
             print("\nTry different initial values")
 
 
-class Gamma(Prior):
+class Gamma(BasePrior):
     """Gamma distribution
 
     Args:
@@ -248,7 +248,7 @@ class Gamma(Prior):
         return self._random(n, hpd, f_rvs, f_ppf)
 
 
-class Beta(Prior):
+class Beta(BasePrior):
     """Beta distribution
 
     Args:
@@ -308,7 +308,7 @@ class Beta(Prior):
         return self._random(n, hpd, f_rvs, f_ppf)
 
 
-class InverseGamma(Prior):
+class InverseGamma(BasePrior):
     """Inverse Gamma distribution
 
     Args:
@@ -413,7 +413,7 @@ class InverseGamma(Prior):
             print("\nTry different initial values")
 
 
-class LogNormal(Prior):
+class LogNormal(BasePrior):
     """LogNormal distribution
 
     Args:
