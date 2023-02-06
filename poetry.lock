@@ -1013,7 +1013,6 @@ packaging = ">=20.0"
 pillow = ">=6.2.0"
 pyparsing = ">=2.2.1"
 python-dateutil = ">=2.7"
-setuptools_scm = ">=7"
 
 [[package]]
 name = "matplotlib-inline"
@@ -1228,8 +1227,8 @@ files = [
 
 [package.dependencies]
 numpy = [
-    {version = ">=1.21.0", markers = "python_version >= \"3.10\""},
     {version = ">=1.20.3", markers = "python_version < \"3.10\""},
+    {version = ">=1.21.0", markers = "python_version >= \"3.10\""},
 ]
 python-dateutil = ">=2.8.1"
 pytz = ">=2020.1"
@@ -1670,6 +1669,13 @@ files = [
     {file = "PyYAML-6.0-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:f84fbc98b019fef2ee9a1cb3ce93e3187a6df0b2538a651bfb890254ba9f90b5"},
     {file = "PyYAML-6.0-cp310-cp310-win32.whl", hash = "sha256:2cd5df3de48857ed0544b34e2d40e9fac445930039f3cfe4bcc592a1f836d513"},
     {file = "PyYAML-6.0-cp310-cp310-win_amd64.whl", hash = "sha256:daf496c58a8c52083df09b80c860005194014c3698698d1a57cbcfa182142a3a"},
+    {file = "PyYAML-6.0-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:d4b0ba9512519522b118090257be113b9468d804b19d63c71dbcf4a48fa32358"},
+    {file = "PyYAML-6.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:81957921f441d50af23654aa6c5e5eaf9b06aba7f0a19c18a538dc7ef291c5a1"},
+    {file = "PyYAML-6.0-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:afa17f5bc4d1b10afd4466fd3a44dc0e245382deca5b3c353d8b757f9e3ecb8d"},
+    {file = "PyYAML-6.0-cp311-cp311-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:dbad0e9d368bb989f4515da330b88a057617d16b6a8245084f1b05400f24609f"},
+    {file = "PyYAML-6.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:432557aa2c09802be39460360ddffd48156e30721f5e8d917f01d31694216782"},
+    {file = "PyYAML-6.0-cp311-cp311-win32.whl", hash = "sha256:bfaef573a63ba8923503d27530362590ff4f576c626d86a9fed95822a8255fd7"},
+    {file = "PyYAML-6.0-cp311-cp311-win_amd64.whl", hash = "sha256:01b45c0191e6d66c470b6cf1b9531a771a83c1c4208272ead47a3ae4f2f603bf"},
     {file = "PyYAML-6.0-cp36-cp36m-macosx_10_9_x86_64.whl", hash = "sha256:897b80890765f037df3403d22bab41627ca8811ae55e9a722fd0392850ec4d86"},
     {file = "PyYAML-6.0-cp36-cp36m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:50602afada6d6cbfad699b0c7bb50d5ccffa7e46a3d738092afddc1f9758427f"},
     {file = "PyYAML-6.0-cp36-cp36m-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:48c346915c114f5fdb3ead70312bd042a953a8ce5c7106d5bfb1a5254e47da92"},
@@ -1809,6 +1815,32 @@ socks = ["PySocks (>=1.5.6,!=1.5.7)"]
 use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
+name = "ruff"
+version = "0.0.241"
+description = "An extremely fast Python linter, written in Rust."
+category = "dev"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "ruff-0.0.241-py3-none-macosx_10_7_x86_64.whl", hash = "sha256:2bebc3caa5a1efd528a427f466a6b1210349766d1438af859a4bf89516a2268a"},
+    {file = "ruff-0.0.241-py3-none-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:7271ff412f60308a2ef3c24d950911532e1327e13b2ede5b1dac92c596e73782"},
+    {file = "ruff-0.0.241-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:7a67284d77413cc680c049b741145b7d7787bd5253777e93cccab99008aea4ba"},
+    {file = "ruff-0.0.241-py3-none-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:6c6408aa688e8bab8610d0a6b78689462ced5aa6bc79dd2e89e22b4461ef962d"},
+    {file = "ruff-0.0.241-py3-none-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:7a3f833d1b7149d2660b577245010243211a524bd6695ad10e26f5b9fb130e69"},
+    {file = "ruff-0.0.241-py3-none-manylinux_2_17_ppc64.manylinux2014_ppc64.whl", hash = "sha256:c16f1146a87d6365b8537dfb6c9572e86c374bb1cc5fe01ca6bceb189d9e0b15"},
+    {file = "ruff-0.0.241-py3-none-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:ab85d063020556238d38f8ae74c84a45968ceb3b394b1b5e7f38273b5ed80f3b"},
+    {file = "ruff-0.0.241-py3-none-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:8630f9457184e05dfdc7452832fcc6942355f4d4caf5e966d949874654e43569"},
+    {file = "ruff-0.0.241-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:c97c5c87e0c9666c3e35fd370cbe8b01624c3d359667c4152f03f252db540e21"},
+    {file = "ruff-0.0.241-py3-none-musllinux_1_2_aarch64.whl", hash = "sha256:972436a823ef8e9496d6cbfee58412278ef0290ef1e9794510f9eee7c3a12283"},
+    {file = "ruff-0.0.241-py3-none-musllinux_1_2_armv7l.whl", hash = "sha256:ff1abbba49b67508e3a1595cc64fc4b1a661f4a0ffb6247f49098b602313ad78"},
+    {file = "ruff-0.0.241-py3-none-musllinux_1_2_i686.whl", hash = "sha256:5691ed16b981825dc73ed1bde066ec8122883cc0c4bf71cf20c1ab5e9bd22e9f"},
+    {file = "ruff-0.0.241-py3-none-musllinux_1_2_x86_64.whl", hash = "sha256:0155e834564ebc750c97b271038e118a7ee44f319363e32667248cbf298fece3"},
+    {file = "ruff-0.0.241-py3-none-win32.whl", hash = "sha256:017d6011ceb8d27c320f4e105e62794fcd8fbe8467abf4f0de3166d0b1768f5e"},
+    {file = "ruff-0.0.241-py3-none-win_amd64.whl", hash = "sha256:201c84c9acf450041a949bd5eb4a4599df63a358ef79df723bd839e8067da139"},
+    {file = "ruff-0.0.241.tar.gz", hash = "sha256:2e16873052e3c524eed41f4d55e96c0d3ec95489d1bf9a36f71311b5ada359b1"},
+]
+
+[[package]]
 name = "scipy"
 version = "1.9.3"
 description = "Fundamental algorithms for scientific computing in Python"
@@ -1863,28 +1895,6 @@ files = [
 docs = ["furo", "jaraco.packaging (>=9)", "jaraco.tidelift (>=1.4)", "pygments-github-lexers (==0.0.5)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-favicon", "sphinx-hoverxref (<2)", "sphinx-inline-tabs", "sphinx-notfound-page (==0.8.3)", "sphinx-reredirects", "sphinxcontrib-towncrier"]
 testing = ["build[virtualenv]", "filelock (>=3.4.0)", "flake8 (<5)", "flake8-2020", "ini2toml[lite] (>=0.9)", "jaraco.envs (>=2.2)", "jaraco.path (>=3.2.0)", "pip (>=19.1)", "pip-run (>=8.8)", "pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=1.3)", "pytest-flake8", "pytest-mypy (>=0.9.1)", "pytest-perf", "pytest-timeout", "pytest-xdist", "tomli-w (>=1.0.0)", "virtualenv (>=13.0.0)", "wheel"]
 testing-integration = ["build[virtualenv]", "filelock (>=3.4.0)", "jaraco.envs (>=2.2)", "jaraco.path (>=3.2.0)", "pytest", "pytest-enabler", "pytest-xdist", "tomli", "virtualenv (>=13.0.0)", "wheel"]
-
-[[package]]
-name = "setuptools-scm"
-version = "7.0.5"
-description = "the blessed package to manage your versions by scm tags"
-category = "main"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "setuptools_scm-7.0.5-py3-none-any.whl", hash = "sha256:7930f720905e03ccd1e1d821db521bff7ec2ac9cf0ceb6552dd73d24a45d3b02"},
-    {file = "setuptools_scm-7.0.5.tar.gz", hash = "sha256:031e13af771d6f892b941adb6ea04545bbf91ebc5ce68c78aaf3fff6e1fb4844"},
-]
-
-[package.dependencies]
-packaging = ">=20.0"
-setuptools = "*"
-tomli = ">=1.0.0"
-typing-extensions = "*"
-
-[package.extras]
-test = ["pytest (>=6.2)", "virtualenv (>20)"]
-toml = ["setuptools (>=42)"]
 
 [[package]]
 name = "six"
@@ -2130,7 +2140,7 @@ files = [
 name = "tomli"
 version = "2.0.1"
 description = "A lil' TOML parser"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -2351,4 +2361,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "49894cd9fc25c568d1a3cf9d1857babb84da0ab35e93bc02e68c066c9bc7ba29"
+content-hash = "a9e06116979ab60fed1632a085308a62016e155d700ee9621d188230d17a1ffd"
