@@ -164,3 +164,4 @@ cython_debug/
 # Place to prototype and interactive test code
 _proto
 test.pickle
+.ruff_cache/
