@@ -1,3 +1,4 @@
+# TODO : use pathlib to rewrite that / make it less "magic"
 import pickle
 import warnings
 
