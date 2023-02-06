@@ -97,23 +97,18 @@ class FreqRegressor(BaseRegressor):
         corr_matrix = inv_sig_theta @ cov_theta @ inv_sig_theta
         pd.set_option("display.float_format", "{:.3e}".format)
         df = pd.DataFrame(
+            data=np.vstack(
+                [
+                    self.ss.parameters.theta_free,
+                    sig_theta,
+                    ttest(self.ss.parameters.theta_free, sig_theta, data[2].shape[1]),
+                    np.abs(results.jac),
+                    np.abs(self.ss.parameters.d_penalty),
+                ]
+            ).T,
+            columns=["θ", "σ(θ)", "pvalue", "|g(η)|", "dpen(θ)|"],
             index=self.ss.parameters.names_free,
-            columns=[
-                "\u03B8",
-                "\u03C3(\u03B8)",
-                "pvalue",
-                "|g(\u03B7)|",
-                "|dpen(\u03B8)|",
-            ],
         )
-        df.iloc[:, 0] = self.ss.parameters.theta_free
-        df.iloc[:, 1] = sig_theta
-        df.iloc[:, 2] = ttest(
-            self.ss.parameters.theta_free, sig_theta, data[2].shape[1]
-        )
-        df.iloc[:, 3] = np.abs(results.jac)
-        df.iloc[:, 4] = np.abs(self.ss.parameters.d_penalty)
-
         df_corr = pd.DataFrame(
             data=corr_matrix,
             index=self.ss.parameters.names_free,
