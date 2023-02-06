@@ -1,7 +1,6 @@
 from typing import Callable, Tuple
 
 import numpy as np
-import scipy.linalg as sla
 
 from .metrics import EuclideanMetric
 

@@ -3,7 +3,7 @@ from collections import defaultdict, namedtuple
 from copy import deepcopy
 from datetime import datetime
 from numbers import Real
-from typing import Iterable, NamedTuple, Tuple, Union
+from typing import NamedTuple, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -11,7 +11,7 @@ import tqdm.auto as tqdm
 from joblib import Parallel, delayed
 from scipy.linalg import LinAlgError
 
-from ..utils.math import cholesky_inverse, log_sum_exp
+from ..utils.math import log_sum_exp
 from .adaptation import (
     CovAdaptation,
     DualAveraging,
@@ -122,13 +122,13 @@ class DynamicHMC:
 
         if len(q.shape) == 1:
             if n_chains != 1:
-                raise ValueError(f"The position array `q` must be an 1d array")
+                raise ValueError("The position array `q` must be an 1d array")
         else:
             if q.shape[1] != n_chains:
                 raise ValueError(f"The position array `q` must have {n_chains} columns")
 
         if n_warmup < 1000:
-            raise ValueError(f"`n_warmup` must be at least 1000 iterations")
+            raise ValueError("`n_warmup` must be at least 1000 iterations")
         self._n_warmup = n_warmup
 
         # Check and  unpack options

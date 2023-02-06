@@ -35,7 +35,7 @@ class MetaStateSpace(type):
                     )
 
         if hasattr(self, "params"):
-            lines += ["", f"**Model parameters**", ""]
+            lines += ["", "**Model parameters**", ""]
             categories = set([Node(*x).category for x in self.params])
             categories = {c: [] for c in categories}
             for x in self.params:

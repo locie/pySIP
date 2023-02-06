@@ -3,7 +3,6 @@ The algorithm may fail because of the random initialization, try to re-run the e
 """
 import arviz as az
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 import seaborn as sns
 

@@ -3,7 +3,6 @@ from typing import Tuple
 
 import numpy as np
 from numpy.linalg import cond
-from scipy.linalg import LinAlgError
 
 from ..utils.math import diff_upper_cholesky, nearest_cholesky
 from .base import GPModel, RCModel, StateSpace

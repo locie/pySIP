@@ -1,4 +1,3 @@
-import numpy as np
 import pytest
 
 from pysip.statespace import GPSum, Matern12, Matern32, Matern52

@@ -1,7 +1,7 @@
 from collections import defaultdict, namedtuple
 from dataclasses import dataclass, field
 from functools import partial
-from typing import NamedTuple, Tuple, Union
+from typing import NamedTuple, Tuple
 
 import numpy as np
 

@@ -1,7 +1,6 @@
 import itertools
 
 import numpy as np
-import pylfsr
 from pylfsr import LFSR
 
 

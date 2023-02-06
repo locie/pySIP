@@ -2,11 +2,9 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from pysip.utils.draw import TikzStateSpace
 from pysip.utils.math import diff_upper_cholesky, nearest_cholesky
 
 from ..base import GPModel
-from ..discretization import disc_d_diffusion_stationary, disc_diffusion_stationary
 
 
 @dataclass

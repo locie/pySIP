@@ -1,9 +1,9 @@
 from copy import deepcopy
-from typing import NamedTuple, Tuple, Union
+from typing import NamedTuple, Tuple
 
 import numpy as np
 from numpy.linalg import lstsq, solve
-from scipy.linalg import LinAlgError, LinAlgWarning, solve_triangular
+from scipy.linalg import LinAlgError, LinAlgWarning
 
 from .base import BayesianFilter
 

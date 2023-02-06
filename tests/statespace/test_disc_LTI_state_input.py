@@ -6,10 +6,6 @@ import numpy as np
 import pytest
 
 from pysip.statespace import (
-    Matern32,
-    Periodic,
-    QuasiPeriodic12,
-    QuasiPeriodic32,
     TwTi_RoRiAwAicv,
     TwTiTh_RoRiRhAwAicv,
     TwTiTm_RoRiRmAwAicv,

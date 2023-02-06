@@ -1,5 +1,4 @@
 import numpy as np
-from scipy.linalg import LinAlgError, cho_solve, cholesky
 
 from ..utils.math import cholesky_inverse
 

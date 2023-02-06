@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from tempfile import TemporaryDirectory, TemporaryFile
+from tempfile import TemporaryDirectory
 
 import numpy as np
 import pytest
