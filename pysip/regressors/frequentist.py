@@ -33,7 +33,7 @@ class FreqRegressor(BaseRegressor):
         self,
         df: pd.DataFrame,
         outputs: Union[str, list],
-        inputs: [str, list] = None,
+        inputs: Union[str, list] = None,
         options: dict = None,
     ) -> Union[pd.DataFrame, pd.DataFrame, dict]:
         """Fit the model
