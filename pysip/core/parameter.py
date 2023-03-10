@@ -20,28 +20,26 @@ class Parameter(object):
 
     where :math:`\\theta_{sd} = f(\\eta)` is one of the following `transform`
 
-    * `none`: :math:`\\theta_{sd} = \\eta \\qquad \\theta_{sd} \\in ]-\\infty, \\infty[`
-    * `log`: :math:`\\theta_{sd} = \\exp(\\eta) \\qquad \\theta_{sd} \\in [0, \\infty[`
-    * `lower`: :math:`\\theta_{sd} = \\exp(\\eta) + a \\qquad \\theta_{sd} \\in [a, \\infty[`
-    * `upper`: :math:`\\theta_{sd} = b - \\exp(\\eta) \\qquad \\theta_{sd} \\in ]-\\infty, b]`
-    * `logit`: :math:`\\theta_{sd} = a+\\frac{(b-a)}{1+\\exp(-\\eta)}\\qquad\\theta_{sd}\\in [a, b]`
+    * `none`: :math:`\\theta_{sd} =\\eta \\qquad \\theta_{sd} \\in ]-\\infty, \\infty[`
+    * `log`: :math:`\\theta_{sd} =\\exp(\\eta) \\qquad \\theta_{sd} \\in [0, \\infty[`
+    * `lower`: :math:`\\theta_{sd} =\\exp(\\eta) + a \\qquad \\theta_{sd} \\in [a,
+      \\infty[`
+    * `upper`: :math:`\\theta_{sd} =b - \\exp(\\eta) \\qquad \\theta_{sd} \\in
+      ]-\\infty, b]`
+    * `logit`: :math:`\\theta_{sd}
+      =a+\\frac{(b-a)}{1+\\exp(-\\eta)}\\qquad\\theta_{sd}\\in [a, b]`
 
     where :math:`a` and :math:`b` are the lower and upper bounds given as a tuple, such
-    that, `bounds` = :math:`(a, b)`. If `transform` = 'fixed' the parameter is not considered as a
-    random variable.
+    that, `bounds` = :math:`(a, b)`. If `transform` = 'fixed' the parameter is not
+    considered as a random variable.
 
     The `prior` distribution is on the standardized constrained parameter value
-    :math:`\\theta_{sd}`. In order to put the prior on the constrained parameter
-    value :math:`\\theta`, use the default configuration, `loc` = 0 and `scale` = 1.
+    :math:`\\theta_{sd}`. In order to put the prior on the constrained parameter value
+    :math:`\\theta`, use the default configuration, `loc` = 0 and `scale` = 1.
 
     Args:
-        name: Parameter name
-        value: Parameter value
-        loc: Location value
-        scale: Scaling value
-        transform: Bijections
-        bounds: Parameters bounds
-        prior: Prior distribution
+        name: Parameter name value: Parameter value loc: Location value scale: Scaling
+        value transform: Bijections bounds: Parameters bounds prior: Prior distribution
     """
 
     __transforms__ = ["fixed", "none", "log", "lower", "upper", "logit"]

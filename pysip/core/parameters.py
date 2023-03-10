@@ -3,22 +3,20 @@ from typing import List, Tuple, Union
 import numpy as np
 
 from .parameter import Parameter
-from .prior import Prior
 
 
 class Parameters:
     """Factory of Parameter instances
 
     Args:
-        parameters: There is two options for instantiating Parameters: `parameters` is a list of
-            strings corresponding to the parameters names. In this case all the parameters have the
-            default settings; `parameters` is a list of dictionaries, where the arguments of
-            Parameter can be modified as key-value pairs
+        parameters: There is two options for instantiating Parameters: `parameters` is a
+          list of strings corresponding to the parameters names. In this case all the
+          parameters have the default settings; `parameters` is a list of dictionaries,
+          where the arguments of Parameter can be modified as key-value pairs
         name: Name of this specific instance
 
     Notes:
-        Multiple instances of Parameters can be added together
-        ::
+        Multiple instances of Parameters can be added together ::
 
             >>> p_alpha = Parameters(['a', 'b', 'c'], name='alpha')
             >>> p_beta = Parameters(['c', 'd', 'e'], name='beta')
@@ -29,8 +27,7 @@ class Parameters:
             >>> p_gamma = Parameters(parameters=params, name='gamma')
             >>> print(p_alpha + p_beta + p_gamma)
 
-            Parameters alpha__beta__gamma
-            * alpha__beta
+            Parameters alpha__beta__gamma * alpha__beta
                 * alpha
                     name=a value=0.000e+00 transform=none bounds=(None, None) prior=None
                     name=b value=0.000e+00 transform=none bounds=(None, None) prior=None
@@ -159,12 +156,15 @@ class Parameters:
 
     @property
     def theta_free(self) -> List:
-        """Get constrained parameter values :math:`\\mathbf{\\theta}` which are not fixed"""
+        """Get constrained parameter values :math:`\\mathbf{\\theta}` which are not
+        fixed
+        """
         return [p.theta for p in self.parameters_free]
 
     @theta_free.setter
     def theta_free(self, x: Union[Tuple, List, np.ndarray]):
-        """Set constrained parameter values :math:`\\mathbf{\\theta}` which are not fixed
+        """Set constrained parameter values :math:`\\mathbf{\\theta}` which are not
+        fixed
 
         Args:
             x: New free constrained parameter values
@@ -180,12 +180,14 @@ class Parameters:
 
     @property
     def theta_sd(self) -> List:
-        """Get standardized parameter values :math:`\\mathbf{\\theta_{sd}}` which are not fixed"""
+        """Get standardized parameter values :math:`\\mathbf{\\theta_{sd}}` which are
+        not fixed"""
         return [p.theta_sd for p in self.parameters_free]
 
     @theta_sd.setter
     def theta_sd(self, x: Union[Tuple, List, np.ndarray]):
-        """Set standardized parameter values :math:`\\mathbf{\\theta_{sd}}` which are not fixed
+        """Set standardized parameter values :math:`\\mathbf{\\theta_{sd}}` which are
+        not fixed
 
         Args:
             x: New free standardized parameter values
@@ -226,8 +228,8 @@ class Parameters:
 
         .. math::
 
-            \\pi(\\eta \\mid y) = \\pi(\\theta \\mid y) +
-            \\log \\left| \\frac{\\partial \\theta}{\\partial \\eta} \\right|
+            \\pi(\\eta \\mid y) = \\pi(\\theta \\mid y) + \\log \\left| \\frac{\\partial
+            \\theta}{\\partial \\eta} \\right|
 
 
         where :math:`\\pi(\\theta \\mid y) = \\log p(\\theta \\mid y)` is the logarithm
@@ -235,25 +237,26 @@ class Parameters:
         :math:`\\theta = f^{-1}(\\eta)` is the inverse bijective transformation.
 
         Notes:
-            The jacobian adjustment is required if a prior distribution is used. This formula is
-            works for univariate change of variables only. For multivariate case, the absolute
-            value of the determinant of the jacobian matrix must be used.
+            The jacobian adjustment is required if a prior distribution is used. This
+            formula is works for univariate change of variables only. For multivariate
+            case, the absolute value of the determinant of the jacobian matrix must be
+            used.
         """
         return np.sum(np.log(np.abs(self.theta_jacobian)))
 
     @property
     def theta_dlog_jacobian(self) -> List:
         """Partial derivative of the logarithm of the jacobian adjustment
-        :math:`\\partial \\log \\left| \\partial \\theta \\,/\\, \\partial \\eta \\right| \\,/\\, \\partial \\eta`
+        :math:`\\partial \\log \\left| \\partial \\theta \\,/\\, \\partial \\eta
+            \\right| \\,/\\, \\partial \\eta`
 
 
         .. math::
 
-            \\frac{\\partial \\pi(\\eta \\mid y)}{\\partial \\eta} =
-            \\frac{\\partial \\pi(\\theta \\mid y)}{\\partial \\theta}
-            \\frac{\\partial \\theta}{\\partial \\eta} +
-            \\frac{\\partial}{\\partial \\eta}
-            \\log \\left|\\frac{\\partial \\theta}{\\partial \\eta}\\right|
+            \\frac{\\partial \\pi(\\eta \\mid y)}{\\partial \\eta} = \\frac{\\partial
+            \\pi(\\theta \\mid y)}{\\partial \\theta} \\frac{\\partial
+            \\theta}{\\partial \\eta} + \\frac{\\partial}{\\partial \\eta} \\log
+            \\left|\\frac{\\partial \\theta}{\\partial \\eta}\\right|
 
 
         where :math:`\\pi(\\theta \\mid y) = \\log p(\\theta \\mid y)` is the logarithm
@@ -261,9 +264,10 @@ class Parameters:
         :math:`\\theta = f^{-1}(\\eta)` is the inverse bijective transformation.
 
         Notes:
-            The jacobian adjustment is required if a prior distribution is used. This formula is
-            works for univariate change of variables only. For multivariate case, the absolute
-            value of the determinant of the jacobian matrix must be used.
+            The jacobian adjustment is required if a prior distribution is used. This
+            formula is works for univariate change of variables only. For multivariate
+            case, the absolute value of the determinant of the jacobian matrix must be
+            used.
         """
         return [p._inv_transform_dlog_jacobian() for p in self.parameters_free]
 
@@ -274,7 +278,8 @@ class Parameters:
 
     @eta.setter
     def eta(self, x: np.ndarray):
-        """Set the unconstrained parameter values :math:`\\mathbf{\\eta}` which are not fixed
+        """Set the unconstrained parameter values :math:`\\mathbf{\\eta}` which are not
+        fixed
 
         Args:
             x: New free unconstrained parameter values
@@ -290,7 +295,8 @@ class Parameters:
 
     @property
     def eta_free(self) -> np.ndarray:
-        """Get the unconstrained parameter values :math:`\\mathbf{\\eta}` which are not fixed"""
+        """Get the unconstrained parameter values :math:`\\mathbf{\\eta}` which are not
+        fixed"""
         return self.eta[self.free]
 
     @property
@@ -326,7 +332,8 @@ class Parameters:
 
     @property
     def d_prior(self) -> List:
-        """Get the partial derivative of logarithm of the prior distribution :math:`\\partial \\log p(\\theta) \\,/\\, \\partial \\theta`"""
+        """Get the partial derivative of logarithm of the prior distribution
+        :math:`\\partial \\log p(\\theta) \\,/\\, \\partial \\theta`"""
         return [
             p.prior.dlog_pdf(p.value) if p.prior is not None else 0.0
             for p in self.parameters_free
@@ -366,10 +373,12 @@ class Parameters:
         return [scaling * p._d_penalty() for p in self.parameters_free]
 
     def prior_init(self, hpd=None):
-        """Draw a random sample from the prior distribution, :math:`\\theta \\sim p(\\theta)`
+        """Draw a random sample from the prior distribution,
+        :math:`\\theta \\sim p(\\theta)`
 
         Args:
-            hpd: Highest Prior Density to draw sample from (True for unimodal distribution)
+            hpd: Highest Prior Density to draw sample from (True for unimodal
+              distribution)
         """
         for p in self.parameters:
             if p.prior is not None:

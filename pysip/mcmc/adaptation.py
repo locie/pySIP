@@ -82,13 +82,13 @@ class DualAveraging:
 
 class WelfordCovEstimator:
     """Welford's accumulator for sequentially estimating the sample covariance matrix.
-    This method is used for estimating the inverse mass matrix in the Hamiltonian Monte Carlo
-    sampler.
+    This method is used for estimating the inverse mass matrix in the Hamiltonian
+    Monte Carlo sampler.
 
     Args:
         dimension: Number of dimension
-        dense: Estimate the full covariance matrix. By default, only the diagonal elements are
-        estimated
+        dense: Estimate the full covariance matrix. By default, only the diagonal
+          elements are estimated
         shrinkage: Shrink the estimate towards unity
     """
 
@@ -219,7 +219,8 @@ class WindowedAdaptation:
         return (self._counter == self._next_window) & (self._counter != self._n_adapt)
 
     def compute_next_window(self):
-        """Compute the next slow adaptation window by doubling the size of the previous one"""
+        """Compute the next slow adaptation window by doubling the size of the previous
+        one"""
         if self._next_window == self._last_window:
             return
 

@@ -42,30 +42,32 @@ class BayesRegressor(BaseRegressor):
         """Bayesian inference of the state-space model
 
         Args:
-            df: Training data
-            outputs: Outputs name(s)
-            inputs: Inputs name(s)
-            options:
+            df: Training data outputs: Outputs name(s) inputs: Inputs name(s) options:
                 - **stepsize** (float, default=0.25 / n_par**0.25)
                     Step-size of the leapfrog integrator
                 - **dense_mass_matrix** (bool, default=False)
-                    Estimate the dense mass matrix during adaptation. By default, only the diagonal
-                    elements are estimated.
+                    Estimate the dense mass matrix during adaptation. By default, only
+                    the diagonal elements are estimated.
                 - **max_tree_depth** (int, default=10)
                     Maximum tree depth
                 - **dH_max** (float, default=1000)
-                    Maximum energy change allowed in a trajectory. Larger deviations are considered
-                    as diverging transitions.
+                    Maximum energy change allowed in a trajectory. Larger deviations are
+                    considered as diverging transitions.
                 - **accp_target** (float, default=0.8):
-                    Target average acceptance probability. Valid values are between ]0, 1[
+                    Target average acceptance probability. Valid values are between ]0,
+                    1[
                 - **t0** (float, default=10.0):
-                    Adaptation iteration offset (primal-dual averaging algorithm parameter)
+                    Adaptation iteration offset (primal-dual averaging algorithm
+                    parameter)
                 - **gamma** (float, default=0.05):
-                    Adaptation regularization scale (primal-dual averaging algorithm parameter)
+                    Adaptation regularization scale (primal-dual averaging algorithm
+                    parameter)
                 - **kappa** (float, default=0.75):
-                    Adaptation relaxation exponent (primal-dual averaging algorithm parameter)
+                    Adaptation relaxation exponent (primal-dual averaging algorithm
+                    parameter)
                 - **mu** (float, default=log(10 * stepsize)):
-                    Asymptotic mean of the step-size (primal-dual averaging algorithm parameter)
+                    Asymptotic mean of the step-size (primal-dual averaging algorithm
+                    parameter)
                 - **n_cpu**: (int, default=-1):
                     Number of cpu to use. To use all available cpu, set the value to -1,
                     otherwise valid values are between [1, +Inf[
@@ -76,14 +78,16 @@ class BayesRegressor(BaseRegressor):
                 - **window**: (int, default=25)
                     Initial width of slow adaptation interval
                 - **init** (str, default=`unconstrained`):
-                    - unconstrained: Uniform draw between [-1, 1] in the uncsontrained space
+                    - unconstrained: Uniform draw between [-1, 1] in the uncsontrained
+                      space
                     - prior: Uniform draw from the prior distribution
                     - zero: Set the unconstrained parameters to 0
                     - fixed: The current parameter values are used
                     - value: Uniform draw between the parameter value +/- 25%
                     - prior_mass (float, default=0.95):
                 - **hpd**: (float, default=0.95)
-                    Highest Prior Density to draw sample from the prior (True if unimodal)
+                    Highest Prior Density to draw sample from the prior (True if
+                    unimodal)
 
         Returns:
             Fit_Bayes(): An instance summarizing the results from the Bayesian inference
@@ -125,7 +129,8 @@ class BayesRegressor(BaseRegressor):
         dhmc = DynamicHMC(EuclideanHamiltonian(potential=dV, metric=metric))
         uchains, stats, options = dhmc.sample(q0, n_draws, n_chains, n_warmup, options)
 
-        # Safety against duplication of parameter names. Do not use self.ss.parameters.names
+        # Safety against duplication of parameter names. Do not use
+        # self.ss.parameters.names
         names = [k for i, k in enumerate(self.ss._names) if self.ss.parameters.free[i]]
         chains = self._array_to_dict(self._inv_transform_chains(uchains), names)
 
@@ -145,7 +150,8 @@ class BayesRegressor(BaseRegressor):
             df: Data
             inputs: Input name(s)
             n_sim: Number of prior predictive draw
-            hpd: Highest Prior Density to draw sample from (True for unimodal distribution)
+            hpd: Highest Prior Density to draw sample from (True for unimodal
+              distribution)
             n_cpu: Number of cpu
 
         Returns:
@@ -178,7 +184,8 @@ class BayesRegressor(BaseRegressor):
             ps[n, :] = out[n][0]
             ppd[n, :, :] = out[n][1]
 
-        # Safety against duplication of parameter names. Do not use self.ss.parameters.names
+        # Safety against duplication of parameter names. Do not use
+        # self.ss.parameters.names
         names = [k for i, k in enumerate(self.ss._names) if self.ss.parameters.free[i]]
         draws = {k: ps[:, i][np.newaxis, :] for i, k in enumerate(names)}
         ppc = {
@@ -330,10 +337,12 @@ class BayesRegressor(BaseRegressor):
         """Transform samples to the constrained space
 
         Args:
-            eta_traces: Unconstrained Markov chain traces of shape (n_chains, n_par, n_draws)
+            eta_traces: Unconstrained Markov chain traces of shape (n_chains, n_par,
+              n_draws)
 
         Returns:
-            theta_traces: Constrained Markov chain traces of shape (n_chains, n_par, n_draws)
+            theta_traces: Constrained Markov chain traces of shape (n_chains, n_par,
+              n_draws)
         """
         if not isinstance(eta_traces, np.ndarray):
             raise TypeError("`eta_traces` must be a numpy array")
@@ -377,7 +386,8 @@ class BayesRegressor(BaseRegressor):
         return {k: chains[:, i, :] for i, k in enumerate(names)}
 
     def _dict_to_array(self, chains: dict, names: Union[str, list]) -> np.ndarray:
-        """Convert dict [n_par keys](n_chains, n_draws) to numpy array (n_par, chain * draw)
+        """Convert dict [n_par keys](n_chains, n_draws) to numpy array (n_par, chain *
+        draw)
 
         Args:
             chains: Markov Chain traces, chains[key](n_chains, n_draws)

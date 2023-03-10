@@ -1,6 +1,5 @@
 import math
 
-import matplotlib.pyplot as plt
 import networkx as nx
 
 
@@ -115,4 +114,4 @@ class TikzStateSpace:
                     f"{layout[start]} node[ground, rotate={int(angle)-90}]{{}}"
                 )
 
-        return canevas.format("\n".join("\t" + l for l in lines))
+        return canevas.format("\n".join("\t" + line for line in lines))

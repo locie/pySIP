@@ -133,7 +133,8 @@ class BaseRegressor:
             pointwise: Return the negative log-likelihood for each time instants
 
         Returns:
-            The negative log-likelihood or the predictive density evaluated for each observation
+            The negative log-likelihood or the predictive density evaluated for each
+            observation
         """
 
         ssm, index = self.ss.get_discrete_ssm(dt)
@@ -238,11 +239,12 @@ class BaseRegressor:
         df: pd.DataFrame,
         inputs: Union[str, list],
         outputs: Union[str, list],
-        tnew: [np.ndarray, pd.Series] = None,
+        tnew: Union[np.ndarray, pd.Series] = None,
     ) -> Union[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """Prepare the data
 
-        This method converts data from the public methods (DataFrame) to the private methods (array)
+        This method converts data from the public methods (DataFrame) to the private
+        methods (array)
 
         Args:
             df: Input/output data with a time index
@@ -259,7 +261,8 @@ class BaseRegressor:
                 - **index_back**: Index corresponding to the new time array `tnew`
 
         Notes:
-            The use of `tnew` is discouraged at the moment; DateTimeIndex are not yet supported.
+            The use of `tnew` is discouraged at the moment; DateTimeIndex are not yet
+            supported.
         """
 
         if not isinstance(df, pd.DataFrame):
@@ -369,15 +372,18 @@ class BaseRegressor:
         Args:
             n_init: Number of random initialization
             method:
-                - **unconstrained**: Uniform draw between [-1, 1] in the uncsontrained space
-                - **prior**: Uniform draw from the prior distribution
-                - **zero**: Set the unconstrained parameters to 0
-                - **fixed**: The current parameter values are used
-                - **value**: Uniform draw between the parameter value +/- 25%
-            hpd: Highest Prior Density to draw sample from (True for unimodal distribution)
+              - **unconstrained**: Uniform draw between [-1, 1] in the uncsontrained
+                space
+              - **prior**: Uniform draw from the prior distribution
+              - **zero**: Set the unconstrained parameters to 0
+              - **fixed**: The current parameter values are used
+              - **value**: Uniform draw between the parameter value +/- 25%
+            hpd: Highest Prior Density to draw sample from (True for unimodal
+              distribution)
 
         Returns:
-            eta0: Array of unconstrained parameters of shape (n_par, n_init), where n_par is the
+            eta0: Array of unconstrained parameters of shape (n_par, n_init), where
+              n_par is the
             number of free parameters and n_init the number of random initialization
         """
 
@@ -417,7 +423,7 @@ class BaseRegressor:
         self,
         df: pd.DataFrame,
         outputs: Union[str, list],
-        inputs: [str, list] = None,
+        inputs: Union[str, list] = None,
         options: dict = None,
     ):
         """Fit the state-space model

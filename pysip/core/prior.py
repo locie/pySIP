@@ -1,5 +1,5 @@
 from numbers import Real
-from typing import Callable, Tuple
+from typing import Callable
 
 import numpy as np
 from scipy import optimize, special, stats
@@ -57,7 +57,8 @@ class Prior:
 
         Args:
             n: Number of draws
-            hpd: Highest Prior Density for drawing sample from (true for unimodal distribution)
+            hpd: Highest Prior Density for drawing sample from (true for unimodal
+            distribution)
         """
         raise NotImplementedError
 

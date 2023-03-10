@@ -1,9 +1,9 @@
 from copy import deepcopy
-from typing import NamedTuple, Tuple, Union
+from typing import NamedTuple, Tuple
 
 import numpy as np
 from numpy.linalg import lstsq, solve
-from scipy.linalg import LinAlgError, LinAlgWarning, solve_triangular
+from scipy.linalg import LinAlgError, LinAlgWarning
 
 from .base import BayesianFilter
 
@@ -12,10 +12,9 @@ class Kalman_QR(BayesianFilter):
     """Square-root Kalman filter and sensitivity equations
 
     References:
-        Maria V. Kulikova, Julia Tsyganova,
-        A unified square-root approach for the score and Fisher information matrix computation in
-        linear dynamic systems.
-        Mathematics and Computers in Simulation 119: 128-141 (2016)
+        Maria V. Kulikova, Julia Tsyganova, A unified square-root approach for the score
+        and Fisher information matrix computation in linear dynamic systems. Mathematics
+        and Computers in Simulation 119: 128-141 (2016)
     """
 
     def predict(

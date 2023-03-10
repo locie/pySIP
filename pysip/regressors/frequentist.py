@@ -45,14 +45,16 @@ class FreqRegressor(BaseRegressor):
             options:
                 - scipy.minimmize options
                 - **init** (str, default=`unconstrained`):
-                    - unconstrained: Uniform draw between [-1, 1] in the uncsontrained space
+                    - unconstrained: Uniform draw between [-1, 1] in the uncsontrained
+                      space
                     - prior: Uniform draw from the prior distribution
                     - zero: Set the unconstrained parameters to 0
                     - fixed: The current parameter values are used
                     - value: Uniform draw between the parameter value +/- 25%
                     - prior_mass (float, default=0.95):
                 - **hpd**: (float, default=0.95)
-                    Highest Prior Density to draw sample from the prior (True if unimodal)
+                    Highest Prior Density to draw sample from the prior (True if
+                    unimodal)
 
         Returns:
             3-elements tuple containing

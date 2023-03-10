@@ -1,7 +1,6 @@
 from typing import Callable, Tuple
 
 import numpy as np
-import scipy.linalg as sla
 
 from .metrics import EuclideanMetric
 
@@ -17,10 +16,11 @@ class EuclideanHamiltonian:
                     &= K(p, q) + V(q)
         \\end{align*}
 
-    where :math:`H(q, p)` is the Hamiltonian function with :math:`q` and :math:`p`,
-    the position and momentum variables in phase space. :math:`K(p, q)` is the Kinetic energy
-    and :math:`V(q)` is the potential energy. The potential energy is completely determined by the
-    target distribution while the kinetic energy is specified by the implementation.
+    where :math:`H(q, p)` is the Hamiltonian function with :math:`q` and :math:`p`, the
+    position and momentum variables in phase space. :math:`K(p, q)` is the Kinetic
+    energy and :math:`V(q)` is the potential energy. The potential energy is completely
+    determined by the target distribution while the kinetic energy is specified by the
+    implementation.
 
     Hamiltonian's equations
 
@@ -41,8 +41,8 @@ class EuclideanHamiltonian:
        :nowrap:
 
         \\begin{align*}
-            K(p) &= \\frac{1}{2} p M^{-1} p + \\log \\lvert M \\rvert + \\text{const.} \\\\
-            &\\propto \\frac{1}{2} p M^{-1} p
+            K(p) &= \\frac{1}{2} p M^{-1} p + \\log \\lvert M \\rvert + \\text{const.}
+            \\\\ &\\propto \\frac{1}{2} p M^{-1} p
         \\end{align*}
 
 
@@ -71,8 +71,8 @@ class EuclideanHamiltonian:
 
 
     Args:
-        potential: Function which evaluate the potential energy and the gradient at a given position
-        metric: Diagonal or Dense Euclidean metric
+        potential: Function which evaluate the potential energy and the gradient at a
+        given position metric: Diagonal or Dense Euclidean metric
 
     References:
         Betancourt, M., 2017. A conceptual introduction to Hamiltonian Monte Carlo.
@@ -110,8 +110,9 @@ class EuclideanHamiltonian:
         return self._V_dV(q)[1]
 
     def V_and_dV(self, q: np.array) -> Tuple[float, np.ndarray]:
-        """Evaluate the potential energy function :math:`V(q)` and the gradient of the potential
-        energy function :math:`\\frac{\\partial V(q)} {\\partial q}` at the position `q`
+        """Evaluate the potential energy function :math:`V(q)` and the gradient of the
+        potential energy function :math:`\\frac{\\partial V(q)} {\\partial q}` at the
+        position `q`
 
         Args:
             q: Position variable
@@ -124,7 +125,8 @@ class EuclideanHamiltonian:
         return self._V_dV(q)
 
     def K(self, p: np.array) -> float:
-        """Evaluate the kinetic energy function :math:`K(p)` at the momentum variable `p`
+        """Evaluate the kinetic energy function :math:`K(p)` at the momentum variable
+        `p`
 
         Args:
             p: Momentum variable

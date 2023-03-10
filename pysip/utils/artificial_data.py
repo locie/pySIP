@@ -1,7 +1,6 @@
 import itertools
 
 import numpy as np
-import pylfsr
 from pylfsr import LFSR
 
 
@@ -21,7 +20,8 @@ def prbs(Tmax, Tmin, initstate="random"):
     Notes:
         The Linear Feedback Shift Register (LFSR) can be installed
         from PyPi: https://pypi.org/project/pylfsr/
-        or from the source:  https://github.com/Nikeshbajaj/Linear_Feedback_Shift_Register
+        or from the source:
+        https://github.com/Nikeshbajaj/Linear_Feedback_Shift_Register
     """
     if not isinstance(Tmax, int):
         raise TypeError("`Tmax` must be an integer")
