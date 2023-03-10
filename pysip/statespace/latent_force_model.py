@@ -27,15 +27,14 @@ class LatentForceModel(StateSpace):
     """Latent Force Model (LFM)
 
     Args:
-        rc: RCModel()
-        gp: GPModel()
-        latent_force: The name of the input considered as the latent force
+        rc: RCModel() gp: GPModel() latent_force: The name of the input considered as
+        the latent force
 
     Notes:
-        The MEASURE_DEVIATION of the GPModel is fixed because it is not used in the latent force
-        model. The GPModel is augmented into the RCModel, therefore, only the measurement noise
-        matrix `R` of the RCModel is used. To avoid useless computation, the MEASURE_DEVIATION
-        of the GPModel must stay fixed.
+        The MEASURE_DEVIATION of the GPModel is fixed because it is not used in the
+        latent force model. The GPModel is augmented into the RCModel, therefore, only
+        the measurement noise matrix `R` of the RCModel is used. To avoid useless
+        computation, the MEASURE_DEVIATION of the GPModel must stay fixed.
     """
 
     def __init__(self, rc: RCModel, gp: GPModel, latent_force: str):
@@ -190,8 +189,8 @@ class LatentForceModel(StateSpace):
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """Discretization of Linear Time Invariant Latent Force Model
 
-        Given the block upper triangular form of the state matrix, the Parlett's method is used for
-        computing the discrete state matrix.
+        Given the block upper triangular form of the state matrix, the Parlett's method
+        is used for computing the discrete state matrix.
 
         Args:
             dt: sampling time
@@ -242,10 +241,8 @@ class LatentForceModel(StateSpace):
         """Discretization of augmented temportal Gaussian Process
 
         Args:
-            dt: Sampling time
-            dA: Jacobian state matrix
-            dB: Jacobian input matrix
-            dQ: Derivative Wiener process scaling matrix
+            dt: Sampling time dA: Jacobian state matrix dB: Jacobian input matrix dQ:
+            Derivative Wiener process scaling matrix
 
         Returns:
             8-elements tuple containing
@@ -256,7 +253,8 @@ class LatentForceModel(StateSpace):
                 - **dAd**: Jacobian discrete state matrix
                 - **dB0d**: Jacobian discrete input matrix (zero order hold)
                 - **dB1d**: Jacobian discrete input matrix (first order hold)
-                - **dQd**: Jacobian of the upper Cholesky factor of the process noise covariance
+                - **dQd**: Jacobian of the upper Cholesky factor of the process noise
+                  covariance
         """
         nj, nx, nu = dB.shape
         n = self._rc.nx
