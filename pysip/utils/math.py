@@ -1,11 +1,11 @@
-
 import numpy as np
 from numpy.linalg import lstsq
 from scipy.linalg import LinAlgError, LinAlgWarning, ldl, solve_triangular
 
 
 def log1p_exp(a: float):
-    """Calculates the log of 1 plus the exponential of the specified value without overflow"""
+    """Calculates the log of 1 plus the exponential of the specified value without
+    overflow"""
     if a > 0.0:
         return a + np.log1p(np.exp(-a))
     return np.log1p(np.exp(a))
@@ -134,8 +134,8 @@ def time_series_pca(X: np.ndarray, verbose: bool = False):
     """Principal Component Analysis reduction of multiple time series into one component
 
     Args:
-        X: Array of time series stacked by columns, e.g. X.shape = (n, nc) where n and nc
-            are respectively the length and the number of time series
+        X: Array of time series stacked by columns, e.g. X.shape = (n, nc) where n and
+          nc are respectively the length and the number of time series
         verbose: Print the percentage of variance explained by the first component
 
     Returns:

@@ -261,7 +261,8 @@ class BaseRegressor:
                 - **index_back**: Index corresponding to the new time array `tnew`
 
         Notes:
-            The use of `tnew` is discouraged at the moment; DateTimeIndex are not yet supported.
+            The use of `tnew` is discouraged at the moment; DateTimeIndex are not yet
+            supported.
         """
 
         if not isinstance(df, pd.DataFrame):
@@ -371,14 +372,14 @@ class BaseRegressor:
         Args:
             n_init: Number of random initialization
             method:
-                - **unconstrained**: Uniform draw between [-1, 1] in the uncsontrained
-                  space
-                - **prior**: Uniform draw from the prior distribution
-                - **zero**: Set the unconstrained parameters to 0
-                - **fixed**: The current parameter values are used
-                - **value**: Uniform draw between the parameter value +/- 25%
+              - **unconstrained**: Uniform draw between [-1, 1] in the uncsontrained
+                space
+              - **prior**: Uniform draw from the prior distribution
+              - **zero**: Set the unconstrained parameters to 0
+              - **fixed**: The current parameter values are used
+              - **value**: Uniform draw between the parameter value +/- 25%
             hpd: Highest Prior Density to draw sample from (True for unimodal
-            distribution)
+              distribution)
 
         Returns:
             eta0: Array of unconstrained parameters of shape (n_par, n_init), where

@@ -59,46 +59,51 @@ class DynamicHMC:
 
         Args:
             q: Initial position variables (e.g. initial parameters)
-            n_draws: Number of samples
-            n_chains: Number of Markov chains
-            n_warmup: Number of iterations to use for adapting the step size and the mass matrix
+            n_draws: Number of
+            samples n_chains: Number of Markov chains
+            n_warmup: Number of iterations to use for adapting the step size and the
+              mass matrix
             options:
-                - **stepsize** (float, default=0.25 / n_par**0.25)
-                    Step-size of the leapfrog integrator
-                - **dense_mass_matrix** (bool, default=False)
-                    Estimate the dense mass matrix during adaptation. By default, only the diagonal
-                    elements are estimated.
-                - **shrinkage** (bool, default=True)
-                    Shrink towards unity the diagonal elements of the estimated mass matrix
-                - **max_tree_depth** (int, default=10)
-                    Maximum tree depth
-                - **dH_max** (float, default=1000)
-                    Maximum energy change allowed in a trajectory. Larger
-                    deviations are considered as diverging transitions.
-                - **accp_target** (float, default=0.8):
-                    Target average acceptance probability. Valid values are between ]0, 1[
-                - **t0** (float, default=10.0):
-                    Adaptation iteration offset (primal-dual averaging algorithm parameter)
-                - **gamma** (float, default=0.05):
-                    Adaptation regularization scale (primal-dual averaging algorithm parameter)
-                - **kappa** (float, default=0.75):
-                    Adaptation relaxation exponent (primal-dual averaging algorithm parameter)
-                - **mu** (float, default=log(10 * stepsize)):
-                    Asymptotic mean of the step-size (primal-dual averaging algorithm parameter)
-                - **n_cpu**: (int, default=-1):
-                    Number of cpu to use. To use all available cpu, set the value to -1,
-                    otherwise valid values are between [1, +Inf[
-                - **init_buffer**: (int, default=75)
-                    Width of initial fast adaptation interval
-                - **term_buffer**: (int, default=100)
-                    Width of final fast adaptation interval
-                - **window**: (int, default=25)
-                    Initial width of slow adaptation interval
+              - **stepsize** (float, default=0.25 / n_par**0.25)
+                  Step-size of the leapfrog integrator
+              - **dense_mass_matrix** (bool, default=False)
+                  Estimate the dense mass matrix during adaptation. By default, only the
+                  diagonal elements are estimated.
+              - **shrinkage** (bool, default=True)
+                  Shrink towards unity the diagonal elements of the estimated mass
+                  matrix
+              - **max_tree_depth** (int, default=10)
+                  Maximum tree depth
+              - **dH_max** (float, default=1000)
+                  Maximum energy change allowed in a trajectory. Larger deviations are
+                  considered as diverging transitions.
+              - **accp_target** (float, default=0.8):
+                  Target average acceptance probability. Valid values are between ]0, 1[
+              - **t0** (float, default=10.0):
+                  Adaptation iteration offset (primal-dual averaging algorithm
+                  parameter)
+              - **gamma** (float, default=0.05):
+                  Adaptation regularization scale (primal-dual averaging algorithm
+                  parameter)
+              - **kappa** (float, default=0.75):
+                  Adaptation relaxation exponent (primal-dual averaging algorithm
+                  parameter)
+              - **mu** (float, default=log(10 * stepsize)):
+                  Asymptotic mean of the step-size (primal-dual averaging algorithm
+                  parameter)
+              - **n_cpu**: (int, default=-1):
+                  Number of cpu to use. To use all available cpu, set the value to -1,
+                  otherwise valid values are between [1, +Inf[
+              - **init_buffer**: (int, default=75)
+                  Width of initial fast adaptation interval
+              - **term_buffer**: (int, default=100)
+                  Width of final fast adaptation interval
+              - **window**: (int, default=25)
+                  Initial width of slow adaptation interval
 
         Returns:
-            chains: Markov chain traces
-            stats: Hamiltonian transition statistics
-            df: Hamiltonian sampler diagnostic
+            chains: Markov chain traces stats: Hamiltonian transition statistics df:
+            Hamiltonian sampler diagnostic
         """
 
         if not isinstance(q, np.ndarray):
@@ -576,12 +581,14 @@ class Fit_Bayes:
 
     def __repr__(self):
         """Return information of the fitting"""
-        return (
-            f"\nmodel: {self._model}\nnumber of chains: {self._n_chains}\n"
-            f"number of draws: {self._n_draws}\nnumber of draws for warm-up: {self._n_warmup}"
-            f'\ndate: {self._datetime.strftime("%d/%m/%Y")}\n'
-            f'time: {self._datetime.strftime("%H:%M:%S")}\n'
-        )
+        return f"""
+model: {self._model}
+number of chains: {self._n_chains}
+number of draws: {self._n_draws}
+number of draws for warm-up: {self._n_warmup}
+date: {self._datetime.strftime("%d/%m/%Y")}
+time: {self._datetime.strftime("%H:%M:%S")}
+"""
 
     @property
     def n_warmup(self) -> int:
@@ -638,8 +645,9 @@ class Fit_Bayes:
             df: Sampler diagnostic
 
         Notes:
-            EBFMI (Energy Bayesian Fraction of Missing Information) values below 0.3 indicates
-            that momentum resampling will ineffciently explore the energy level sets.
+            EBFMI (Energy Bayesian Fraction of Missing Information) values below 0.3
+            indicates that momentum resampling will ineffciently explore the energy
+            level sets.
         """
         df = pd.DataFrame(
             index=["Chain " + str(i) for i in range(self._n_chains)],

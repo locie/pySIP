@@ -1,6 +1,7 @@
 from .nodes import Node
+from ..utils import Namespace
 
-model_registry = {}
+model_registry = Namespace()
 
 
 def statespace(cls, *args, **kwargs):

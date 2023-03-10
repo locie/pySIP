@@ -71,7 +71,8 @@ def eigvals_2x2(X: np.ndarray) -> np.ndarray:
         Eigenvalues of `X`
 
     References:
-        M.J. Kronenbur. A Method for Fast Diagonalization ofa 2x2 or 3x3 Real Symmetric Matrix
+        M.J. Kronenbur. A Method for Fast Diagonalization ofa 2x2 or 3x3 Real Symmetric
+        Matrix
     """
     x00 = X[0, 0]
     x01 = X[0, 1]
@@ -93,7 +94,8 @@ def eig_2x2(X: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
             - **v**: Eigenvectors
 
     References:
-        M.J. Kronenbur. A Method for Fast Diagonalization ofa 2x2 or 3x3 Real Symmetric Matrix
+        M.J. Kronenbur. A Method for Fast Diagonalization ofa 2x2 or 3x3 Real Symmetric
+        Matrix
     """
     x00 = X[0, 0]
     x01 = X[0, 1]
@@ -138,7 +140,8 @@ def eigvals_3x3(X: np.ndarray) -> np.ndarray:
         This symbolic expression doesn't work for complex eigenvalues
 
     References:
-        M.J. Kronenbur. A Method for Fast Diagonalization ofa 2x2 or 3x3 Real Symmetric Matrix
+        M.J. Kronenbur. A Method for Fast Diagonalization ofa 2x2 or 3x3 Real Symmetric
+        Matrix
     """
     x00, x01, x02, x10, x11, x12, x20, x21, x22 = X.ravel()
 
@@ -411,20 +414,18 @@ def expm_triu(
     f11: np.ndarray,
     f22: np.ndarray,
 ) -> np.ndarray:
-    """Compute the exponential of the upper triangular matrix A using the Parlett's method
+    """Compute the exponential of the upper triangular matrix A using the Parlett's
+    method
 
     .. math::
 
-        F = \\exp(A) = \\exp \\left(\\begin{bmatrix} a11 & a12 \\\\ 0 & a22 \\end{bmatrix} \\right)
-        = \\begin{bmatrix} f11 & f12 \\\\ 0 & f22 \\end{bmatrix}
+        F = \\exp(A) = \\exp \\left(\\begin{bmatrix} a11 & a12 \\\\ 0 & a22
+        \\end{bmatrix} \\right) = \\begin{bmatrix} f11 & f12 \\\\ 0 & f22 \\end{bmatrix}
 
     Args:
-        a11: Upper left input matrix
-        a12: Upper right input matrix
-        a22: Lower right input matrix
-        dt: Sampling time
-        f11: Upper left output matrix
-        f22: Lower right output matrix
+        a11: Upper left input matrix a12: Upper right input matrix a22: Lower right
+        input matrix dt: Sampling time f11: Upper left output matrix f22: Lower right
+        output matrix
 
     Returns:
         F: Matrix exponential of A
@@ -592,7 +593,8 @@ def disc_d_state_input_expm(
     dt: float = 1.0,
     order_hold: int = 0,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    """Discretize the state and input matrices, and their derivatives with the matrix exponential
+    """Discretize the state and input matrices, and their derivatives with the matrix
+    exponential
 
     Args:
         A: State matrix
@@ -667,12 +669,13 @@ def dexpm_triu(
     df11: np.ndarray,
     df22: np.ndarray,
 ) -> Tuple[np.ndarray, np.ndarray]:
-    """Compute the exponential of the upper triangular matrix A and its derivative using the
-    Parlett's method
+    """Compute the exponential of the upper triangular matrix A and its derivative using
+    the Parlett's method
 
     .. math::
 
-        F = \\exp(A) = \\exp \\left(\\begin{bmatrix} a11 & a12 \\\\ 0 & a22 \\end{bmatrix} \\right)
+        F = \\exp(A) = \\exp \\left(\\begin{bmatrix} a11 & a12 \\\\ 0 & a22
+        \\end{bmatrix} \\right)
         = \\begin{bmatrix} f11 & f12 \\\\ 0 & f22 \\end{bmatrix}
 
     Args:
@@ -834,7 +837,8 @@ def disc_d_diffusion_kron(
     dQ: np.ndarray,
     dAd: np.ndarray,
 ) -> np.ndarray:
-    """Discretize diffusion matrix and its derivative by solving indirectly the Lyapunov equation
+    """Discretize diffusion matrix and its derivative by solving indirectly the Lyapunov
+    equation
 
     Charles C. Driver, Manuel C. Voelkle.
     Introduction to Hierarchical Continuous Time Dynamic Modelling With ctsem

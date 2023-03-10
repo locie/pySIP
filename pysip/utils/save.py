@@ -41,6 +41,7 @@ def load_model(path):
         model.ss.update_continuous_dssm()
     except Exception:
         warnings.warn(
-            "Updating continuous dssm while deserializing model hasn't been successfull."
+            "Updating continuous dssm while deserializing model hasn't been "
+            "successfull."
         )
     return model

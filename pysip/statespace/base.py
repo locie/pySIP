@@ -235,7 +235,8 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
                 - **dAd**: Jacobian discrete state matrix
                 - **dB0d**: Jacobian discrete input matrix (zero order hold)
                 - **dB1d**: Jacobian discrete input matrix (first order hold)
-                - **dQd**: Jacobian of the upper Cholesky factor of the process noise covariance
+                - **dQd**: Jacobian of the upper Cholesky factor of the process noise
+                  covariance
         """
         nj = dA.shape[0]
 
@@ -284,7 +285,8 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
                     - **dAd**: Jacobian discrete state matrix
                     - **dB0d**: Jacobian discrete input matrix (zero order hold)
                     - **dB1d**: Jacobian discrete input matrix (first order hold)
-                    - **dQd**: Jacobian of the upper Cholesky factor of the process noise covariance
+                    - **dQd**: Jacobian of the upper Cholesky factor of the process
+                      noise covariance
         """
         # Different sampling time up to the nanosecond
         dt, _, idx = np.unique(np.round(dt, 9), True, True)
@@ -409,7 +411,8 @@ class RCModel(StateSpace):
                 - **dAd**: Derivative discrete state matrix
                 - **dB0d**: Derivative discrete input matrix (zero order hold)
                 - **dB1d**: Derivative discrete input matrix (first order hold)
-                - **dQd**: Derivative of the upper Cholesky factor of the process noise covariance
+                - **dQd**: Derivative of the upper Cholesky factor of the process noise
+                  covariance
         """
         Qc = self.Q.T @ self.Q
         dQc = dQ.swapaxes(1, 2) @ self.Q + self.Q.T @ dQ
@@ -531,7 +534,8 @@ class GPModel(StateSpace):
                 - **dAd**: Jacobian discrete state matrix
                 - **dB0d**: Jacobian discrete input matrix (zero order hold)
                 - **dB1d**: Jacobian discrete input matrix (first order hold)
-                - **dQd**: Jacobian of the upper Cholesky factor of the process noise covariance
+                - **dQd**: Jacobian of the upper Cholesky factor of the process noise
+                  covariance
         """
         nj = dA.shape[0]
         Ad, dAd = disc_d_state(self.A, dA, dt)
