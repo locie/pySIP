@@ -70,8 +70,10 @@ def test_save_model_to_pickle(reg):
 def test_save_version_number():
     from pysip import __version__
 
-    save_model("test", Regressor(None))
-    load_reg = load_model("test")
+    with TemporaryDirectory() as tmpdir:
+        tmpdir = Path(tmpdir)
+        save_model(tmpdir / "test", Regressor(None))
+        load_reg = load_model(tmpdir / "test")
 
     assert load_reg.__version__ == __version__
 
@@ -97,8 +99,9 @@ def test_model_pickle_file_size_limit(ss, size_kb):
     )
     model.ss.update_continuous_dssm()
 
-    save_model("big", model)
-    size = os.path.getsize("big.pickle")
-    os.remove("big.pickle")
+    with TemporaryDirectory() as tmpdir:
+        tmpdir = Path(tmpdir)
+        save_model(tmpdir / "big", model)
+        size = os.path.getsize(tmpdir / "big.pickle")
 
     assert size <= size_kb * 1000

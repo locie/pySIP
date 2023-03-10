@@ -8,7 +8,7 @@ from pysip import __version__
 def with_extension(extension):
     def _extension(f):
         def wrapper(*args):
-            a = args[0]
+            a = str(args[0])
             if not a.endswith("." + extension):
                 a += "." + extension
             return f(a, *args[1:])
