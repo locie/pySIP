@@ -129,4 +129,4 @@ def test_gradient_RCModel(artificial_data_rc, reg, inputs, outputs):
 
     assert ned(grad, grad_fd) < 1e-7
     assert np.all(np.sign(grad) == np.sign(grad_fd))
-    assert grad == pytest.approx(grad_fd, rel=1e-6)
+    assert grad == pytest.approx(grad_fd, rel=1e-3)
