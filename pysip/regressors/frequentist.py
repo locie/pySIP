@@ -108,7 +108,7 @@ class FreqRegressor(BaseRegressor):
                     np.abs(self.ss.parameters.d_penalty),
                 ]
             ).T,
-            columns=["θ", "σ(θ)", "pvalue", "|g(η)|", "dpen(θ)|"],
+            columns=["θ", "σ(θ)", "pvalue", "|g(η)|", "|dpen(θ)|"],
             index=self.ss.parameters.names_free,
         )
         df_corr = pd.DataFrame(

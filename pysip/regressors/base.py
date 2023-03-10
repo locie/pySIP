@@ -358,7 +358,7 @@ class BaseRegressor:
 
             if tnew is not None:
                 y = np.append(
-                    y, np.full((self.ss.ny, tp.shape[0]), np.nan, np.float), axis=1
+                    y, np.full((self.ss.ny, tp.shape[0]), np.nan, np.float64), axis=1
                 )
                 y = y[:, index]
 

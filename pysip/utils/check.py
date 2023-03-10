@@ -19,13 +19,13 @@ def eigen_values(model, summary, corr):
 @stack
 def summary(model, summary, corr):
     """All ??? are less than 10^-4"""
-    return (summary["|g(\u03B7)|"] < 1e-4).all()
+    return (summary["|g(η)|"] < 1e-4).all()
 
 
 @stack
 def summary_penalty(model, summary, corr):
     """??"""
-    return (summary["|dpen(\u03B8)|"] < summary["|g(\u03B7)|"]).all()
+    return (summary["|dpen(θ)|"] < summary["|g(η)|"]).all()
 
 
 @stack

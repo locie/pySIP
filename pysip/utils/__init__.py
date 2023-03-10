@@ -17,6 +17,7 @@ from .math import (
 from .plot import percentile_plot, plot_ccf, plot_cpgram
 from .save import load_model, save_model
 from .statistics import aic, ccf, check_ccf, check_cpgram, cpgram, lrtest, ttest
+from .misc import Namespace
 
 __all__ = [
     "generate_random_binary",
@@ -48,4 +49,5 @@ __all__ = [
     "cpgram",
     "lrtest",
     "ttest",
+    "Namespace",
 ]
