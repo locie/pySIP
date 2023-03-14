@@ -76,15 +76,23 @@ class FreqRegressor(BaseRegressor):
         self.ss.parameters.eta = self._init_parameters(1, init, hpd)
         data = self._prepare_data(df, inputs, outputs, None)[:-1]
 
-        results = minimize(
-            fun=self._eval_dlog_posterior,
-            x0=self.ss.parameters.eta_free,
-            args=data,
-            method="BFGS",
-            jac=True,
-            options=options,
-        )
-
+        if hasattr(self.filter, "dlog_likelihood"):
+            results = minimize(
+                fun=self._eval_dlog_posterior,
+                x0=self.ss.parameters.eta_free,
+                args=data,
+                method="BFGS",
+                options=options,
+                jac=True,
+            )
+        else:
+            results = minimize(
+                fun=self._eval_log_prior,
+                x0=self.ss.parameters.eta_free,
+                args=data,
+                method="BFGS",
+                options=options,
+            )
         # inverse jacobian of the transform eta = f(theta)
         inv_jac = np.diag(1.0 / np.array(self.ss.parameters.eta_jacobian))
 
