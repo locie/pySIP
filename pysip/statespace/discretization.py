@@ -11,10 +11,6 @@ from scipy.linalg import (
     solve_continuous_lyapunov,
     solve_sylvester,
 )
-from joblib import Memory
-from platformdirs import user_cache_dir
-
-memory = Memory(Path(user_cache_dir("pysip")) / "discretization_cache", verbose=0)
 
 
 def inv_2x2(X: np.ndarray) -> np.ndarray:
@@ -215,7 +211,6 @@ def dexpm_2x2(X: np.ndarray, dX: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     return v @ np.diag(exp_w) @ u, v @ (u @ dX @ v * d) @ u
 
 
-@memory.cache()
 def disc_state_input(
     A: np.ndarray,
     B: np.ndarray,
@@ -250,7 +245,6 @@ def disc_state_input(
         return Ad, B0d, B1d
     else:
         raise ValueError("`method must be `expm` or `analytic`")
-
 
 def disc_state(A: np.ndarray, dt: float = 1.0) -> np.ndarray:
     """Discretize the state matrix
@@ -338,7 +332,6 @@ def disc_state_input_expm(
         Ad, B0d, B1d = np.split(
             expm(F * dt)[:nx, :], indices_or_sections=[nx, nx + nu], axis=1
         )
-
     return Ad, B0d, B1d
 
 

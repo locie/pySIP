@@ -17,8 +17,7 @@ from .discretization import (
 from .meta import MetaStateSpace
 from .nodes import Node
 
-ssm = namedtuple("ssm", "A, B0, B1, C, D, Q, R, x0, P0")
-dssm = namedtuple("dssm", "dA, dB0, dB1, dC, dD, dQ, dR, dx0, dP0")
+local_ssm = namedtuple("ssm", "A, B0, B1, Q")
 
 
 def zeros(m, n):
@@ -86,7 +85,7 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
         """Update the state-space model with the constrained parameters"""
         pass
 
-    def get_discrete_ssm(self, dt: np.ndarray) -> Tuple[NamedTuple, np.ndarray]:
+    def get_discrete_ssm(self, dt: float) -> Tuple[NamedTuple, np.ndarray]:
         """Return the updated discrete state-space model
 
         Args:
@@ -99,40 +98,12 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
         """
 
         self.update_continuous_ssm()
-        index, Ad, B0d, B1d, Qd, *_ = self.discretization(dt, False)
-        return ssm(Ad, B0d, B1d, self.C, self.D, Qd, self.R, self.x0, self.P0), index
-
-    def _lti_disc(
-        self, dt: float
-    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-        """Discretization of LTI state-space model
-
-        Args:
-            dt: sampling time
-
-        Returns:
-            4-elements tuple containing
-                - **Ad**: Discrete state matrix
-                - **B0d**: Discrete input matrix (zero order hold)
-                - **B1d**: Discrete input matrix (first order hold)
-                - **Qd**: Upper Cholesky factor of the process noise covariance
-        """
-
-        if self.nu == 0:
-            Ad = disc_state(self.A, dt)
-            B0d = np.zeros((self.nx, self.nu))
-            B1d = B0d
-        else:
-            Ad, B0d, B1d = disc_state_input(self.A, self.B, dt, self.hold_order, "expm")
-
-        Qd = nearest_cholesky(disc_diffusion_mfd(self.A, self.Q.T @ self.Q, dt))
-
-        return Ad, B0d, B1d, Qd
-
+        Ad, B0d, B1d, Qd = self.discretization(dt)
+        return local_ssm(Ad, B0d, B1d, Qd)
 
     def discretization(
         self, dt: float
-    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, Tuple]:
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """Discretization of LTI state-space model
 
         Args:
@@ -155,9 +126,16 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
         """
         # Different sampling time up to the nanosecond
 
-        A, B0, B1, Q = self._lti_disc(dt)
+        if self.nu == 0:
+            Ad = disc_state(self.A, dt)
+            B0d = np.zeros((self.nx, self.nu))
+            B1d = B0d
+        else:
+            Ad, B0d, B1d = disc_state_input(self.A, self.B, dt, self.hold_order, "expm")
 
-        return A, B0, B1, Q
+        Qd = nearest_cholesky(disc_diffusion_mfd(self.A, self.Q.T @ self.Q, dt))
+
+        return Ad, B0d, B1d, Qd
 
 
 @dataclass
@@ -168,6 +146,11 @@ class RCModel(StateSpace):
 
     def __post_init__(self):
         super().__post_init__()
+        eig = np.real(np.linalg.eigvals(self.A))
+        if np.all(eig < 0) and eig.max() / eig.min():
+            self._method = "analytic"
+        else:
+            self._method = "mfd"
 
     def __repr__(self):
         return f"\n{self.__class__.__name__}" + "-" * len(self.__class__.__name__)
@@ -178,7 +161,7 @@ class RCModel(StateSpace):
 
         return LatentForceModel(self, gp, self.latent_forces)
 
-    def _lti_disc(
+    def discretization(
         self, dt: float
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """Discretization of RC model
@@ -193,9 +176,8 @@ class RCModel(StateSpace):
                 - **B1d**: Discrete input matrix (first order hold)
                 - **Qd**: Upper Cholesky factor of the process noise covariance
         """
-        eig = np.real(np.linalg.eigvals(self.A))
 
-        if np.all(eig < 0) and eig.max() / eig.min() > 1e-10:
+        if self.method == "analytic":
             Ad, B0d, B1d = disc_state_input(
                 self.A, self.B, dt, self.hold_order, "analytic"
             )
@@ -251,7 +233,7 @@ class GPModel(StateSpace):
 
         return GPSum(self, gp)
 
-    def _lti_disc(
+    def discretization(
         self, dt: float
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """Discretization of temporal Gaussian Process

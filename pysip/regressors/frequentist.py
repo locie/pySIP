@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import minimize
 
-from ..state_estimator import BayesianFilter, Kalman_QR
+from ..state_estimator.fast_kalman_qr import KalmanQR, BayesianFilter
 from ..statespace.base import StateSpace
 from ..utils.statistics import ttest
 from .base import BaseRegressor
@@ -24,7 +24,7 @@ class FreqRegressor(BaseRegressor):
     def __init__(
         self,
         ss: StateSpace,
-        bayesian_filter: BayesianFilter = Kalman_QR,
+        bayesian_filter: BayesianFilter = KalmanQR,
         time_scale: str = "s",
     ):
         super().__init__(ss, bayesian_filter, time_scale, False, True)
@@ -74,25 +74,16 @@ class FreqRegressor(BaseRegressor):
         init = options.pop("init", "fixed")
         hpd = options.pop("hpd", 0.95)
         self.ss.parameters.eta = self._init_parameters(1, init, hpd)
-        data = self._prepare_data(df, inputs, outputs, None)[:-1]
+        data = self._prepare_data(df, inputs, outputs)
 
-        if hasattr(self.filter, "dlog_likelihood"):
-            results = minimize(
-                fun=self._eval_dlog_posterior,
-                x0=self.ss.parameters.eta_free,
-                args=data,
-                method="BFGS",
-                options=options,
-                jac=True,
-            )
-        else:
-            results = minimize(
-                fun=self._eval_log_prior,
-                x0=self.ss.parameters.eta_free,
-                args=data,
-                method="BFGS",
-                options=options,
-            )
+        results = minimize(
+            fun=self._eval_log_posterior,
+            x0=self.ss.parameters.eta_free,
+            args=data,
+            method="BFGS",
+            options=options,
+        )
+
         # inverse jacobian of the transform eta = f(theta)
         inv_jac = np.diag(1.0 / np.array(self.ss.parameters.eta_jacobian))
 
@@ -193,7 +184,6 @@ class FreqRegressor(BaseRegressor):
         df: pd.DataFrame,
         outputs: Union[str, list],
         inputs: Union[str, list] = None,
-        pointwise: bool = False,
     ) -> Union[float, np.ndarray]:
         """Evaluate the negative log-likelihood
 
@@ -207,8 +197,8 @@ class FreqRegressor(BaseRegressor):
             Negative log-likelihood or predictive density evaluated point-wise
         """
 
-        dt, u, u1, y, *_ = self._prepare_data(df, inputs, outputs, None)
-        return self._eval_log_likelihood(dt, u, u1, y, pointwise)
+        dt, u, u1, y = self._prepare_data(df, inputs, outputs)
+        return self._eval_log_likelihood(dt, u, u1, y)
 
     def predict(
         self,

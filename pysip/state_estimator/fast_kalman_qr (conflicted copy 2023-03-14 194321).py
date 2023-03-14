@@ -1,5 +1,4 @@
 from copy import deepcopy
-from functools import lru_cache
 import math
 from typing import NamedTuple
 import warnings
@@ -60,13 +59,13 @@ def _nb_log_likelihood(x, u, dtu, y, C, D, R, P, Q, A, B0, B1):
     _Arru = np.zeros((nx + ny, nx + ny))
     log_likelihood = 0.5 * n_timesteps * math.log(2.0 * math.pi)
     for i in range(n_timesteps):
-        Q_i = Q[:, :, i]
-        A_i = A[:, :, i]
-        B0_i = B0[:, :, i]
-        B1_i = B1[:, :, i]
-        y_i = y[i]
-        u_i = u[i].reshape(-1, 1)
-        dtu_i = dtu[i].reshape(-1, 1)
+        Q_i = Q[i]
+        A_i = A[i]
+        B0_i = B0[i]
+        B1_i = B1[i]
+        y_i = y[:, i]
+        u_i = u[:, i].reshape(-1, 1)
+        dtu_i = dtu[:, i].reshape(-1, 1)
         x, P, e, S = _nb_kalman_step(
             x, P, u_i, dtu_i, y_i, C, D, R, Q_i, A_i, B0_i, B1_i, _Arru
         )
@@ -77,12 +76,11 @@ def _nb_log_likelihood(x, u, dtu, y, C, D, R, P, Q, A, B0, B1):
     return log_likelihood
 
 
-# try:
-#     from numba import jit_module
-
-#     jit_module(nopython=True, nogil=True, cache=True)
-# except ImportError:
-#     warnings.warn("Numba not installed, using pure python implementation")
+try:
+    from numba import jit_module
+    jit_module(nopython=True, nogil=True, cache=True)
+except ImportError:
+    warnings.warn("Numba not installed, using pure python implementation")
 
 
 class KalmanQR(BayesianFilter):
@@ -94,21 +92,14 @@ class KalmanQR(BayesianFilter):
         dtu: pd.DataFrame,
         y: pd.DataFrame,
     ):
-        discretization = lru_cache(ss.discretization)
         x = deepcopy(ss.x0)
         P = deepcopy(ss.P0)
 
         C = ss.C
         D = ss.D
         R = ss.R
-        Q, A, B0, B1 = map(np.dstack, zip(*dt.apply(discretization).to_list()))
-        u = u.to_numpy()
-        dtu = dtu.to_numpy()
-        y = y.to_numpy()
-
-        print(x.shape, u.shape, dtu.shape, y.shape)
+        Q, A, B0, B1 = zip(*dt.apply(ss.discretization).to_list())
+        print(Q)
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=NumbaPerformanceWarning)
-            return _nb_log_likelihood(
-                x, u, dtu, y, C, D, R, P, Q, A, B0, B1
-            )
+            return _nb_log_likelihood(x, u, dtu, y, C, D, R, P, Q, A, B0, B1)
