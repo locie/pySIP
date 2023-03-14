@@ -26,7 +26,6 @@ def solve_triu_inplace(A, b):
 
 def _nb_update(C, D, R, x, P, u, y, _Arru):
     ny, nx = C.shape
-    _Arru = np.zeros((nx + ny, nx + ny))
     _Arru[:ny, :ny] = R
     _Arru[ny:, :ny] = P @ C.T
     _Arru[ny:, ny:] = P

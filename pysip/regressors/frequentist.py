@@ -74,7 +74,7 @@ class FreqRegressor(BaseRegressor):
         init = options.pop("init", "fixed")
         hpd = options.pop("hpd", 0.95)
         self.ss.parameters.eta = self._init_parameters(1, init, hpd)
-        data = self._prepare_data(df, outputs, inputs)
+        data = self._prepare_data(df, inputs, outputs)
 
         results = minimize(
             fun=self._eval_log_posterior,
