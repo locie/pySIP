@@ -140,26 +140,6 @@ class BaseRegressor:
         ssm, index = self.ss.get_discrete_ssm(dt)
         return self.filter.log_likelihood(ssm, index, u, u1, y, pointwise)
 
-    def _eval_dlog_likelihood(
-        self, dt: np.ndarray, u: np.ndarray, u1: np.ndarray, y: np.ndarray
-    ) -> Tuple[float, np.ndarray]:
-        """Evaluate the negative log-likelihood and the gradient
-
-        Args:
-            dt: Sampling time
-            u: Input data
-            u1: Forward finite difference of the input data
-            y: Output data
-
-        Returns:
-            2-element tuple containing
-                - The negative log-likelihood
-                - The gradient of the negative log-likelihood
-        """
-
-        ssm, dssm, index = self.ss.get_discrete_dssm(dt)
-        return self.filter.dlog_likelihood(ssm, dssm, index, u, u1, y)
-
     def _eval_log_posterior(
         self,
         eta: np.ndarray,
@@ -192,47 +172,6 @@ class BaseRegressor:
             log_posterior += self.ss.parameters.penalty
 
         return log_posterior
-
-    def _eval_dlog_posterior(
-        self,
-        eta: np.ndarray,
-        dt: np.ndarray,
-        u: np.ndarray,
-        u1: np.ndarray,
-        y: np.ndarray,
-    ) -> Union[float, np.ndarray]:
-        """Evaluate the negative log-posterior and the gradient
-
-        Args:
-            eta: Unconstrained parameters
-            dt: Sampling time
-            u: Input data
-            u1: Forward finite difference of the input data
-            y: Output data
-
-        Returns:
-            2-element tuple containing
-                - The negative log-posterior
-                - The gradient of the negative log-posterior
-        """
-
-        self.ss.parameters.eta = eta
-        log_likelihood, dlog_likelihood = self._eval_dlog_likelihood(dt, u, u1, y)
-        log_posterior = log_likelihood - self.ss.parameters.prior
-        dlog_posterior = (
-            dlog_likelihood * self.ss.parameters.scale - self.ss.parameters.d_prior
-        )
-        dlog_posterior *= self.ss.parameters.theta_jacobian
-
-        if self._use_jacobian:
-            log_posterior -= self.ss.parameters.theta_log_jacobian
-            dlog_posterior -= self.ss.parameters.theta_dlog_jacobian
-
-        if self._use_penalty:
-            log_posterior += self.ss.parameters.penalty
-            dlog_posterior += self.ss.parameters.d_penalty
-
-        return log_posterior, dlog_posterior
 
     def _prepare_data(
         self,
@@ -282,28 +221,13 @@ class BaseRegressor:
                     f"The model {self.ss.name} requires {self.ss.nu} inputs"
                 )
 
-        if tnew is None:
-            if isinstance(df.index, pd.DatetimeIndex):
-                dt = np.diff(df.index) / np.timedelta64(1, self._time_scale)
-            else:
-                dt = np.diff(df.index.astype(np.float64))
-            index_back = ()
-            n = df.index.shape[0]
+        if isinstance(df.index, pd.DatetimeIndex):
+            dt = np.diff(df.index) / np.timedelta64(1, self._time_scale)
         else:
-            if isinstance(df.index, pd.DatetimeIndex):
-                t = df.index.astype(np.int64) // 1e9
-            else:
-                t = df.index.astype(np.float64)
-            tbase = t.copy()
+            dt = np.diff(df.index.astype(np.float64))
 
-            if isinstance(tnew, pd.DatetimeIndex):
-                tp = tnew.astype(np.int64) // 1e9
-            else:
-                tp = tnew.astype(np.float64)
-
-            t, index, index_back = np.unique(np.append(tbase, tp), True, True)
-            dt = np.diff(t)
-            n = t.shape[0]
+        index_back = ()
+        n = df.index.shape[0]
 
         # Compute sampling time
         if n > 1:

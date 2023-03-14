@@ -75,38 +75,18 @@ class GPProduct(GPModel):
         # special case for Periodic covariance
         if isinstance(self._gp1, Periodic):
             self._Q1 = self._gp1.P0
-            self._dQ1 = self._gp1.dP0
         else:
             self._Q1 = self._gp1.Q
-            self._dQ1 = self._gp1.dQ
 
         if isinstance(self._gp2, Periodic):
             self._Q2 = self._gp2.P0
-            self._dQ2 = self._gp2.dP0
         else:
             self._Q2 = self._gp2.Q
-            self._dQ2 = self._gp2.dQ
 
         super().__post_init__()
-
-    def init_continuous_dssm(self):
-        self._init_continuous_dssm()
-        self._gp1._init_continuous_dssm()
-        self._gp2._init_continuous_dssm()
-        self.set_constant_continuous_dssm()
-
-    def delete_continuous_dssm(self):
-        self._gp1.delete_continuous_dssm()
-        self._gp2.delete_continuous_dssm()
-        self._delete_continuous_dssm()
-
     def set_constant_continuous_ssm(self):
         self._gp1.set_constant_continuous_ssm()
         self._gp2.set_constant_continuous_ssm()
-
-    def set_constant_continuous_dssm(self):
-        self._gp1.set_constant_continuous_dssm()
-        self._gp2.set_constant_continuous_dssm()
 
     def update_continuous_ssm(self):
         self._gp1.update_continuous_ssm()
@@ -117,23 +97,3 @@ class GPProduct(GPModel):
         self.Q = np.kron(self._Q1, self._Q2)
         self.R = self._gp1.R
         self.P0 = np.kron(self._gp1.P0, self._gp2.P0)
-
-    def update_continuous_dssm(self):
-        self._gp1.update_continuous_dssm()
-        self._gp2.update_continuous_dssm()
-
-        s1 = self._gp1.name + "__"
-        s2 = self._gp2.name + "__"
-
-        # for n in self._gp1.parameters.names_free:
-        for n in self._gp1._names:
-            self.dA[s1 + n][:] = np.kron(self._gp1.dA[n], self._I2)
-            self.dQ[s1 + n][:] = np.kron(self._dQ1[n], self._Q2)
-            self.dP0[s1 + n][:] = np.kron(self._gp1.dP0[n], self._gp2.P0)
-            self.dR[s1 + n][:] = self._gp1.dR[n]
-
-        for n in self._gp2._names:
-            self.dA[s2 + n][:] = np.kron(self._I1, self._gp2.dA[n])
-            self.dQ[s2 + n][:] = np.kron(self._Q1, self._dQ2[n])
-            self.dP0[s2 + n][:] = np.kron(self._gp1.P0, self._gp2.dP0[n])
-            self.dR[s2 + n][:] = self._gp2.dR[n]

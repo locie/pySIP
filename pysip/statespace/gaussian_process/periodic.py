@@ -50,9 +50,6 @@ class Periodic(GPModel):
             np.array([[0.0, -2.0 * np.pi], [2.0 * np.pi, 0.0]]),
         )
 
-    def set_constant_continuous_dssm(self):
-        self.dR["sigv"][0, 0] = 1.0
-
     def update_continuous_ssm(self):
         period, mscale, lscale, sigv, *_ = self.parameters.theta
 
@@ -70,34 +67,3 @@ class Periodic(GPModel):
         self.A[:] = self._kron / period
         self.R[0, 0] = sigv
         self.P0[self._diag] = np.repeat(np.sqrt(q2), 2)
-
-    def update_continuous_dssm(self):
-        period, mscale, lscale, *_ = self.parameters.theta
-
-        q2 = (
-            2.0
-            * mscale**2
-            * np.exp(-(lscale ** (-2)))
-            * iv(range(self.J + 1), lscale ** (-2))
-        )
-        q2[0] *= 0.5
-        q = np.sqrt(q2)
-
-        dq2 = np.empty(int(self.J + 1))
-        dq2[:] = mscale**2 * lscale ** (-3) * np.exp(-(lscale ** (-2)))
-        dq2[0] *= 2.0 * (iv(0, lscale ** (-2)) - iv(1, lscale ** (-2)))
-        dq2[1:] *= -4.0 * iv(range(self.J), lscale ** (-2)) + 4.0 * (
-            1.0 + np.arange(1, self.J + 1) / (lscale ** (-2))
-        ) * iv(range(1, self.J + 1), lscale ** (-2))
-
-        if not np.all(np.isfinite(dq2)):
-            raise ValueError(
-                "Derivative of spectral variance coefficients are not finite!"
-            )
-
-        dql = 0.5 / q * dq2
-        dqm = 0.5 / q * q2 * 2.0 / mscale
-
-        self.dA["period"] = self._kron / -(period**2)
-        self.dP0["lscale"][self._diag] = np.repeat(dql, 2)
-        self.dP0["mscale"][self._diag] = np.repeat(dqm, 2)

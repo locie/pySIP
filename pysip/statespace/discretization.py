@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Tuple
 
 import numpy as np
@@ -10,6 +11,10 @@ from scipy.linalg import (
     solve_continuous_lyapunov,
     solve_sylvester,
 )
+from joblib import Memory
+from platformdirs import user_cache_dir
+
+memory = Memory(Path(user_cache_dir("pysip")) / "discretization_cache", verbose=0)
 
 
 def inv_2x2(X: np.ndarray) -> np.ndarray:
@@ -210,6 +215,7 @@ def dexpm_2x2(X: np.ndarray, dX: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     return v @ np.diag(exp_w) @ u, v @ (u @ dX @ v * d) @ u
 
 
+@memory.cache()
 def disc_state_input(
     A: np.ndarray,
     B: np.ndarray,
@@ -246,52 +252,6 @@ def disc_state_input(
         raise ValueError("`method must be `expm` or `analytic`")
 
 
-def disc_d_state_input(
-    A: np.ndarray,
-    B: np.ndarray,
-    dA: np.ndarray,
-    dB: np.ndarray,
-    dt: float = 1.0,
-    order_hold: int = 0,
-    method: str = "expm",
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    """Discretize the state and input matrices, and their derivatives
-
-    .. math::
-
-        x_{k+1} = Ad x_k + B0d u_k + B1d \\Delta u_k
-        dx_{k+1} = dAd x_k + Ad dx_k + dB0d u_k + dB1d \\Delta u_k
-
-    Args:
-        A: State matrix
-        B: Input matrix
-        dA: Derivative state matrix
-        dB: Derivative input matrix
-        dt: Sampling time
-        order_hold: zero order hold = 0 or first order hold = 1
-        method: Augmented matrix exponential `expm` or symbolic `analytic`
-
-    Returns:
-        6-elements tuple containing
-            - Ad: Discrete state matrix
-            - B0d: Discrete input matrix (zero order hold)
-            - B1d: Discrete input matrix (first order hold)
-            - dAd:  Derivative discrete state matrix
-            - dB0d: Derivative discrete input matrix (zero order hold)
-            - dB1d: Derivative discrete input matrix (first order hold)
-    """
-    if method == "expm":
-        return disc_d_state_input_expm(A, B, dA, dB, dt, order_hold)
-    elif method == "analytic":
-        Ad, dAd = disc_d_state(A, dA, dt)
-        B0d, B1d, dB0d, dB1d = disc_d_input_analytic(
-            A, B, Ad, dA, dB, dAd, dt, order_hold
-        )
-        return Ad, B0d, B1d, dAd, dB0d, dB1d
-    else:
-        raise ValueError("`method must be `expm` or `analytic`")
-
-
 def disc_state(A: np.ndarray, dt: float = 1.0) -> np.ndarray:
     """Discretize the state matrix
 
@@ -303,30 +263,6 @@ def disc_state(A: np.ndarray, dt: float = 1.0) -> np.ndarray:
         Discrete state matrix
     """
     return expm(A * dt)
-
-
-def disc_d_state(
-    A: np.ndarray, dA: np.ndarray, dt: float = 1.0
-) -> Tuple[np.ndarray, np.ndarray]:
-    """Discretize the state matrix and its derivative
-
-    Args:
-        A: State matrix
-        dA: Derivative state matrix
-        dt: Sampling time
-
-    Returns:
-        2-elements tuple containing
-            - Ad: Discrete state matrix
-            - dAd: Derivative discrete state matrix
-    """
-    nj, nx, _ = dA.shape
-    dAd = np.zeros((nj, nx, nx))
-    for n in range(nj):
-        if dA[n].any() or n == 0:
-            Ad, dAd[n] = expm_frechet(A * dt, dA[n] * dt)
-
-    return Ad, dAd
 
 
 def disc_input_analytic(

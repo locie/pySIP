@@ -57,24 +57,9 @@ class GPSum(GPModel):
 
         super().__post_init__()
 
-    def init_continuous_dssm(self):
-        self._init_continuous_dssm()
-        self._gp1._init_continuous_dssm()
-        self._gp2._init_continuous_dssm()
-        self.set_constant_continuous_dssm()
-
-    def delete_continuous_dssm(self):
-        self._gp1.delete_continuous_dssm()
-        self._gp2.delete_continuous_dssm()
-        self._delete_continuous_dssm()
-
     def set_constant_continuous_ssm(self):
         self._gp1.set_constant_continuous_ssm()
         self._gp2.set_constant_continuous_ssm()
-
-    def set_constant_continuous_dssm(self):
-        self._gp1.set_constant_continuous_dssm()
-        self._gp2.set_constant_continuous_dssm()
 
     def update_continuous_ssm(self):
         self._gp1.update_continuous_ssm()
@@ -93,22 +78,3 @@ class GPSum(GPModel):
 
         self.P0[: self._gp1.nx, : self._gp1.nx] = self._gp1.P0
         self.P0[self._gp1.nx :, self._gp1.nx :] = self._gp2.P0
-
-    def update_continuous_dssm(self):
-        self._gp1.update_continuous_dssm()
-        self._gp2.update_continuous_dssm()
-
-        s1 = self._gp1.name + "__"
-        s2 = self._gp2.name + "__"
-
-        for n in self._gp1._names:
-            self.dA[s1 + n][: self._gp1.nx, : self._gp1.nx] = self._gp1.dA[n]
-            self.dQ[s1 + n][: self._gp1.nx, : self._gp1.nx] = self._gp1.dQ[n]
-            self.dR[s1 + n] = self._gp1.dR[n]
-            self.dP0[s1 + n][: self._gp1.nx, : self._gp1.nx] = self._gp1.dP0[n]
-
-        for n in self._gp2._names:
-            self.dA[s2 + n][self._gp1.nx :, self._gp1.nx :] = self._gp2.dA[n]
-            self.dQ[s2 + n][self._gp1.nx :, self._gp1.nx :] = self._gp2.dQ[n]
-            self.dR[s2 + n] = self._gp2.dR[n]
-            self.dP0[s2 + n][self._gp1.nx :, self._gp1.nx :] = self._gp2.dP0[n]

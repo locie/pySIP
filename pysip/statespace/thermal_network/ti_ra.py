@@ -32,12 +32,6 @@ class Ti_RA(RCModel):
     def set_constant_continuous_ssm(self):
         self.C[0, 0] = 1.0
 
-    def set_constant_continuous_dssm(self):
-        self.dQ["sigw"][0, 0] = 1.0
-        self.dR["sigv"][0, 0] = 1.0
-        self.dx0["x0"][0, 0] = 1.0
-        self.dP0["sigx0"][0, 0] = 1.0
-
     def update_continuous_ssm(self):
         R, C, A, sigw, sigv, x0, sigx0, *_ = self.parameters.theta
 
@@ -47,13 +41,3 @@ class Ti_RA(RCModel):
         self.R[0, 0] = sigv
         self.x0[0, 0] = x0
         self.P0[0, 0] = sigx0
-
-    def update_continuous_dssm(self):
-        R, C, A, *_ = self.parameters.theta
-
-        self.dA["R"][0, 0] = 1.0 / (C * R**2)
-        self.dA["C"][0, 0] = 1.0 / (R * C**2)
-
-        self.dB["R"][0, 0] = -1.0 / (C * R**2)
-        self.dB["C"][0, :] = [-1.0 / (C**2 * R), -A / C**2, -1.0 / C**2]
-        self.dB["A"][0, 1] = 1.0 / C

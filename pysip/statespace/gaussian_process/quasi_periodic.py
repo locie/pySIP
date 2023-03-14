@@ -51,9 +51,6 @@ class QuasiPeriodic12(GPModel):
             np.array([[0.0, -2.0 * np.pi], [2.0 * np.pi, 0.0]]),
         )
 
-    def set_constant_continuous_dssm(self):
-        self.dR["sigv"][0, 0] = 1.0
-
     def update_continuous_ssm(self):
         period, mscale, lscale, sigv, decay, *_ = self.parameters.theta
 
@@ -75,46 +72,6 @@ class QuasiPeriodic12(GPModel):
         self.R[0, 0] = sigv
         self.P0[self._diag] = np.repeat(np.sqrt(q2), 2)
         self.Q[:] = self.P0 * 2.0**0.5 * decay ** (-0.5)
-
-    def update_continuous_dssm(self):
-        period, mscale, lscale, _, decay, *_ = self.parameters.theta
-
-        q2 = (
-            2.0
-            * mscale**2
-            * np.exp(-(lscale ** (-2)))
-            * iv(range(self.J + 1), lscale ** (-2))
-        )
-        q2[0] *= 0.5
-        q = np.sqrt(q2)
-
-        dq2 = np.empty(int(self.J + 1))
-        dq2[:] = mscale**2 * lscale ** (-3) * np.exp(-(lscale ** (-2)))
-        dq2[0] *= 2.0 * (iv(0, lscale ** (-2)) - iv(1, lscale ** (-2)))
-        dq2[1:] *= -4.0 * iv(range(self.J), lscale ** (-2)) + 4.0 * (
-            1.0 + np.arange(1, self.J + 1) / (lscale ** (-2))
-        ) * iv(range(1, self.J + 1), lscale ** (-2))
-
-        if not np.all(np.isfinite(dq2)):
-            raise ValueError(
-                "Derivative of spectral variance coefficients are not finite!"
-            )
-
-        self.dA["period"][:] = self._kron / -(period**2)
-
-        self.dA["decay"][:] = np.kron(
-            np.eye(self.J + 1),
-            np.array([[1.0 / (decay**2), 0.0], [0.0, 1.0 / (decay**2)]]),
-        )
-
-        dql = 0.5 / q * dq2
-        dqm = 0.5 / q * q2 * 2.0 / mscale
-        self.dP0["lscale"][self._diag] = np.repeat(dql, 2)
-        self.dP0["mscale"][self._diag] = np.repeat(dqm, 2)
-        self.dQ["lscale"][:] = self.dP0["lscale"] * 2.0**0.5 * decay ** (-0.5)
-        self.dQ["mscale"][:] = self.dP0["mscale"] * 2.0**0.5 * decay ** (-0.5)
-        self.dQ["decay"][:] = -0.5 * self.Q / decay
-
 
 @dataclass
 class QuasiPeriodic32(GPModel):
@@ -171,9 +128,6 @@ class QuasiPeriodic32(GPModel):
             ),
         )
 
-    def set_constant_continuous_dssm(self):
-        self.dR["sigv"][0, 0] = 1.0
-
     def update_continuous_ssm(self):
         period, mscale, lscale, sigv, decay, *_ = self.parameters.theta
 
@@ -208,67 +162,3 @@ class QuasiPeriodic32(GPModel):
             _P0, np.array([[0.0, 0.0], [0.0, 2.0 * 3.0**0.75 / decay**1.5]])
         )
         self.P0[:] = np.kron(_P0, np.array([[1.0, 0.0], [0.0, 3.0**0.5 / decay]]))
-
-    def update_continuous_dssm(self):
-        period, mscale, lscale, _, decay, *_ = self.parameters.theta
-
-        q2 = (
-            2.0
-            * mscale**2
-            * np.exp(-(lscale ** (-2)))
-            * iv(range(self.J + 1), lscale ** (-2))
-        )
-        q2[0] *= 0.5
-        q = np.sqrt(q2)
-
-        dq2 = np.empty(int(self.J + 1))
-        dq2[:] = mscale**2 * lscale ** (-3) * np.exp(-(lscale ** (-2)))
-        dq2[0] *= 2.0 * (iv(0, lscale ** (-2)) - iv(1, lscale ** (-2)))
-        dq2[1:] *= -4.0 * iv(range(self.J), lscale ** (-2)) + 4.0 * (
-            1.0 + np.arange(1, self.J + 1) / (lscale ** (-2))
-        ) * iv(range(1, self.J + 1), lscale ** (-2))
-
-        if not np.all(np.isfinite(dq2)):
-            raise ValueError(
-                "Derivative of spectral variance " "coefficients are not finite!"
-            )
-
-        self.dA["period"][:] = self._kron / -(period**2)
-
-        tmp1 = 6.0 / decay**3
-        tmp2 = 2.0 * 3.0**0.5 / decay**2
-        self.dA["decay"][:] = np.kron(
-            np.eye(self.J + 1),
-            np.array(
-                [
-                    [0.0, 0.0, 0.0, 0.0],
-                    [tmp1, tmp2, 0.0, 0.0],
-                    [0.0, 0.0, 0.0, 0.0],
-                    [0.0, 0.0, tmp1, tmp2],
-                ]
-            ),
-        )
-
-        dql = 0.5 / q * dq2
-        dqm = 0.5 / q * q2 * 2.0 / mscale
-
-        _P0 = np.kron(np.diag(np.sqrt(q2)), np.eye(2))
-        _dP0l = np.kron(np.diag(dql), np.eye(2))
-        _dP0m = np.kron(np.diag(dqm), np.eye(2))
-
-        self.dQ["lscale"][:] = np.kron(
-            _dP0l, np.array([[0.0, 0.0], [0.0, 2.0 * 3.0**0.75 / decay**1.5]])
-        )
-        self.dQ["mscale"][:] = np.kron(
-            _dP0m, np.array([[0.0, 0.0], [0.0, 2.0 * 3.0**0.75 / decay**1.5]])
-        )
-        self.dQ["decay"][:] = -1.5 * self.Q / decay
-        self.dP0["lscale"][:] = np.kron(
-            _dP0l, np.array([[1.0, 0.0], [0.0, 3.0**0.5 / decay]])
-        )
-        self.dP0["mscale"][:] = np.kron(
-            _dP0m, np.array([[1.0, 0.0], [0.0, 3.0**0.5 / decay]])
-        )
-        self.dP0["decay"][:] = np.kron(
-            _P0, np.array([[0.0, 0.0], [0.0, -(3.0**0.5) / decay**2]])
-        )

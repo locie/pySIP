@@ -39,15 +39,6 @@ class TwTi_RoRi(RCModel):
     def set_constant_continuous_ssm(self):
         self.C[0, 1] = 1.0
 
-    def set_constant_continuous_dssm(self):
-        self.dQ["sigw_w"][0, 0] = 1.0
-        self.dQ["sigw_i"][1, 1] = 1.0
-        self.dR["sigv"][0, 0] = 1.0
-        self.dx0["x0_w"][0, 0] = 1.0
-        self.dx0["x0_i"][1, 0] = 1.0
-        self.dP0["sigx0_w"][0, 0] = 1.0
-        self.dP0["sigx0_i"][1, 1] = 1.0
-
     def update_continuous_ssm(self):
         (
             Ro,
@@ -73,18 +64,3 @@ class TwTi_RoRi(RCModel):
         self.R[0, 0] = sigv
         self.x0[:, 0] = [x0_w, x0_i]
         self.P0[self._diag] = [sigx0_w, sigx0_i]
-
-    def update_continuous_dssm(self):
-        Ro, Ri, Cw, Ci, *_ = self.parameters.theta
-
-        self.dA["Ro"][0, 0] = 1.0 / (Cw * Ro**2)
-        self.dA["Ri"][:] = [
-            [1.0 / (Cw * Ri**2), -1.0 / (Cw * Ri**2)],
-            [-1.0 / (Ci * Ri**2), 1.0 / (Ci * Ri**2)],
-        ]
-        self.dA["Cw"][0, :] = [(Ro + Ri) / (Cw**2 * Ri * Ro), -1.0 / (Cw**2 * Ri)]
-        self.dA["Ci"][1, :] = [-1.0 / (Ci**2 * Ri), 1.0 / (Ci**2 * Ri)]
-
-        self.dB["Ro"][0, 0] = -1.0 / (Cw * Ro**2)
-        self.dB["Cw"][0, 0] = -1.0 / (Cw**2 * Ro)
-        self.dB["Ci"][1, 1] = -1.0 / Ci**2

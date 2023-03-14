@@ -41,15 +41,6 @@ class TiTh_RwRhAi(RCModel):
     def set_constant_continuous_ssm(self):
         self.C[0, 0] = 1.0
 
-    def set_constant_continuous_dssm(self):
-        self.dQ["sigw_i"][0, 0] = 1.0
-        self.dQ["sigw_h"][1, 1] = 1.0
-        self.dR["sigv"][0, 0] = 1.0
-        self.dx0["x0_i"][0, 0] = 1.0
-        self.dx0["x0_h"][1, 0] = 1.0
-        self.dP0["sigx0_i"][0, 0] = 1.0
-        self.dP0["sigx0_h"][1, 1] = 1.0
-
     def update_continuous_ssm(self):
         (
             Rw,
@@ -76,19 +67,3 @@ class TiTh_RwRhAi(RCModel):
         self.R[0, 0] = sigv
         self.x0[:, 0] = [x0_i, x0_h]
         self.P0[self._diag] = [sigx0_i, sigx0_h]
-
-    def update_continuous_dssm(self):
-        Rw, Rh, Ci, Ch, Ai, *_ = self.parameters.theta
-
-        self.dA["Rw"][0, 0] = 1.0 / (Ci * Rw**2)
-        self.dA["Rh"][:] = [
-            [1.0 / (Ci * Rh**2), -1.0 / (Ci * Rh**2)],
-            [-1.0 / (Ch * Rh**2), 1.0 / (Ch * Rh**2)],
-        ]
-        self.dA["Ci"][0, :] = [(Rh + Rw) / (Ci**2 * Rh * Rw), -1.0 / (Ci**2 * Rh)]
-        self.dA["Ch"][1, :] = [-1.0 / (Ch**2 * Rh), 1.0 / (Ch**2 * Rh)]
-
-        self.dB["Rw"][0, 0] = -1.0 / (Ci * Rw**2)
-        self.dB["Ci"][0, :2] = [-1.0 / (Ci**2 * Rw), -Ai / Ci**2]
-        self.dB["Ch"][1, 2] = -1.0 / Ch**2
-        self.dB["Ai"][0, 1] = 1.0 / Ci
