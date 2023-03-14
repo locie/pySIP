@@ -1,26 +1,30 @@
 # Stochastic State-Space Inference and Prediction in Python (pySIP)
 
-Ordinary differential equations, determined from first-principles, can be used for modeling physical
-systems. However, the exact dynamics of such systems are uncertain and only measured at
-discrete-time instants through non-ideal sensors. In this case, stochastic differential equations
-provide a modeling framework which is more robust to these uncertainties. The stochastic part of the
-state-space model can accomodate for unmodeled disturbances, which do not have a significant
-influence on the system dynamics. Otherwise, unmeasured disturbances can be modeled as temporal
-**Gaussian Processes** with certain parametrized covariance structure. The resulting **Latent Force
-Model** is a combination of parametric grey-box model and non-parametric Gaussian process model.
+Ordinary differential equations, determined from first-principles, can be used
+for modeling physical systems. However, the exact dynamics of such systems are
+uncertain and only measured at discrete-time instants through non-ideal sensors.
+In this case, stochastic differential equations provide a modeling framework
+which is more robust to these uncertainties. The stochastic part of the
+state-space model can accomodate for unmodeled disturbances, which do not have a
+significant influence on the system dynamics. Otherwise, unmeasured disturbances
+can be modeled as temporal **Gaussian Processes** with certain parametrized
+covariance structure. The resulting **Latent Force Model** is a combination of
+parametric grey-box model and non-parametric Gaussian process model.
 
-**pySIP** provides a framework for **infering continuous time linear stochastic state-space models**
-. For that purpose, it is possible to chose between a **frequentist** and a **Bayesian** workflow.
-Each workflow allows to estimate the parameters, assess the inference and model reliability, and
-perform model selection.
+**pySIP** provides a framework for **infering continuous time linear stochastic
+state-space models**. For that purpose, it is possible to chose between a
+**frequentist** and a **Bayesian** workflow. Each workflow allows to estimate
+the parameters, assess the inference and model reliability, and perform model
+selection.
 
-**pySIP** is being developed in the perspective to build a library which gather models from
-different engineering applications. Currently, applications involving dynamic thermal models
-(RC network) and temporal Gaussian Processes are being prioritized. Nevertheless, any model
-following the formalism of **pySIP** can benefit from the features.
+**pySIP** is being developed in the perspective to build a library which gather
+models from different engineering applications. Currently, applications
+involving dynamic thermal models (RC network) and temporal Gaussian Processes
+are being prioritized. Nevertheless, any model following the formalism of
+**pySIP** can benefit from the features.
 
-**pySIP** is currently under development and in beta version. Please feel free to contact us if you
-want to be involved in the current development process.
+**pySIP** is currently under development and in beta version. Please feel free
+to contact us if you want to be involved in the current development process.
 
 ## Getting started
 
@@ -80,16 +84,18 @@ plt.legend(loc='best', fancybox=True, framealpha=0.5)
 
 ## Reference documentation
 
-For details about the pySIP API, see the [reference documentation](https://locie.github.io/pySIP/).
+For details about the pySIP API, see the [reference
+documentation](https://locie.github.io/pySIP/).
 
 ## Contributors
 
-* [Loïc Raillon](https://github.com/LoicRaillon) -
-[Univ. Grenoble Alpes, Univ. Savoie Mont Blanc](https://www.locie.univ-smb.fr/en/home/), CNRS,
-LOCIE, 73000 Chambéry, France,
-* [Maxime Janvier](https://github.com/mjanv) - [Lancey Energy Storage](https://www.lancey.fr/en/)
+* [Loïc Raillon](https://github.com/LoicRaillon) - [Univ. Grenoble Alpes, Univ.
+  Savoie Mont Blanc](https://www.locie.univ-smb.fr/en/home/), CNRS, LOCIE, 73000
+Chambéry, France,
+* [Maxime Janvier](https://github.com/mjanv) - [Lancey Energy
+  Storage](https://www.lancey.fr/en/)
 
 ## Funding
 
-* Auvergne Rhône-Alpes, project HESTIA-Diag, habitat Econome avec Système Thermique Innovant Adapté
-pour le Diagnostic
+* Auvergne Rhône-Alpes, project HESTIA-Diag, habitat Econome avec Système
+Thermique Innovant Adapté pour le Diagnostic
