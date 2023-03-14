@@ -32,7 +32,7 @@ class BaseRegressor:
     ):
 
         self.ss = ss
-        self.filter = bayesian_filter()
+        self.filter: BayesianFilter = bayesian_filter()
         self._time_scale = time_scale
         self._use_jacobian = use_jacobian
         self._use_penalty = use_penalty
@@ -142,7 +142,7 @@ class BaseRegressor:
 
     def _eval_dlog_likelihood(
         self, dt: np.ndarray, u: np.ndarray, u1: np.ndarray, y: np.ndarray
-    ) -> Union[float, np.ndarray]:
+    ) -> Tuple[float, np.ndarray]:
         """Evaluate the negative log-likelihood and the gradient
 
         Args:
