@@ -8,6 +8,237 @@ from scipy.linalg import LinAlgError, LinAlgWarning
 from .base import BayesianFilter
 
 
+def _predict(
+    Ad: np.ndarray,
+    B0d: np.ndarray,
+    B1d: np.ndarray,
+    Qd: np.ndarray,
+    x: np.ndarray,
+    P: np.ndarray,
+    u: np.ndarray,
+    u1: np.ndarray,
+) -> Tuple[np.ndarray, np.ndarray]:
+    """State prediction
+
+    Args:
+        Ad: State matrix
+        B0d: Input matrix (zero order hold)
+        B1d: Input matrix (first order hold)
+        Qd: Process noise covariance matrix
+        x: State mean
+        P: State deviation
+        u: Input data
+        u1: Forward finite difference of the input data
+
+    Returns:
+        2-element tuple containing
+            - **x**: Prior state mean
+            - **P**: Prior state deviation
+    """
+    P = np.linalg.qr(np.vstack([P @ Ad.T, Qd]), "r")
+    x = Ad @ x + B0d @ u + B1d @ u1
+
+    return x, P
+
+
+def _grad_predict(
+    Ad: np.ndarray,
+    dAd: np.ndarray,
+    B0d: np.ndarray,
+    dB0d: np.ndarray,
+    B1d: np.ndarray,
+    dB1d: np.ndarray,
+    Qd: np.ndarray,
+    dQd: np.ndarray,
+    x: np.ndarray,
+    dx: np.ndarray,
+    P: np.ndarray,
+    dP: np.ndarray,
+    u: np.ndarray,
+    u1: np.ndarray,
+) -> Tuple[tuple([np.ndarray] * 4)]:
+    """Derivative state prediction
+
+    Args:
+        Ad: State matrix
+        dAd: Jacobian state matrix
+        B0d: Input matrix (zero order hold)
+        dB0d: Jacobian input matrix (zero order hold)
+        B1d: Input matrix (first order hold)
+        dB1d: Jacobian input matrix (first order hold)
+        Qd: Process noise covariance matrix
+        dQd: Jacobian process noise covariance matrix
+        x: State mean
+        dx: Jacobian state mean
+        P: State deviation
+        dP: Jacobian state deviation
+        u: Input data
+        u1: Forward finite difference of the input data
+
+    Returns:
+        4-element tuple containing
+            - **x**: Prior state mean
+            - **dx**: Derivative prior state mean
+            - **P**: Prior state deviation
+            - **dP**: Derivative prior state deviation
+    """
+
+    dArrp = np.hstack([dP @ Ad.T + P @ dAd.swapaxes(1, 2), dQd])
+    Q, P = np.linalg.qr(np.vstack([P @ Ad.T, Qd]))
+    inner = dArrp.swapaxes(1, 2) @ Q
+    try:
+        tmp = solve(P.T, inner).swapaxes(1, 2)
+    except (LinAlgError, LinAlgWarning):
+        tmp = inner.swapaxes(1, 2) @ np.linalg.pinv(P)
+    dP = (np.swapaxes(np.tril(tmp, -1), 1, 2) + np.triu(tmp)) @ P
+
+    dx = dAd @ x + Ad @ dx + dB0d @ u + dB1d @ u1
+    x = Ad @ x + B0d @ u + B1d @ u1
+
+    return x, dx, P, dP
+
+
+def _update(
+    C: np.ndarray,
+    D: np.ndarray,
+    R: np.ndarray,
+    x: np.ndarray,
+    P: np.ndarray,
+    u: np.ndarray,
+    y: np.ndarray,
+) -> Tuple[tuple([np.ndarray] * 4)]:
+    """State update
+
+    Args:
+        C: Output matrix
+        D: Feedthrough matrix
+        R: Measurement deviation matrix
+        x: State mean
+        P: State deviation
+        u: Input data
+        y: Output data
+
+    Returns:
+        4-element tuple containing
+            - **x**: Filtered state mean
+            - **P**: Filtered state deviation
+            - **e**: Standardized residulas
+            - **S**: Residuals deviation
+    """
+    ny, nx = C.shape
+    x = x.copy()
+    P = P.copy()
+    Arru = np.zeros((nx + ny, nx + ny))
+
+    Arru[:ny, :ny] = R
+    Arru[ny:, :ny] = P @ C.T
+    Arru[ny:, ny:] = P
+    _, Post = np.linalg.qr(Arru)
+    S = Post[:ny, :ny]
+    e = np.zeros((ny, 1))
+    if ny > 1:
+        try:
+            e = solve(S, y - C @ x - D @ u)
+        except (LinAlgWarning, LinAlgError):
+            e = lstsq(S, y - C @ x - D @ u, rcond=-1)[0]
+    else:
+        e = (y - C @ x - D @ u) / S
+
+    x += Post[:ny, ny:].T @ e
+    P = Post[ny:, ny:]
+
+    return x, P, e, S
+
+
+def _grad_update(
+    C: np.ndarray,
+    dC: np.ndarray,
+    D: np.ndarray,
+    dD: np.ndarray,
+    R: np.ndarray,
+    dR: np.ndarray,
+    x: np.ndarray,
+    dx: np.ndarray,
+    P: np.ndarray,
+    dP: np.ndarray,
+    u: np.ndarray,
+    y: np.ndarray,
+) -> Tuple[tuple([np.ndarray] * 8)]:
+    """Derivative state update
+
+    Args:
+        C: Output matrix
+        dC: Jacobian output matrix
+        D: Feedthrough matrix
+        dD: Jacobian feedthrough matrix
+        R: Measurement deviation matrix
+        dR: Jacobian measurement deviation matrix
+        x: State mean
+        dx: Jacobian state mean
+        P: State deviation
+        dP: Jacobian state deviation
+        u: Input data
+        y: Output data
+
+    Returns:
+        8-element tuple containing
+            - **x**: Filtered state mean
+            - **dx**: Derivative filtered state mean
+            - **P**: Filtered state deviation
+            - **dP**: Derivative filtered state deviation
+            - **e**: Standardized residulas
+            - **de**: Derivative standardized residulas
+            - **S**: Residuals deviation
+            - **dS**: Derivative residuals deviation
+    """
+    npar, ny, nx = dC.shape
+
+    x = x.copy()
+    P = P.copy()
+    dx = dx.copy()
+    dP = dP.copy()
+    Arru = np.zeros((nx + ny, nx + ny))
+    dArru = np.zeros((npar, nx + ny, nx + ny))
+    Arru[:ny, :ny] = R
+    Arru[ny:, :ny] = P @ C.T
+    Arru[ny:, ny:] = P
+
+    dArru[:, :ny, :ny] = dR
+    dArru[:, ny:, :ny] = dP @ C.T + P @ dC.swapaxes(1, 2)
+    dArru[:, ny:, ny:] = dP
+
+    Q, Post = np.linalg.qr(Arru)
+    inner = dArru.swapaxes(1, 2) @ Q
+    try:
+        tmp = np.linalg.solve(Post.T, inner).swapaxes(1, 2)
+    except (LinAlgError, LinAlgWarning):
+        tmp = inner.swapaxes(1, 2) @ np.linalg.pinv(Post)
+    dPost = (np.swapaxes(np.tril(tmp, -1), 1, 2) + np.triu(tmp)) @ Post
+
+    K = Post[:ny, ny:].T
+    S = Post[:ny, :ny]
+    dS = dPost[:, :ny, :ny]
+
+    if ny > 1:
+        try:
+            e = solve(S, y - C @ x - D @ u)
+            de = solve(-S, dS @ e + dC @ x + C @ dx + dD @ u)
+        except (LinAlgWarning, LinAlgError):
+            invS = np.linalg.pinv(S)
+            e = invS @ (y - C @ x - D @ u)
+            de = -invS @ (dS @ e + dC @ x + C @ dx + dD @ u)
+    else:
+        e = (y - C @ x - D @ u) / S
+        de = -(dS @ e + dC @ x + C @ dx + dD @ u) / S
+
+    x += K @ e
+    dx += dPost[:, :ny, ny:].swapaxes(1, 2) @ e + K @ de
+    P = Post[ny:, ny:]
+    dP = dPost[:, ny:, ny:]
+
+    return x, dx, P, dP, e, de, S, dS
+
+
 class Kalman_QR(BayesianFilter):
     """Square-root Kalman filter and sensitivity equations
 
@@ -45,10 +276,7 @@ class Kalman_QR(BayesianFilter):
                 - **x**: Prior state mean
                 - **P**: Prior state deviation
         """
-        P = np.linalg.qr(np.vstack([P @ Ad.T, Qd]), "r")
-        x = Ad @ x + B0d @ u + B1d @ u1
-
-        return x, P
+        return _predict(Ad, B0d, B1d, Qd, x, P, u, u1)
 
     def dpredict(
         self,
@@ -66,7 +294,7 @@ class Kalman_QR(BayesianFilter):
         dP: np.ndarray,
         u: np.ndarray,
         u1: np.ndarray,
-    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    ) -> Tuple[tuple([np.ndarray] * 4)]:
         """Derivative state prediction
 
         Args:
@@ -93,19 +321,22 @@ class Kalman_QR(BayesianFilter):
                 - **dP**: Derivative prior state deviation
         """
 
-        dArrp = np.hstack([dP @ Ad.T + P @ dAd.swapaxes(1, 2), dQd])
-        Q, P = np.linalg.qr(np.vstack([P @ Ad.T, Qd]))
-        inner = dArrp.swapaxes(1, 2) @ Q
-        try:
-            tmp = solve(P.T, inner).swapaxes(1, 2)
-        except (LinAlgError, LinAlgWarning):
-            tmp = inner.swapaxes(1, 2) @ np.linalg.pinv(P)
-        dP = (np.swapaxes(np.tril(tmp, -1), 1, 2) + np.triu(tmp)) @ P
-
-        dx = dAd @ x + Ad @ dx + dB0d @ u + dB1d @ u1
-        x = Ad @ x + B0d @ u + B1d @ u1
-
-        return x, dx, P, dP
+        return _grad_predict(
+            Ad,
+            dAd,
+            B0d,
+            dB0d,
+            B1d,
+            dB1d,
+            Qd,
+            dQd,
+            x,
+            dx,
+            P,
+            dP,
+            u,
+            u1,
+        )
 
     def update(
         self,
@@ -116,7 +347,7 @@ class Kalman_QR(BayesianFilter):
         P: np.ndarray,
         u: np.ndarray,
         y: np.ndarray,
-    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    ) -> Tuple[tuple([np.ndarray] * 4)]:
         """State update
 
         Args:
@@ -135,27 +366,7 @@ class Kalman_QR(BayesianFilter):
                 - **e**: Standardized residulas
                 - **S**: Residuals deviation
         """
-        ny, nx = C.shape
-        Arru = np.zeros((nx + ny, nx + ny))
-
-        Arru[:ny, :ny] = R
-        Arru[ny:, :ny] = P @ C.T
-        Arru[ny:, ny:] = P
-        Post = np.linalg.qr(Arru, "r")
-        S = Post[:ny, :ny]
-
-        if ny > 1:
-            try:
-                e = solve(S, y - C @ x - D @ u)
-            except (LinAlgWarning, LinAlgError):
-                e = lstsq(S, y - C @ x - D @ u, rcond=-1)[0]
-        else:
-            e = (y - C @ x - D @ u) / S
-
-        x += Post[:ny, ny:].T @ e
-        P = Post[ny:, ny:]
-
-        return x, P, e, S
+        return _update(C, D, R, x, P, u, y)
 
     def dupdate(
         self,
@@ -208,48 +419,21 @@ class Kalman_QR(BayesianFilter):
                 - **S**: Residuals deviation
                 - **dS**: Derivative residuals deviation
         """
-        npar, ny, nx = dC.shape
-        Arru = np.zeros((nx + ny, nx + ny))
-        dArru = np.zeros((npar, nx + ny, nx + ny))
 
-        Arru[:ny, :ny] = R
-        Arru[ny:, :ny] = P @ C.T
-        Arru[ny:, ny:] = P
-
-        dArru[:, :ny, :ny] = dR
-        dArru[:, ny:, :ny] = dP @ C.T + P @ dC.swapaxes(1, 2)
-        dArru[:, ny:, ny:] = dP
-
-        Q, Post = np.linalg.qr(Arru)
-        inner = dArru.swapaxes(1, 2) @ Q
-        try:
-            tmp = np.linalg.solve(Post.T, inner).swapaxes(1, 2)
-        except (LinAlgError, LinAlgWarning):
-            tmp = inner.swapaxes(1, 2) @ np.linalg.pinv(Post)
-        dPost = (np.swapaxes(np.tril(tmp, -1), 1, 2) + np.triu(tmp)) @ Post
-
-        K = Post[:ny, ny:].T
-        S = Post[:ny, :ny]
-        dS = dPost[:, :ny, :ny]
-
-        if ny > 1:
-            try:
-                e = solve(S, y - C @ x - D @ u)
-                de = solve(-S, dS @ e + dC @ x + C @ dx + dD @ u)
-            except (LinAlgWarning, LinAlgError):
-                invS = np.linalg.pinv(S)
-                e = invS @ (y - C @ x - D @ u)
-                de = -invS @ (dS @ e + dC @ x + C @ dx + dD @ u)
-        else:
-            e = (y - C @ x - D @ u) / S
-            de = -(dS @ e + dC @ x + C @ dx + dD @ u) / S
-
-        x += K @ e
-        dx += dPost[:, :ny, ny:].swapaxes(1, 2) @ e + K @ de
-        P = Post[ny:, ny:]
-        dP = dPost[:, ny:, ny:]
-
-        return x, dx, P, dP, e, de, S, dS
+        return _grad_update(
+            C,
+            dC,
+            D,
+            dD,
+            R,
+            dR,
+            x,
+            dx,
+            P,
+            dP,
+            u,
+            y,
+        )
 
     def log_likelihood(
         self,
@@ -302,7 +486,6 @@ class Kalman_QR(BayesianFilter):
                 u[:, t : t + 1],
                 u1[:, t : t + 1],
             )
-
         if not point_wise:
             loglik = loglik.sum()
 
@@ -396,7 +579,7 @@ class Kalman_QR(BayesianFilter):
         y: np.ndarray,
         x0: np.ndarray = None,
         P0: np.ndarray = None,
-    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    ) -> Tuple[tuple([np.ndarray] * 4)]:
         """Compute the filtered state distribution
 
         Args:
