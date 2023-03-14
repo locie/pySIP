@@ -19,8 +19,8 @@ def _check_data(dt, u, dtu, y):
 
 def _prepare_data(
     df: pd.DataFrame,
-    inputs: Union[str, list],
     outputs: Union[str, list],
+    inputs: Union[str, list],
     time_scale: str = "s",
 ):
     time = df.index.to_series()

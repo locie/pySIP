@@ -33,7 +33,7 @@ def _nb_update(C, D, R, x, P, u, y, _Arru):
     _, r_fact = np.linalg.qr(_Arru)
     S = r_fact[:ny, :ny]
     if ny == 1:
-        e = (y - C @ x - D @ u) / S
+        e = (y - C @ x - D @ u) / S[0, 0]
         x += r_fact[:1, 1:].T * e
     else:
         e = solve_triu_inplace(S, y - C @ x - D @ u)
@@ -42,15 +42,15 @@ def _nb_update(C, D, R, x, P, u, y, _Arru):
     return x, P, e, S
 
 
-def _nb_predict(A, B0, B1, Q, x, P, u, u1):
+def _nb_predict(A, B0, B1, Q, x, P, u, dtu):
     _, r = np.linalg.qr(np.vstack((P @ A.T, Q)))
-    x = A @ x + B0 @ u + B1 @ u1
+    x = A @ x + B0 @ u + B1 @ dtu
     return x, r
 
 
-def _nb_kalman_step(x, P, u, u1, y, C, D, R, Q, A, B0, B1, _Arru):
+def _nb_kalman_step(x, P, u, dtu, y, C, D, R, Q, A, B0, B1, _Arru):
     x, P, e, S = _nb_update(C, D, R, x, P, u, y, _Arru)
-    x, P = _nb_predict(A, B0, B1, Q, x, P, u, u1)
+    x, P = _nb_predict(A, B0, B1, Q, x, P, u, dtu)
     return x, P, e, S
 
 
@@ -64,7 +64,7 @@ def _nb_log_likelihood(x, u, dtu, y, C, D, R, P, Q, A, B0, B1):
         A_i = A[:, :, i]
         B0_i = B0[:, :, i]
         B1_i = B1[:, :, i]
-        y_i = y[i]
+        y_i = y[i].reshape(-1, 1)
         u_i = u[i].reshape(-1, 1)
         dtu_i = dtu[i].reshape(-1, 1)
         x, P, e, S = _nb_kalman_step(
@@ -106,7 +106,6 @@ class KalmanQR(BayesianFilter):
         dtu = dtu.to_numpy()
         y = y.to_numpy()
 
-        print(x.shape, u.shape, dtu.shape, y.shape)
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=NumbaPerformanceWarning)
             return _nb_log_likelihood(
