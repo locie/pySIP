@@ -54,7 +54,6 @@ class TwTi_RoRi(RCModel):
             sigx0_i,
             *_,
         ) = self.parameters.theta
-
         self.A[:] = [
             [-(Ro + Ri) / (Cw * Ri * Ro), 1.0 / (Cw * Ri)],
             [1.0 / (Ci * Ri), -1.0 / (Ci * Ri)],

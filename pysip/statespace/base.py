@@ -96,7 +96,6 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
                 - **ssm**: Discrete state-space model
                 - **index**: Index of unique sampling time
         """
-
         self.update_continuous_ssm()
         Ad, B0d, B1d, Qd = self.discretization(dt)
         return local_ssm(Ad, B0d, B1d, Qd)

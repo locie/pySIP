@@ -300,26 +300,6 @@ class Parameters:
         return self.eta[self.free]
 
     @property
-    def eta_jacobian(self) -> List:
-        """Transform jacobian :math:`\\partial \\eta \\,/\\, \\partial \\theta`
-
-        .. math::
-
-            \\frac{\\partial \\pi(\\theta \\mid y)}{\\partial \\theta} =
-            \\frac{\\partial \\pi(\\eta \\mid y)}{\\partial \\eta}
-            \\frac{\\partial \\eta}{\\partial \\theta}
-
-
-        where :math:`\\pi(\\theta \\mid y) = \\log p(\\theta \\mid y)` is the logarithm
-        of the posterior distribution in the constrained parameter space and,
-        :math:`\\eta = f(\\theta)` is the bijective transformation.
-
-        Notes:
-            Only univariate change of variables are supported.
-        """
-        return [p._transform_jacobian() for p in self.parameters_free]
-
-    @property
     def prior(self) -> float:
         """Get the logarithm of the prior distribution :math:`\\log p(\\theta)`"""
         return np.sum(
@@ -329,15 +309,6 @@ class Parameters:
                 if p.prior is not None
             ]
         )
-
-    @property
-    def d_prior(self) -> List:
-        """Get the partial derivative of logarithm of the prior distribution
-        :math:`\\partial \\log p(\\theta) \\,/\\, \\partial \\theta`"""
-        return [
-            p.prior.dlog_pdf(p.value) if p.prior is not None else 0.0
-            for p in self.parameters_free
-        ]
 
     @property
     def free(self) -> List[bool]:
@@ -353,24 +324,6 @@ class Parameters:
     def names_free(self) -> List[str]:
         """Return the list of free parameter names"""
         return [p.name for p in self.parameters_free]
-
-    @property
-    def penalty(self, scaling: float = 1e-4) -> float:
-        """penalty function
-
-        Args:
-            scaling: Scaling coefficient of the penalty function
-        """
-        return scaling * np.sum([p._penalty() for p in self.parameters_free])
-
-    @property
-    def d_penalty(self, scaling: float = 1e-4) -> List:
-        """Partial derivative of the penalty function
-
-        Args:
-            scaling: Scaling coefficient of the penalty function
-        """
-        return [scaling * p._d_penalty() for p in self.parameters_free]
 
     def prior_init(self, hpd=None):
         """Draw a random sample from the prior distribution,
