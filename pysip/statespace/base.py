@@ -250,6 +250,6 @@ class GPModel(StateSpace):
         """
         Ad = disc_state(self.A, dt)
         B0d = np.zeros((self.nx, self.nu))
-        Qd = disc_diffusion_stationary(self.P0.T @ self.P0, Ad))
+        Qd = disc_diffusion_stationary(self.P0.T @ self.P0, Ad)
 
         return Ad, B0d, B0d, Qd
