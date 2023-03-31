@@ -133,7 +133,7 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
             Ad, B0d, B1d = disc_state_input(self.A, self.B, dt, self.hold_order, "expm")
 
         # Qd = disc_diffusion_mfd(self.A, self.Q.T @ self.Q, dt)
-        Qd = disc_diffusion_mfd(self.A, self.Q.T @ self.Q, dt)
+        Qd = nearest_cholesky(disc_diffusion_mfd(self.A, self.Q.T @ self.Q, dt))
 
         return Ad, B0d, B1d, Qd
 
@@ -181,10 +181,10 @@ class RCModel(StateSpace):
             Ad, B0d, B1d = disc_state_input(
                 self.A, self.B, dt, self.hold_order, "analytic"
             )
-            Qd = disc_diffusion_lyap(self.A, self.Q.T @ self.Q, Ad)
+            Qd = nearest_cholesky(disc_diffusion_lyap(self.A, self.Q.T @ self.Q, Ad))
         else:
             Ad, B0d, B1d = disc_state_input(self.A, self.B, dt, self.hold_order, "expm")
-            Qd = disc_diffusion_mfd(self.A, self.Q.T @ self.Q, dt)
+            Qd = nearest_cholesky(disc_diffusion_mfd(self.A, self.Q.T @ self.Q, dt))
 
         return Ad, B0d, B1d, Qd
 
@@ -250,6 +250,6 @@ class GPModel(StateSpace):
         """
         Ad = disc_state(self.A, dt)
         B0d = np.zeros((self.nx, self.nu))
-        Qd = disc_diffusion_stationary(self.P0.T @ self.P0, Ad)
+        Qd = nearest_cholesky(disc_diffusion_stationary(self.P0.T @ self.P0, Ad))
 
         return Ad, B0d, B0d, Qd
