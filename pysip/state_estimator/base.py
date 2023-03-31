@@ -8,16 +8,8 @@ class BayesianFilter:
         """State predictive distribution from time t to t+1"""
         raise NotImplementedError
 
-    def dpredict(self, **kwargs):
-        """Derivative state predictive distribution from time t to t+1"""
-        raise NotImplementedError
-
     def update(self, **kwargs):
         """Filtered state distribution at time t"""
-        raise NotImplementedError
-
-    def dupdate(self, **kwargs):
-        """Derivative filtered state distribution at time t"""
         raise NotImplementedError
 
     def filtering(self, **kwargs):
@@ -30,8 +22,4 @@ class BayesianFilter:
 
     def log_likelihood(self, **kwargs):
         """Evaluate the negative log-likelihood"""
-        raise NotImplementedError
-
-    def dlog_likelihood(self, **kwargs):
-        """Evaluate the gradient of the negative log-likelihood"""
         raise NotImplementedError

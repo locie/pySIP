@@ -239,7 +239,7 @@ def _grad_update(
     return x, dx, P, dP, e, de, S, dS
 
 
-class Kalman_QR(BayesianFilter):
+class KalmanQR(BayesianFilter):
     """Square-root Kalman filter and sensitivity equations
 
     References:

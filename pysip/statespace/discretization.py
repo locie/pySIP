@@ -319,13 +319,13 @@ def disc_state_input_expm(
     """
     nx, nu = B.shape
     if order_hold == 0:
-        F = np.zeros((nx + nu, nx + nu))
+        F = np.zeros((nx + nu, nx + nu), dtype=A.dtype)
         F[:nx, :nx] = A
         F[:nx, nx:] = B
         Ad, B0d = np.split(expm(F * dt)[:nx, :], indices_or_sections=[nx], axis=1)
         B1d = np.zeros((nx, nu))
     else:
-        F = np.zeros((nx + 2 * nu, nx + 2 * nu))
+        F = np.zeros((nx + 2 * nu, nx + 2 * nu), dtype=A.dtype)
         F[:nx, :nx] = A
         F[:nx, nx : nx + nu] = B
         F[nx : nx + nu, nx + nu :] = np.eye(nu)
@@ -380,7 +380,7 @@ def disc_diffusion_mfd(A: np.ndarray, Q: np.ndarray, dt: float = 1.0) -> np.ndar
         return Q
 
     nx = A.shape[0]
-    F = np.zeros((2 * nx, 2 * nx))
+    F = np.zeros((2 * nx, 2 * nx), dtype=A.dtype)
     F[:nx, :nx] = A
     F[nx:, nx:] = -A.T
     F[:nx, nx:] = Q

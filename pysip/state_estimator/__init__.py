@@ -1,4 +1,4 @@
 from .base import BayesianFilter
-from .kalman_qr import Kalman_QR
+from .kalman_qr import KalmanQR
 
-__all__ = ['BayesianFilter', 'Kalman_QR']
+__all__ = ['BayesianFilter', 'KalmanQR']

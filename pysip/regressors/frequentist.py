@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import minimize
 
-from ..state_estimator.fast_kalman_qr import KalmanQR, BayesianFilter
+from ..state_estimator.kalman_qr import KalmanQR, BayesianFilter
 from ..statespace.base import StateSpace
 from ..utils.statistics import ttest
 from .base import BaseRegressor

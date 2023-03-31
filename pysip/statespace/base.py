@@ -132,7 +132,7 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
         else:
             Ad, B0d, B1d = disc_state_input(self.A, self.B, dt, self.hold_order, "expm")
 
-        # Qd = nearest_cholesky(disc_diffusion_mfd(self.A, self.Q.T @ self.Q, dt))
+        # Qd = disc_diffusion_mfd(self.A, self.Q.T @ self.Q, dt)
         Qd = disc_diffusion_mfd(self.A, self.Q.T @ self.Q, dt)
 
         return Ad, B0d, B1d, Qd

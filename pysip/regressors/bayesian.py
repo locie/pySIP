@@ -9,7 +9,7 @@ from tqdm import tqdm
 from ..mcmc.hamiltonian import EuclideanHamiltonian
 from ..mcmc.hmc import DynamicHMC, Fit_Bayes
 from ..mcmc.metrics import Dense, Diagonal
-from ..state_estimator import BayesianFilter, Kalman_QR
+from ..state_estimator import BayesianFilter, KalmanQR
 from ..statespace.base import StateSpace
 from .base import BaseRegressor
 
@@ -27,7 +27,7 @@ class BayesRegressor(BaseRegressor):
     def __init__(
         self,
         ss: StateSpace,
-        bayesian_filter: BayesianFilter = Kalman_QR,
+        bayesian_filter: BayesianFilter = KalmanQR,
         time_scale: str = "s",
     ):
         super().__init__(ss, bayesian_filter, time_scale, True, False)
