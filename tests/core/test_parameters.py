@@ -1,6 +1,6 @@
 import pytest
 
-from pysip.core import Parameters
+from pysip.params import Parameters
 
 
 @pytest.fixture

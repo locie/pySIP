@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 
-from pysip.core import Gamma, Normal
+from pysip.params import Gamma, Normal
 from pysip.regressors import BayesRegressor as Regressor
 from pysip.statespace import TwTi_RoRi
 from pysip.utils import percentile_plot

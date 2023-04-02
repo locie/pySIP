@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from pysip.core import LogNormal, Normal
+from pysip.params import LogNormal, Normal
 from pysip.regressors import FreqRegressor as Regressor
 from pysip.statespace.thermal_network import TwTi_RoRi
 from pysip.utils.check import check_model

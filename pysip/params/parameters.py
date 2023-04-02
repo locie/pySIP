@@ -1,4 +1,4 @@
-from typing import List, Tuple, Union
+from typing import List, Self, Tuple, Union
 
 import numpy as np
 
@@ -16,7 +16,7 @@ class Parameters:
         name: Name of this specific instance
 
     Notes:
-        Multiple instances of Parameters can be added together ::
+        Multiple instances of Parameters can be added together :
 
             >>> p_alpha = Parameters(['a', 'b', 'c'], name='alpha')
             >>> p_beta = Parameters(['c', 'd', 'e'], name='beta')
@@ -45,6 +45,7 @@ class Parameters:
 
         self._name = name
 
+        # TODO: make more robust
         if isinstance(parameters, dict):
             self._parameters = parameters
         elif isinstance(parameters[0], str):
@@ -72,14 +73,14 @@ class Parameters:
         self.n = 0
         return self
 
-    def __next__(self):
+    def __next__(self) -> Parameter:
         if self.n == len(self._parameters):
             raise StopIteration
         result = list(self._parameters.values())[self.n]
         self.n += 1
         return result
 
-    def __add__(self, other):
+    def __add__(self, other: Self) -> Self:
         left_name = self._name if self._name else "left"
         right_name = other._name if other._name else "right"
         return Parameters(
@@ -87,7 +88,7 @@ class Parameters:
             name="__".join((left_name, right_name)),
         )
 
-    def __eq__(self, other):
+    def __eq__(self, other: Self) -> bool:
         for k in self._parameters:
             if k not in other._parameters:
                 return False
@@ -109,10 +110,8 @@ class Parameters:
     def set_parameter(self, *args, **kwargs):
         """Change settings of Parameters after instantiation
 
-        ::
-
-                p_alpha = Parameters(['a', 'b', 'c'], name='alpha')
-                p_alpha.set_parameter('a', value=1, transform='log')
+        p_alpha = Parameters(['a', 'b', 'c'], name='alpha')
+        p_alpha.set_parameter('a', value=1, transform='log')
         """
 
         def _get(d, *args):
@@ -135,12 +134,12 @@ class Parameters:
 
     @property
     def theta(self) -> List:
-        """Get the constrained parameter values :math:`\\mathbf{\\theta}`"""
+        """Get the constrained parameter values θ"""
         return [h.theta for h in self.parameters]
 
     @theta.setter
     def theta(self, x: Union[Tuple, List, np.ndarray]):
-        """Set the constrained parameter values :math:`\\mathbf{\\theta}`
+        """Set the constrained parameter values θ
 
         Args:
             x: New constrained parameter values
@@ -156,20 +155,10 @@ class Parameters:
 
     @property
     def theta_free(self) -> List:
-        """Get constrained parameter values :math:`\\mathbf{\\theta}` which are not
-        fixed
-        """
         return [p.theta for p in self.parameters_free]
 
     @theta_free.setter
     def theta_free(self, x: Union[Tuple, List, np.ndarray]):
-        """Set constrained parameter values :math:`\\mathbf{\\theta}` which are not
-        fixed
-
-        Args:
-            x: New free constrained parameter values
-        """
-
         if len(x) != self.n_par:
             raise ValueError(
                 f"theta has {self.n_par} free parameters but {len(x)} are given"
@@ -180,19 +169,10 @@ class Parameters:
 
     @property
     def theta_sd(self) -> List:
-        """Get standardized parameter values :math:`\\mathbf{\\theta_{sd}}` which are
-        not fixed"""
         return [p.theta_sd for p in self.parameters_free]
 
     @theta_sd.setter
     def theta_sd(self, x: Union[Tuple, List, np.ndarray]):
-        """Set standardized parameter values :math:`\\mathbf{\\theta_{sd}}` which are
-        not fixed
-
-        Args:
-            x: New free standardized parameter values
-        """
-
         if len(x) != self.n_par:
             raise ValueError(
                 f"theta_sd has {self.n_par} free parameters but {len(x)} are given"
@@ -243,33 +223,6 @@ class Parameters:
             used.
         """
         return np.sum(np.log(np.abs(self.theta_jacobian)))
-
-    @property
-    def theta_dlog_jacobian(self) -> List:
-        """Partial derivative of the logarithm of the jacobian adjustment
-        :math:`\\partial \\log \\left| \\partial \\theta \\,/\\, \\partial \\eta
-            \\right| \\,/\\, \\partial \\eta`
-
-
-        .. math::
-
-            \\frac{\\partial \\pi(\\eta \\mid y)}{\\partial \\eta} = \\frac{\\partial
-            \\pi(\\theta \\mid y)}{\\partial \\theta} \\frac{\\partial
-            \\theta}{\\partial \\eta} + \\frac{\\partial}{\\partial \\eta} \\log
-            \\left|\\frac{\\partial \\theta}{\\partial \\eta}\\right|
-
-
-        where :math:`\\pi(\\theta \\mid y) = \\log p(\\theta \\mid y)` is the logarithm
-        of the posterior distribution in the constrained parameter space and,
-        :math:`\\theta = f^{-1}(\\eta)` is the inverse bijective transformation.
-
-        Notes:
-            The jacobian adjustment is required if a prior distribution is used. This
-            formula is works for univariate change of variables only. For multivariate
-            case, the absolute value of the determinant of the jacobian matrix must be
-            used.
-        """
-        return [p._inv_transform_dlog_jacobian() for p in self.parameters_free]
 
     @property
     def eta(self) -> np.ndarray:
@@ -327,15 +280,6 @@ class Parameters:
             scaling: Scaling coefficient of the penalty function
         """
         return scaling * np.sum([p._penalty() for p in self.parameters_free])
-
-    @property
-    def d_penalty(self, scaling: float = 1e-4) -> List:
-        """Partial derivative of the penalty function
-
-        Args:
-            scaling: Scaling coefficient of the penalty function
-        """
-        return [scaling * p._d_penalty() for p in self.parameters_free]
 
     @property
     def prior(self) -> float:

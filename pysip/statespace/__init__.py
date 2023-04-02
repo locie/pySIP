@@ -1,4 +1,4 @@
-from .base import GPModel, RCModel, StateSpace
+from .base_statespace import GPModel, RCModel, StateSpace
 from .gaussian_process import GPProduct, GPSum
 from .latent_force_model import LatentForceModel, R2C2_Qgh_Matern32
 from .meta import MetaStateSpace, model_registry, statespace

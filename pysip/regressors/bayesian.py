@@ -9,8 +9,8 @@ from tqdm import tqdm
 from ..mcmc.hamiltonian import EuclideanHamiltonian
 from ..mcmc.hmc import DynamicHMC, Fit_Bayes
 from ..mcmc.metrics import Dense, Diagonal
-from ..state_estimator import BayesianFilter, KalmanQR
-from ..statespace.base import StateSpace
+from ..filters import BayesianFilter, KalmanQR
+from ..statespace.base_statespace import StateSpace
 from .base import BaseRegressor
 
 

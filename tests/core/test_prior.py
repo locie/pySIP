@@ -3,7 +3,7 @@ import numpy as np
 import pytest
 from scipy import stats
 
-from pysip.core import Beta, Gamma, InverseGamma, LogNormal, Normal
+from pysip.params import Beta, Gamma, InverseGamma, LogNormal, Normal
 
 
 @pytest.fixture(name="N")

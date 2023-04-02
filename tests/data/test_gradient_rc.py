@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from pysip.core import Beta, Gamma, InverseGamma, LogNormal, Normal
+from pysip.params import Beta, Gamma, InverseGamma, LogNormal, Normal
 from pysip.regressors import FreqRegressor as Regressor
 from pysip.statespace import model_registry
 from pysip.utils import generate_random_binary, generate_sine, ned

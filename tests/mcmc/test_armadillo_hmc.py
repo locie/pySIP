@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from pysip.core import Gamma, Normal
+from pysip.params import Gamma, Normal
 from pysip.regressors import BayesRegressor as Regressor
 from pysip.statespace import TwTi_RoRi
 

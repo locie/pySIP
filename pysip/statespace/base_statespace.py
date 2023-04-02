@@ -1,23 +1,31 @@
-from collections import namedtuple
 from dataclasses import dataclass, field
 from typing import NamedTuple, Tuple
 
 import numpy as np
 
-from ..core import Parameters
+from ..params import Parameters
 from ..utils.draw import TikzStateSpace
 from ..utils.math import nearest_cholesky
-from .discretization import (
-    disc_diffusion_lyap,
-    disc_diffusion_mfd,
-    disc_diffusion_stationary,
-    disc_state,
-    disc_state_input,
-)
+from . import discretization
 from .meta import MetaStateSpace
 from .nodes import Node
 
-local_ssm = namedtuple("ssm", "A, B0, B1, Q")
+
+class States(NamedTuple):
+    C: np.ndarray
+    D: np.ndarray
+    R: np.ndarray
+    A: np.ndarray
+    B0: np.ndarray
+    B1: np.ndarray
+    Q: np.ndarray
+
+
+class DiscreteStates(NamedTuple):
+    A: np.ndarray
+    B0: np.ndarray
+    B1: np.ndarray
+    Q: np.ndarray
 
 
 def zeros(m, n):
@@ -98,7 +106,7 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
         """
         self.update_continuous_ssm()
         Ad, B0d, B1d, Qd = self.discretization(dt)
-        return local_ssm(Ad, B0d, B1d, Qd)
+        return DiscreteStates(Ad, B0d, B1d, Qd)
 
     def discretization(
         self, dt: float
@@ -126,14 +134,18 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
         # Different sampling time up to the nanosecond
 
         if self.nu == 0:
-            Ad = disc_state(self.A, dt)
+            Ad = discretization.state(self.A, dt)
             B0d = np.zeros((self.nx, self.nu))
             B1d = B0d
         else:
-            Ad, B0d, B1d = disc_state_input(self.A, self.B, dt, self.hold_order, "expm")
+            Ad, B0d, B1d = discretization.state_input(
+                self.A, self.B, dt, self.hold_order, "expm"
+            )
 
         # Qd = disc_diffusion_mfd(self.A, self.Q.T @ self.Q, dt)
-        Qd = nearest_cholesky(disc_diffusion_mfd(self.A, self.Q.T @ self.Q, dt))
+        Qd = nearest_cholesky(
+            discretization.diffusion_mfd(self.A, self.Q.T @ self.Q, dt)
+        )
 
         return Ad, B0d, B1d, Qd
 
@@ -178,13 +190,19 @@ class RCModel(StateSpace):
         """
 
         if self.method == "analytic":
-            Ad, B0d, B1d = disc_state_input(
+            Ad, B0d, B1d = discretization.state_input(
                 self.A, self.B, dt, self.hold_order, "analytic"
             )
-            Qd = nearest_cholesky(disc_diffusion_lyap(self.A, self.Q.T @ self.Q, Ad))
+            Qd = nearest_cholesky(
+                discretization.diffusion_lyap(self.A, self.Q.T @ self.Q, Ad)
+            )
         else:
-            Ad, B0d, B1d = disc_state_input(self.A, self.B, dt, self.hold_order, "expm")
-            Qd = nearest_cholesky(disc_diffusion_mfd(self.A, self.Q.T @ self.Q, dt))
+            Ad, B0d, B1d = discretization.state_input(
+                self.A, self.B, dt, self.hold_order, "expm"
+            )
+            Qd = nearest_cholesky(
+                discretization.diffusion_mfd(self.A, self.Q.T @ self.Q, dt)
+            )
 
         return Ad, B0d, B1d, Qd
 
@@ -248,8 +266,10 @@ class GPModel(StateSpace):
                 - **B1d**: Discrete input matrix (first order hold)
                 - **Qd**: Upper Cholesky factor of the process noise covariance
         """
-        Ad = disc_state(self.A, dt)
+        Ad = discretization.state(self.A, dt)
         B0d = np.zeros((self.nx, self.nu))
-        Qd = nearest_cholesky(disc_diffusion_stationary(self.P0.T @ self.P0, Ad))
+        Qd = nearest_cholesky(
+            discretization.diffusion_stationary(self.P0.T @ self.P0, Ad)
+        )
 
         return Ad, B0d, B0d, Qd

@@ -2,7 +2,7 @@ from collections import namedtuple
 
 import pytest
 
-from pysip.core import Normal, Parameter
+from pysip.params import Normal, Parameter
 
 defaults = namedtuple("Defaults", "name value scale bounds prior theta")(
     name="name",

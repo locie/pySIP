@@ -5,14 +5,8 @@ import numpy as np
 from numpy.linalg import cond
 
 from ..utils.math import nearest_cholesky
-from .base import GPModel, RCModel, StateSpace
-from .discretization import (
-    disc_diffusion_lyap,
-    disc_diffusion_mfd,
-    disc_state,
-    disc_state_input,
-    expm_triu,
-)
+from .base_statespace import GPModel, RCModel, StateSpace
+from . import discretization
 from .nodes import Par
 
 
@@ -98,7 +92,6 @@ class LatentForceModel(StateSpace):
 
         super().__post_init__()
 
-
     def set_constant_continuous_ssm(self):
         self._rc.set_constant_continuous_ssm()
         self._gp.set_constant_continuous_ssm()
@@ -128,7 +121,6 @@ class LatentForceModel(StateSpace):
         self.P0[: self._rc.nx, : self._rc.nx] = self._rc.P0
         self.P0[self._rc.nx :, self._rc.nx :] = self._gp.P0
 
-
     def _lti_disc(
         self, dt: float
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
@@ -152,24 +144,25 @@ class LatentForceModel(StateSpace):
         else:
             method = "expm"
 
-        F11, G0, G1 = disc_state_input(
+        F11, G0, G1 = discretization.state_input(
             self._rc.A, self.B[: self._rc.nx, :], dt, self.hold_order, method
         )
 
-        F22 = disc_state(self._gp.A, dt)
+        F22 = discretization.state(self._gp.A, dt)
         A12 = self.A[: self._rc.nx, self._rc.nx :]
-        Ad = expm_triu(self._rc.A, A12, self._gp.A, dt, F11, F22)
+        Ad = discretization.expm_triu(self._rc.A, A12, self._gp.A, dt, F11, F22)
 
         Oxu = np.zeros((self._gp.nx, self.nu))
         B0d = np.vstack([G0, Oxu])
         B1d = np.vstack([G1, Oxu])
 
         if np.all(np.real(np.linalg.eigvals(self.A)) < 0):
-            Q = disc_diffusion_lyap(self.A, self.Q.T @ self.Q, Ad)
+            Q = discretization.diffusion_lyap(self.A, self.Q.T @ self.Q, Ad)
         else:
-            Q = disc_diffusion_mfd(self.A, self.Q.T @ self.Q, dt)
+            Q = discretization.diffusion_mfd(self.A, self.Q.T @ self.Q, dt)
 
         return Ad, B0d, B1d, nearest_cholesky(Q)
+
 
 @dataclass
 class R2C2_Qgh_Matern32(RCModel):

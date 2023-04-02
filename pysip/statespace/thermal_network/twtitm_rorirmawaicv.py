@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from ..base import RCModel
+from ..base_statespace import RCModel
 
 
 @dataclass

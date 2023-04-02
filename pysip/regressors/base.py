@@ -5,8 +5,8 @@ from typing import Tuple, Union
 import numpy as np
 import pandas as pd
 
-from ..state_estimator import BayesianFilter
-from ..statespace.base import StateSpace
+from ..filters import BayesianFilter
+from ..statespace.base_statespace import StateSpace
 
 
 def _check_data(dt, u, dtu, y):
