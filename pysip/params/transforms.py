@@ -1,32 +1,39 @@
-# .. math::
-#    :nowrap:
+""" Parameter transforms
 
-#     \\begin{equation*}
-#         \\theta = loc + f(\\eta) \\times scale
-#     \\end{equation*}
+This module contains the different transforms that can be applied to a parameter.
+The transforms are used to transform a parameter value θ to the unconstrained space
+η and vice versa. The transforms are used to ensure that the parameters are
+constrained to a certain range and that the optimization algorithm can find the
+optimal parameters.
 
+The transforms are defined in the class ParameterTransform. The class has the
+following abstract attributes / methods:
 
-# where :math:`\\theta_{sd} = f(\\eta)` is one of the following `transform`
+    - name: Name of the transform
+    - transform: Transform a parameter value θ to the unconstrained space η
+    - untransform: Transform a parameter value η to the constrained space θ
+    - grad_transform: Gradient of the transform function
+    - grad_untransform: Gradient of the untransform function
 
-# * `none`: :math:`\\theta_{sd} =\\eta \\qquad \\theta_{sd} \\in ]-\\infty, \\infty[`
-# * `log`: :math:`\\theta_{sd} =\\exp(\\eta) \\qquad \\theta_{sd} \\in [0, \\infty[`
-# * `lower`: :math:`\\theta_{sd} =\\exp(\\eta) + a \\qquad \\theta_{sd} \\in [a,
-#   \\infty[`
-# * `upper`: :math:`\\theta_{sd} =b - \\exp(\\eta) \\qquad \\theta_{sd} \\in
-#   ]-\\infty, b]`
-# * `logit`: :math:`\\theta_{sd}
-#   =a+\\frac{(b-a)}{1+\\exp(-\\eta)}\\qquad\\theta_{sd}\\in [a, b]`
+The transforms are registered in the Transforms namespace. The namespace is used
+to get the transform class from the name of the transform.
 
-# where :math:`a` and :math:`b` are the lower and upper bounds given as a tuple, such
-# that, `bounds` = :math:`(a, b)`. If `transform` = 'fixed' the parameter is not
-# considered as a random variable.
+The following transforms are available:
 
-# The `prior` distribution is on the standardized constrained parameter value
-# :math:`\\theta_{sd}`. In order to put the prior on the constrained parameter value
-# θ, use the default configuration, `loc` = 0 and `scale` = 1.
+    - None: No transform
+    - Fixed: Fixed parameter
+    - Log: Log transform
+    - Lower: Lower bound
+    - Upper: Upper bound
+    - Logit: Logit transform
+
+An auto transform is also available. The auto transform will select the best
+transform based on the bounds of the parameter.
+"""
 
 from abc import ABCMeta, abstractmethod
 import math
+from typing_extensions import Self
 
 from ..utils.misc import Namespace
 
@@ -50,33 +57,111 @@ class ParameterTransform(metaclass=ABCMeta):
 
     @abstractmethod
     def transform(self, θ: float) -> float:
+        """ Transform a parameter value θ to the unconstrained space η
+
+        Parameters
+        ----------
+        θ : float
+            Parameter value in the constrained space θ
+
+        Returns
+        -------
+        η : float
+            Parameter value in the unconstrained space η
+        """
         pass
 
     @abstractmethod
     def untransform(self, η: float) -> float:
+        """ Transform a parameter value η to the constrained space θ
+
+        Parameters
+        ----------
+        η : float
+            Parameter value in the unconstrained space η
+
+        Returns
+        -------
+        θ : float
+            Parameter value in the constrained space θ
+        """
         pass
 
     @abstractmethod
     def grad_transform(self, θ: float) -> float:
+        """ Gradient of the transform function
+
+        Parameters
+        ----------
+        θ : float
+            Parameter value in the constrained space θ
+
+        Returns
+        -------
+        grad : float
+            Gradient of the transform function
+        """
         pass
 
     @abstractmethod
     def grad_untransform(self, η: float) -> float:
+        """ Gradient of the untransform function
+
+        Parameters
+        ----------
+        η : float
+            Parameter value in the unconstrained space η
+
+        Returns
+        -------
+        grad : float
+            Gradient of the untransform function
+        """
         pass
 
     @abstractmethod
     def penalty(self, θ: float) -> float:
+        """ Penalty for the parameter value θ
+
+        Parameters
+        ----------
+        θ : float
+            Parameter value in the constrained space θ
+
+        Returns
+        -------
+        penalty : float
+            Penalty for the parameter value θ
+        """
         pass
 
     def in_bounds(self, x: float) -> bool:
+        """ Check if the parameter value is in the bounds of the transform
+
+        Parameters
+        ----------
+        x : float
+            Parameter value in the constrained space θ
+
+        Returns
+        -------
+        in_bounds : bool
+            True if the parameter value is in the bounds of the transform
+        """
         return True
 
     def __repr__(self):
         return f"{self.name}"
 
+    def __eq__(self, __value: Self) -> bool:
+        if isinstance(__value, ParameterTransform):
+            return self.name == __value.name
+        return False
+
 
 @register_transform
 class NoneTransform(ParameterTransform):
+    """ No transform, i.e. θ = η"""
     name = "none"
 
     def transform(self, θ: float) -> float:
@@ -97,11 +182,15 @@ class NoneTransform(ParameterTransform):
 
 @register_transform
 class FixedTransform(NoneTransform):
+    """ Fixed transform, i.e. θ = η, but the parameter is not considered as a random
+    variable.
+    """
     name = "fixed"
 
 
 @register_transform
 class LogTransform(ParameterTransform):
+    """ Log transform, i.e. θ = exp(η)"""
     name = "log"
 
     def transform(self, θ: float) -> float:
@@ -122,6 +211,7 @@ class LogTransform(ParameterTransform):
 
 @register_transform
 class LowerTransform(ParameterTransform):
+    """ Lower bound transform, i.e. θ = exp(η) + a, where a is the lower bound"""
     name = "lower"
 
     def transform(self, θ: float) -> float:
@@ -145,6 +235,7 @@ class LowerTransform(ParameterTransform):
 
 @register_transform
 class UpperTransform(ParameterTransform):
+    """ Upper bound transform, i.e. θ = a - exp(η), where a is the upper bound"""
     name = "upper"
 
     def transform(self, θ: float) -> float:
@@ -168,6 +259,9 @@ class UpperTransform(ParameterTransform):
 
 @register_transform
 class LogitTransform(ParameterTransform):
+    """ Logit transform, i.e. θ = a + (b - a) / (1 + exp(-η)), where a and b are the
+    lower and upper bounds, respectively
+    ."""
     name = "logit"
 
     def transform(self, θ: float) -> float:
@@ -191,6 +285,18 @@ class LogitTransform(ParameterTransform):
 
 
 def auto_transform(bounds):
+    """ Automatically select a transform based on the bounds
+
+    Parameters
+    ----------
+    bounds : tuple
+        Lower and upper bounds of the parameter. Both bounds can be None.
+
+    Returns
+    -------
+    transform : ParameterTransform
+        Transform that is automatically selected based on the bounds
+    """
     lb, ub = bounds
     if lb is None and ub is None:
         return Transforms["none"](bounds)

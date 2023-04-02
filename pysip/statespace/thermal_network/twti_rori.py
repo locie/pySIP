@@ -1,9 +1,6 @@
-from dataclasses import dataclass
-
 from ..base_statespace import RCModel
 
 
-@dataclass
 class TwTi_RoRi(RCModel):
     """Second order RC model"""
 

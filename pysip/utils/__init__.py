@@ -1,6 +1,5 @@
 from .artificial_data import generate_random_binary, generate_sine, generate_time, prbs
 from .check import check_model
-from .draw import TikzStateSpace
 from .math import (
     cholesky_inverse,
     fit,
@@ -25,7 +24,6 @@ __all__ = [
     "generate_time",
     "prbs",
     "check_model",
-    "TikzStateSpace",
     "cholesky_inverse",
     "fit",
     "log1p_exp",

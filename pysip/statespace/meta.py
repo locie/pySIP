@@ -50,7 +50,4 @@ class MetaStateSpace(type):
                     )
                 lines += [""]
 
-        if hasattr(self, "tikz"):
-            lines.append(self.tikz.fget(self))
-
         self.__doc__ = "\n".join([self.__doc__] + lines)

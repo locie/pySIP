@@ -12,13 +12,17 @@ from scipy.linalg import (
 
 
 def inv_2x2(X: np.ndarray) -> np.ndarray:
-    """Inverse of 2-dimensional square matrix
+    """Inverse of 2-dimensional square matrix.
 
-    Args:
-        X: 2-dimensional square matrix
+    Parameters
+    ----------
+    X : ndarray
+        2-dimensional square matrix.
 
-    Returns:
-        Inverse of `X`
+    Returns
+    -------
+    ndarray
+        Inverse of `X`.
     """
     x00 = X[0, 0]
     x01 = X[0, 1]
@@ -34,10 +38,14 @@ def inv_2x2(X: np.ndarray) -> np.ndarray:
 def inv_3x3(X: np.ndarray) -> np.ndarray:
     """Inverse of 3-dimensional square matrix
 
-    Args:
-        X: 3-dimensional square matrix
+    Parameters
+    ----------
+    X : array_like
+        3-dimensional square matrix
 
-    Returns:
+    Returns
+    -------
+    array_like
         Inverse of `X`
     """
     x00, x01, x02, x10, x11, x12, x20, x21, x22 = X.ravel()
@@ -63,15 +71,20 @@ def inv_3x3(X: np.ndarray) -> np.ndarray:
 def eigvals_2x2(X: np.ndarray) -> np.ndarray:
     """Eigenvalues of 2-dimensional square matrix
 
-    Args:
-        X: 2-dimensional square matrix
+    Parameters
+    ----------
+    X : (N, N) array_like
+        2-dimensional square matrix
 
-    Returns:
+    Returns
+    -------
+    eigenvalues : (N,) ndarray
         Eigenvalues of `X`
 
-    References:
-        M.J. Kronenbur. A Method for Fast Diagonalization ofa 2x2 or 3x3 Real Symmetric
-        Matrix
+    References
+    ----------
+    .. [1] M.J. Kronenbur. A Method for Fast Diagonalization ofa 2x2 or 3x3 Real
+           Symmetric Matrix
     """
     x00 = X[0, 0]
     x01 = X[0, 1]
@@ -84,17 +97,22 @@ def eigvals_2x2(X: np.ndarray) -> np.ndarray:
 def eig_2x2(X: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     """Eigenvalues and eigenvectors of 2-dimensional square matrix
 
-    Args:
-        X: 2-dimensional square matrix
+    Parameters
+    ----------
+    X : array_like
+        2-dimensional square matrix
 
-    Returns:
-        2-elements tuple containing
-            - **w**: Eigenvalues
-            - **v**: Eigenvectors
+    Returns
+    -------
+    w : ndarray
+        Eigenvalues
+    v : ndarray
+        Eigenvectors
 
-    References:
-        M.J. Kronenbur. A Method for Fast Diagonalization ofa 2x2 or 3x3 Real Symmetric
-        Matrix
+    References
+    ----------
+    M.J. Kronenbur. A Method for Fast Diagonalization ofa 2x2 or 3x3 Real Symmetric
+    Matrix
     """
     x00 = X[0, 0]
     x01 = X[0, 1]
@@ -127,20 +145,26 @@ def trunc_arccos(x: float) -> float:
 
 
 def eigvals_3x3(X: np.ndarray) -> np.ndarray:
-    """Eigenvalues of 3-dimensional real square matrix
+    """Eigenvalues of 3x3 real square matrix
 
-    Args:
-        X: 3-dimensional square matrix
+    Parameters
+    ----------
+    X: (3, 3) array
+        Square matrix
 
-    Returns:
+    Returns
+    -------
+    eigenvalues: (3,) array
         Eigenvalues of `X`
 
-    Notes:
-        This symbolic expression doesn't work for complex eigenvalues
+    Notes
+    -----
+    This symbolic expression doesn't work for complex eigenvalues
 
-    References:
-        M.J. Kronenbur. A Method for Fast Diagonalization ofa 2x2 or 3x3 Real Symmetric
-        Matrix
+    References
+    ----------
+    M.J. Kronenbur. A Method for Fast Diagonalization ofa 2x2 or 3x3 Real Symmetric
+    Matrix
     """
     x00, x01, x02, x10, x11, x12, x20, x21, x22 = X.ravel()
 
@@ -176,10 +200,14 @@ def eigvals_3x3(X: np.ndarray) -> np.ndarray:
 def expm_2x2(X: np.ndarray) -> np.ndarray:
     """Matrix exponential of 2-dimensional square matrix
 
-    Args:
-        X: 2-dimensional square matrix
+    Parameters
+    ----------
+    X : array_like
+        2-dimensional square matrix
 
-    Returns:
+    Returns
+    -------
+    array_like
         Matrix exponential of `X`
     """
     w, v = eig_2x2(X)
@@ -189,14 +217,19 @@ def expm_2x2(X: np.ndarray) -> np.ndarray:
 def dexpm_2x2(X: np.ndarray, dX: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     """Derivative Matrix exponential of 2-dimensional square matrix
 
-    Args:
-        X: 2-dimensional square matrix
-        dX: Derivative of `X` stacked along the first dimension
+    Parameters
+    ----------
+    X : numpy.ndarray
+        2-dimensional square matrix
+    dX : numpy.ndarray
+        Derivative of `X` stacked along the first dimension
 
-    Returns:
-        2-elements tuple containing
-            - Matrix exponential of `X`
-            - Derivative of the matrix exponential of `X`
+    Returns
+    -------
+    numpy.ndarray
+        Matrix exponential of `X`
+    numpy.ndarray
+        Derivative of the matrix exponential of `X`
     """
     w, v = eig_2x2(X)
     u = inv_2x2(v)
@@ -222,18 +255,27 @@ def state_input(
 
         x_{k+1} = Ad x_k + B0d u_k + B1d \\Delta u_k
 
-    Args:
-        A: State matrix
-        B: Input matrix
-        dt: Sampling time
-        order_hold: zero order hold = 0 or first order hold = 1
-        method: Augmented matrix exponential `expm` or symbolic `analytic`
+    Parameters
+    ----------
+    A : ndarray
+        State matrix
+    B : ndarray
+        Input matrix
+    dt : float
+        Sampling time
+    order_hold : int
+        zero order hold = 0 or first order hold = 1
+    method : str
+        Augmented matrix exponential `expm` or symbolic `analytic`
 
-    Returns:
-        3-elements tuple containing
-            - Ad: Discrete state matrix
-            - B0d: Discrete input matrix (zero order hold)
-            - B1d: Discrete input matrix (first order hold)
+    Returns
+    -------
+    Ad : ndarray
+        Discrete state matrix
+    B0d : ndarray
+        Discrete input matrix (zero order hold)
+    B1d : ndarray
+        Discrete input matrix (first order hold)
     """
     if method == "expm":
         return state_input_expm(A, B, dt, order_hold)
@@ -247,11 +289,16 @@ def state_input(
 def state(A: np.ndarray, dt: float = 1.0) -> np.ndarray:
     """Discretize the state matrix
 
-    Args:
-        A: State matrix
-        dt: Sampling time
+    Parameters
+    ----------
+    A : array_like
+        State matrix
+    dt : float
+        Sampling time
 
-    Returns:
+    Returns
+    -------
+    Ad : array_like
         Discrete state matrix
     """
     return expm(A * dt)
@@ -262,17 +309,25 @@ def input_analytic(
 ) -> Tuple[np.ndarray, np.ndarray]:
     """Discretize the input matrix with the analytic expression
 
-    Args:
-        A: State matrix
-        B: Input matrix
-        Ad: Discrete state matrix
-        dt: Sampling time
-        order_hold: zero order hold = 0 or first order hold = 1
+    Parameters
+    ----------
+    A : array_like
+        State matrix
+    B : array_like
+        Input matrix
+    Ad : array_like
+        Discrete state matrix
+    dt : float
+        Sampling time
+    order_hold : int
+        zero order hold = 0 or first order hold = 1
 
-    Returns:
-        2-elements tuple containing
-            - B0d: Discrete input matrix (zero order hold)
-            - B1d: Discrete input matrix (first order hold)
+    Returns
+    -------
+    B0d : array_like
+        Discrete input matrix (zero order hold)
+    B1d : array_like
+        Discrete input matrix (first order hold)
     """
     nx, nu = B.shape
     Ix = np.eye(nx)
@@ -303,17 +358,25 @@ def state_input_expm(
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Discretize the state and input matrices with matrix exponential
 
-    Args:
-        A: State matrix
-        B: Input matrix
-        dt: Sampling time
-        order_hold: zero order hold = 0 or first order hold = 1
+    Parameters
+    ----------
+    A : numpy.array
+        State matrix
+    B : numpy.array
+        Input matrix
+    dt : float
+        Sampling time
+    order_hold : int
+        zero order hold = 0 or first order hold = 1
 
-    Returns:
-        3-elements tuple containing
-            - Ad: Discrete state matrix
-            - B0d: Discrete input matrix (zero order hold)
-            - B1d: Discrete input matrix (first order hold)
+    Returns
+    -------
+    Ad : numpy.array
+        Discrete state matrix
+    B0d : numpy.array
+        Discrete input matrix (zero order hold)
+    B1d : numpy.array
+        Discrete input matrix (first order hold)
     """
     nx, nu = B.shape
     if order_hold == 0:
@@ -349,13 +412,18 @@ def expm_triu(
         F = \\exp(A) = \\exp \\left(\\begin{bmatrix} a11 & a12 \\\\ 0 & a22
         \\end{bmatrix} \\right) = \\begin{bmatrix} f11 & f12 \\\\ 0 & f22 \\end{bmatrix}
 
-    Args:
-        a11: Upper left input matrix a12: Upper right input matrix a22: Lower right
-        input matrix dt: Sampling time f11: Upper left output matrix f22: Lower right
-        output matrix
+    Parameters
+    ----------
+    a11: Upper left input matrix
+    a12: Upper right input matrix
+    a22: Lower right input matrix
+    dt: Sampling time
+    f11: Upper left output matrix
+    f22: Lower right output matrix
 
-    Returns:
-        F: Matrix exponential of A
+    Returns
+    -------
+    F: Matrix exponential of A
     """
     F = block_diag(f11, f22)
     dim = a12.shape[0]
@@ -364,15 +432,21 @@ def expm_triu(
 
 
 def diffusion_mfd(A: np.ndarray, Q: np.ndarray, dt: float = 1.0) -> np.ndarray:
-    """Discretize the diffusion matrix by Matrix Fraction Decomposition
+    """Discretize the diffusion matrix by Matrix Fraction Decomposition.
 
-    Args:
-        A: State matrix
-        Q: Diffusion matrix
-        dt: Sampling time
+    Parameters
+    ----------
+    A : array_like
+        State matrix.
+    Q : array_like
+        Diffusion matrix.
+    dt : float
+        Sampling time.
 
-    Returns:
-        Process noise covariance matrix
+    Returns
+    -------
+    array_like
+        Process noise covariance matrix.
     """
     if not Q.any():
         return Q
@@ -390,12 +464,18 @@ def diffusion_mfd(A: np.ndarray, Q: np.ndarray, dt: float = 1.0) -> np.ndarray:
 def diffusion_lyap(A: np.ndarray, Q: np.ndarray, Ad: np.ndarray) -> np.ndarray:
     """Discretize the diffusion matrix by solving the Lyapunov equation
 
-    Args:
-        A: State matrix
-        Q: Diffusion matrix
-        Ad: Discrete state matrix
+    Parameters
+    ----------
+    A : array_like
+        State matrix
+    Q : array_like
+        Diffusion matrix
+    Ad : array_like
+        Discrete state matrix
 
-    Returns:
+    Returns
+    -------
+    Qd : array_like
         Process noise covariance matrix
     """
     if not Q.any():
@@ -404,13 +484,19 @@ def diffusion_lyap(A: np.ndarray, Q: np.ndarray, Ad: np.ndarray) -> np.ndarray:
 
 
 def diffusion_stationary(Pinf: np.ndarray, Ad: np.ndarray) -> np.ndarray:
-    """Discretize the stationary covariance matrix
+    """
+    Discretize the stationary covariance matrix
 
-    Args:
-        Pinf: Stationary state covariance matrix
-        Ad: Discrete state matrix
+    Parameters
+    ----------
+    Pinf : numpy.array
+        Stationary state covariance matrix
+    Ad : numpy.array
+        Discrete state matrix
 
-    Returns:
+    Returns
+    -------
+    numpy.array
         Process noise covariance matrix
     """
     if not Pinf.any():
@@ -424,12 +510,18 @@ def diffusion_kron(A: np.ndarray, Q: np.ndarray, Ad: np.ndarray) -> np.ndarray:
     Charles C. Driver, Manuel C. Voelkle.
     Introduction to Hierarchical Continuous Time Dynamic Modelling With ctsem
 
-    Args:
-        A: State matrix
-        Q: Diffusion matrix
-        Ad: Discrete state matrix
+    Parameters
+    ----------
+    A : array
+        State matrix
+    Q : array
+        Diffusion matrix
+    Ad : array
+        Discrete state matrix
 
-    Returns:
+    Returns
+    -------
+    Qd : array
         Process noise covariance matrix
     """
     if not Q.any():

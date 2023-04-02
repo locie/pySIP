@@ -32,8 +32,16 @@ class Parameter:
 
     Attributes
     ----------
+    theta : float
+        Parameter value in the constrained space θ
+    theta_sd : float
+        Parameter value in the standardized constrained space θ_sd
+    eta : float
+        Parameter value in the unconstrained space η
+    eta_sd : float
+        Parameter value in the standardized unconstrained space η_sd
     free : bool
-        True if the parameter is not fixed
+        False if the parameter is fixed
     """
 
     name: str
@@ -91,47 +99,42 @@ class Parameter:
 
     @property
     def theta_sd(self) -> float:
-        """Returns standardized constrained parameter value θsd"""
         return self.value
 
     @theta_sd.setter
     def theta_sd(self, x):
-        """Set standardized constrained parameter value θsd"""
         self.value = x
         self.transform.transform(self.value)
 
     @property
     def eta(self) -> float:
-        """Returns unconstrained parameter value η"""
         return self._eta
 
     @eta.setter
     def eta(self, x):
-        """Returns unconstrained parameter value η"""
         self._eta = x
         self.value = self.transform.grad_untransform(self._eta)
 
     @property
     def free(self) -> bool:
-        """Returns True if the parameter is not fixed"""
         return isinstance(self.transform, FixedTransform)
 
-    def _transform(self):
+    def get_transformed(self):
         """Do inverse transformation θsd = f^{-1}(η)"""
         return self.transform.transform(self._eta)
 
-    def _transform_jacobian(self):
+    def get_transform_jacobian(self):
         """Get the jacobian of η = f(θsd)"""
         return self.transform.grad_transform(self.value)
 
-    def _inv_transform(self):
+    def get_inv_transformed(self):
         """Do inverse transformation θsd = f^{-1}(η)"""
         return self.transform.untransform(self._eta)
 
-    def _inv_transform_jacobian(self) -> float:
+    def get_inv_transform_jacobian(self) -> float:
         """Get the jacobian of θsd = f⁻¹(η)"""
         return self.transform.grad_untransform(self._eta)
 
-    def _penalty(self) -> float:
+    def get_penalty(self) -> float:
         """Penalty function"""
         return self.transform.penalty(self.value)

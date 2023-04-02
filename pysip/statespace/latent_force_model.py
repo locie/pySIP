@@ -14,15 +14,21 @@ from .nodes import Par
 class LatentForceModel(StateSpace):
     """Latent Force Model (LFM)
 
-    Args:
-        rc: RCModel() gp: GPModel() latent_force: The name of the input considered as
-        the latent force
+    Parameters
+    ----------
+    rc : RCModel()
+        ...
+    gp : GPModel()
+        ...
+    latent_force : str
+        The name of the input considered as the latent force
 
-    Notes:
-        The MEASURE_DEVIATION of the GPModel is fixed because it is not used in the
-        latent force model. The GPModel is augmented into the RCModel, therefore, only
-        the measurement noise matrix `R` of the RCModel is used. To avoid useless
-        computation, the MEASURE_DEVIATION of the GPModel must stay fixed.
+    Notes
+    -----
+    The MEASURE_DEVIATION of the GPModel is fixed because it is not used in the
+    latent force model. The GPModel is augmented into the RCModel, therefore, only
+    the measurement noise matrix `R` of the RCModel is used. To avoid useless
+    computation, the MEASURE_DEVIATION of the GPModel must stay fixed.
     """
 
     def __init__(self, rc: RCModel, gp: GPModel, latent_force: str):
@@ -129,15 +135,22 @@ class LatentForceModel(StateSpace):
         Given the block upper triangular form of the state matrix, the Parlett's method
         is used for computing the discrete state matrix.
 
-        Args:
-            dt: sampling time
+        Parameters
+        ----------
+        dt : float
+            sampling time
 
-        Returns:
-            4-elements tuple containing
-                - **Ad**: Discrete state matrix
-                - **B0d**: Discrete input matrix (zero order hold)
-                - **B1d**: Discrete input matrix (first order hold)
-                - **Qd**: Upper Cholesky factor of the process noise covariance
+        Returns
+        -------
+        Ad : array_like
+            Discrete state matrix
+        B0d : array_like
+            Discrete input matrix (zero order hold)
+        B1d : array_like
+            Discrete input matrix (first order hold)
+        Qd : array_like
+            Upper Cholesky factor of the process noise covariance
+
         """
         if cond(self._rc.A, "fro") < 1e12:
             method = "analytic"
