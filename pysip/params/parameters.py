@@ -1,16 +1,18 @@
-from typing import List, Sequence, Union
+from typing import List, Literal, Sequence, Union
 from typing_extensions import Self
 
 import numpy as np
 
 from .parameter import Parameter
 
+
 def _coerce_params(parameters: Union[List[str], List[dict]]) -> List[dict]:
     if isinstance(parameters, dict):
-        return  parameters
+        return parameters
     if isinstance(parameters[0], str):
         return {name: Parameter(name) for name in parameters}
     return {k["name"]: Parameter(**k) for k in parameters}
+
 
 class Parameters:
     """Factory of Parameter instances
@@ -69,13 +71,12 @@ class Parameters:
         self.name = name
         self._parameters = _coerce_params(parameters)
 
-
     def __repr__(self):
         # TODO: make that easier to maintain
         def _repr(d, level=0):
             s = ""
             if level == 0:
-                s += "Parameters " + self._name + "\n"
+                s += "Parameters " + self.name + "\n"
             for k, v in d.items():
                 s += "    " * level
                 if isinstance(v, Parameter):
@@ -143,9 +144,9 @@ class Parameters:
             _set(self._parameters, parameter, *args)
 
     @property
-    def theta(self) -> List[float]:
+    def theta(self) -> np.ndarray:
         """Get the constrained parameter values θ"""
-        return [h.theta for h in self.parameters]
+        return np.array([h.theta for h in self.parameters])
 
     @theta.setter
     def theta(self, x: Sequence[float]):
@@ -156,8 +157,8 @@ class Parameters:
             p.theta = value
 
     @property
-    def theta_free(self) -> List[float]:
-        return [p.theta for p in self.parameters_free]
+    def theta_free(self) -> np.ndarray:
+        return np.array([p.theta for p in self.parameters_free])
 
     @theta_free.setter
     def theta_free(self, x: Sequence[float]):
@@ -168,8 +169,8 @@ class Parameters:
             p.theta = value
 
     @property
-    def theta_sd(self) -> List[float]:
-        return [p.theta_sd for p in self.parameters_free]
+    def theta_sd(self) -> np.ndarray:
+        return np.array([p.theta_sd for p in self.parameters_free])
 
     @theta_sd.setter
     def theta_sd(self, x: Sequence[float]):
@@ -180,11 +181,11 @@ class Parameters:
             p.theta_sd = value
 
     @property
-    def theta_jacobian(self) -> List:
-        return [p.get_inv_transform_jacobian() for p in self.parameters_free]
+    def theta_jacobian(self) -> np.ndarray:
+        return np.array([p.get_inv_transform_jacobian() for p in self.parameters_free])
 
     @property
-    def theta_log_jacobian(self) -> List:
+    def theta_log_jacobian(self) -> np.ScalarType:
         return np.sum(np.log(np.abs(self.theta_jacobian)))
 
     @property
@@ -192,7 +193,7 @@ class Parameters:
         return np.array([p.eta for p in self.parameters])
 
     @eta.setter
-    def eta(self, x: np.ndarray):
+    def eta(self, x: Sequence[float]):
         if len(x) != self.n_par:
             raise ValueError(f"{len(x)} values are given but {len(self)} are expected")
 
@@ -213,6 +214,16 @@ class Parameters:
         return SCALING * np.sum([p.get_penalty() for p in self.parameters_free])
 
     @property
+    def d_penalty(self) -> List:
+        """Partial derivative of the penalty function
+
+        Args:
+            scaling: Scaling coefficient of the penalty function
+        """
+        SCALING = 1e-4
+        return [SCALING * p.get_grad_penalty() for p in self.parameters_free]
+
+    @property
     def prior(self) -> float:
         return np.sum(
             [
@@ -224,15 +235,15 @@ class Parameters:
 
     @property
     def free(self) -> List[bool]:
-        return [p.free for p in self.parameters]
+        return np.array([p.free for p in self.parameters])
 
     @property
     def names(self) -> List[str]:
-        return [p.name for p in self.parameters]
+        return np.array([p.name for p in self.parameters])
 
     @property
     def names_free(self) -> List[str]:
-        return [p.name for p in self.parameters_free]
+        return np.array([p.name for p in self.parameters_free])
 
     def prior_init(self, hpd=None):
         """Draw a random sample from the prior distribution for each parameter
@@ -249,7 +260,7 @@ class Parameters:
 
     @property
     def scale(self) -> List[float]:
-        return [p.scale for p in self.parameters_free]
+        return np.array([p.scale for p in self.parameters_free])
 
     @property
     def n_par(self) -> int:
@@ -257,4 +268,68 @@ class Parameters:
 
     @property
     def parameters_free(self) -> List[Parameter]:
-        return [p for p in self.parameters if p.free]
+        return np.array([p for p in self.parameters if p.free])
+
+    def init_parameters(
+        self,
+        n_init: int = 1,
+        method: Literal[
+            "unconstrained", "prior", "zero", "fixed", "value"
+        ] = "unconstrained",
+        hpd: float = 0.95,
+    ) -> np.ndarray:
+        """Random initialization of the parameters
+
+        Parameters
+        ----------
+        n_init: int, default 1
+            Number of random initialization
+        method: str, default 'unconstrained'
+            - **unconstrained**: Uniform draw between [-1, 1] in the uncsontrained
+            space
+            - **prior**: Uniform draw from the prior distribution
+            - **zero**: Set the unconstrained parameters to 0
+            - **fixed**: The current parameter values are used
+            - **value**: Uniform draw between the parameter value +/- 25%
+        hpd: bool, default False
+            Highest Prior Density to draw sample from (True for unimodal
+            distribution)
+
+        Returns
+        -------
+        eta0: ndarray of shape (n_par, n_init)
+            Array of unconstrained parameters, where n_par is the
+            number of free parameters and n_init the number of random initialization
+        """
+
+        if not isinstance(n_init, int) or n_init <= 0:
+            raise TypeError("`n_init` must an integer greater or equal to 1")
+
+        available_methods = ["unconstrained", "prior", "zero", "fixed", "value"]
+        if method not in available_methods:
+            raise ValueError(
+                f"`method` must be one of the following {available_methods}"
+            )
+
+        if not (0.0 < hpd <= 1.0):
+            raise ValueError("`hpd` must be between ]0, 1]")
+
+        n_par = len(self.eta_free)
+        if method == "unconstrained":
+            eta0 = np.random.uniform(-1, 1, (n_par, n_init))
+        elif method == "zero":
+            eta0 = np.zeros((n_par, n_init))
+        else:
+            eta0 = np.zeros((n_par, n_init))
+            for n in range(n_init):
+                if method == "prior":
+                    self.prior_init(hpd=hpd)
+                elif method == "value":
+                    value = np.asarray(self.theta_sd)
+                    lb = value - 0.25 * value
+                    ub = value + 0.25 * value
+                    self.theta_sd = np.random.uniform(lb, ub)
+
+                eta0[:, n] = self.eta_free
+
+        return np.squeeze(eta0)

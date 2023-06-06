@@ -40,6 +40,7 @@ from ..utils.misc import Namespace
 
 Transforms = Namespace()
 
+
 # decorator to register transforms
 def register_transform(cls):
     Transforms[cls.name] = cls
@@ -57,7 +58,7 @@ class ParameterTransform(metaclass=ABCMeta):
 
     @abstractmethod
     def transform(self, θ: float) -> float:
-        """ Transform a parameter value θ to the unconstrained space η
+        """Transform a parameter value θ to the unconstrained space η
 
         Parameters
         ----------
@@ -73,7 +74,7 @@ class ParameterTransform(metaclass=ABCMeta):
 
     @abstractmethod
     def untransform(self, η: float) -> float:
-        """ Transform a parameter value η to the constrained space θ
+        """Transform a parameter value η to the constrained space θ
 
         Parameters
         ----------
@@ -89,7 +90,7 @@ class ParameterTransform(metaclass=ABCMeta):
 
     @abstractmethod
     def grad_transform(self, θ: float) -> float:
-        """ Gradient of the transform function
+        """Gradient of the transform function
 
         Parameters
         ----------
@@ -105,7 +106,7 @@ class ParameterTransform(metaclass=ABCMeta):
 
     @abstractmethod
     def grad_untransform(self, η: float) -> float:
-        """ Gradient of the untransform function
+        """Gradient of the untransform function
 
         Parameters
         ----------
@@ -121,7 +122,7 @@ class ParameterTransform(metaclass=ABCMeta):
 
     @abstractmethod
     def penalty(self, θ: float) -> float:
-        """ Penalty for the parameter value θ
+        """Penalty for the parameter value θ
 
         Parameters
         ----------
@@ -135,8 +136,24 @@ class ParameterTransform(metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
+    def grad_penalty(self, θ: float) -> float:
+        """Gradient of the penalty function for the parameter value θ
+
+        Parameters
+        ----------
+        θ : float
+            Parameter value in the constrained space θ
+
+        Returns
+        -------
+        grad_penalty : float
+            Gradient of the penalty function for the parameter value θ
+        """
+        pass
+
     def in_bounds(self, x: float) -> bool:
-        """ Check if the parameter value is in the bounds of the transform
+        """Check if the parameter value is in the bounds of the transform
 
         Parameters
         ----------
@@ -161,7 +178,8 @@ class ParameterTransform(metaclass=ABCMeta):
 
 @register_transform
 class NoneTransform(ParameterTransform):
-    """ No transform, i.e. θ = η"""
+    """No transform, i.e. θ = η"""
+
     name = "none"
 
     def transform(self, θ: float) -> float:
@@ -179,18 +197,23 @@ class NoneTransform(ParameterTransform):
     def penalty(self, θ: float) -> float:
         return 0.0
 
+    def grad_penalty(self, θ: float) -> float:
+        return 0.0
+
 
 @register_transform
 class FixedTransform(NoneTransform):
-    """ Fixed transform, i.e. θ = η, but the parameter is not considered as a random
+    """Fixed transform, i.e. θ = η, but the parameter is not considered as a random
     variable.
     """
+
     name = "fixed"
 
 
 @register_transform
 class LogTransform(ParameterTransform):
-    """ Log transform, i.e. θ = exp(η)"""
+    """Log transform, i.e. θ = exp(η)"""
+
     name = "log"
 
     def transform(self, θ: float) -> float:
@@ -208,10 +231,14 @@ class LogTransform(ParameterTransform):
     def penalty(self, θ: float) -> float:
         return 1e-12 / (θ - 1e-12)
 
+    def grad_penalty(self, θ: float) -> float:
+        return -1e-12 / (θ - 1e-12) ** 2
+
 
 @register_transform
 class LowerTransform(ParameterTransform):
-    """ Lower bound transform, i.e. θ = exp(η) + a, where a is the lower bound"""
+    """Lower bound transform, i.e. θ = exp(η) + a, where a is the lower bound"""
+
     name = "lower"
 
     def transform(self, θ: float) -> float:
@@ -229,13 +256,17 @@ class LowerTransform(ParameterTransform):
     def penalty(self, θ: float) -> float:
         return abs(self.lb) / (θ - self.lb)
 
+    def grad_penalty(self, θ: float) -> float:
+        return -abs(self.lb) / (θ - self.lb) ** 2
+
     def in_bounds(self, x: float) -> bool:
         return x > self.lb
 
 
 @register_transform
 class UpperTransform(ParameterTransform):
-    """ Upper bound transform, i.e. θ = a - exp(η), where a is the upper bound"""
+    """Upper bound transform, i.e. θ = a - exp(η), where a is the upper bound"""
+
     name = "upper"
 
     def transform(self, θ: float) -> float:
@@ -253,15 +284,19 @@ class UpperTransform(ParameterTransform):
     def penalty(self, θ: float) -> float:
         return abs(self.ub) / (self.ub - θ)
 
+    def grad_penalty(self, θ: float) -> float:
+        return abs(self.ub) / (self.ub - θ) ** 2
+
     def in_bounds(self, x: float) -> bool:
         return x < self.ub
 
 
 @register_transform
 class LogitTransform(ParameterTransform):
-    """ Logit transform, i.e. θ = a + (b - a) / (1 + exp(-η)), where a and b are the
+    """Logit transform, i.e. θ = a + (b - a) / (1 + exp(-η)), where a and b are the
     lower and upper bounds, respectively
     ."""
+
     name = "logit"
 
     def transform(self, θ: float) -> float:
@@ -280,12 +315,17 @@ class LogitTransform(ParameterTransform):
     def penalty(self, θ: float) -> float:
         return UpperTransform.penalty(self, θ) + LowerTransform.penalty(self, θ)
 
+    def grad_penalty(self, θ: float) -> float:
+        return UpperTransform.grad_penalty(self, θ) + LowerTransform.grad_penalty(
+            self, θ
+        )
+
     def in_bounds(self, x: float) -> bool:
         return self.lb < x < self.ub
 
 
 def auto_transform(bounds):
-    """ Automatically select a transform based on the bounds
+    """Automatically select a transform based on the bounds
 
     Parameters
     ----------

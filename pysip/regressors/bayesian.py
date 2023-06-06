@@ -10,7 +10,7 @@ from ..mcmc.hamiltonian import EuclideanHamiltonian
 from ..mcmc.hmc import DynamicHMC, Fit_Bayes
 from ..mcmc.metrics import Dense, Diagonal
 from ..filters import BayesianFilter, KalmanQR
-from ..statespace.base_statespace import StateSpace
+from ..statespace.base import StateSpace
 from .base import BaseRegressor
 
 

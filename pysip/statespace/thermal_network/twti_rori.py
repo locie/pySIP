@@ -1,4 +1,4 @@
-from ..base_statespace import RCModel
+from ..base import RCModel
 
 
 class TwTi_RoRi(RCModel):

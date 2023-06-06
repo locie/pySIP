@@ -113,11 +113,11 @@ class Parameter:
     @eta.setter
     def eta(self, x):
         self._eta = x
-        self.value = self.transform.grad_untransform(self._eta)
+        self.value = self.transform.untransform(self._eta)
 
     @property
     def free(self) -> bool:
-        return isinstance(self.transform, FixedTransform)
+        return not isinstance(self.transform, FixedTransform)
 
     def get_transformed(self):
         """Do inverse transformation θsd = f^{-1}(η)"""
@@ -138,3 +138,7 @@ class Parameter:
     def get_penalty(self) -> float:
         """Penalty function"""
         return self.transform.penalty(self.value)
+
+    def get_grad_penalty(self) -> float:
+        """Penalty function"""
+        return self.transform.grad_penalty(self.value)

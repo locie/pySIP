@@ -4,7 +4,7 @@
 from abc import ABCMeta, abstractmethod
 import numpy as np
 import pandas as pd
-from ..statespace.base_statespace import StateSpace
+from ..statespace.base import StateSpace
 
 
 class BayesianFilter(metaclass=ABCMeta):

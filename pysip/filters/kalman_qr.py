@@ -8,9 +8,8 @@ import numpy as np
 import pandas as pd
 from numba.core.errors import NumbaPerformanceWarning
 
-from ..statespace.base_statespace import StateSpace, States
-from .base_kfilter import BayesianFilter
-
+from ..statespace.base import StateSpace, States
+from .base import BayesianFilter
 
 def _solve_triu_inplace(A, b):
     for i in range(b.shape[0]):
@@ -27,10 +26,10 @@ def _update(C, D, R, x, P, u, y, _Arru):
     S = r_fact[:ny, :ny]
     if ny == 1:
         k = (y - C @ x - D @ u) / S[0, 0]
-        x += r_fact[:1, 1:].T * k
+        x = x + r_fact[:1, 1:].T * k
     else:
         k = _solve_triu_inplace(S, y - C @ x - D @ u)
-        x += r_fact[:ny, ny:].T @ k
+        x = x + r_fact[:ny, ny:].T @ k
     P = r_fact[ny:, ny:]
     return x, P, k, S
 
@@ -53,10 +52,10 @@ def _unpack_states(states, i):
         states.C,
         states.D,
         states.R,
-        states.Q[:, :, i],
         states.A[:, :, i],
         states.B0[:, :, i],
         states.B1[:, :, i],
+        states.Q[:, :, i],
     )
 
 
@@ -250,7 +249,6 @@ class KalmanQR(BayesianFilter):
         dtu: pd.DataFrame,
         y: pd.DataFrame,
     ):
-
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=NumbaPerformanceWarning)
             x0, P0, u, dtu, y, states = KalmanQR._proxy_params(ss, dt, (u, dtu, y))
@@ -268,7 +266,6 @@ class KalmanQR(BayesianFilter):
             warnings.simplefilter("ignore", category=NumbaPerformanceWarning)
             x0, P0, u, dtu, y, states = KalmanQR._proxy_params(ss, dt, (u, dtu, y))
             _filtering(x0, P0, u, dtu, y, states)
-
 
     @staticmethod
     def smoothing(

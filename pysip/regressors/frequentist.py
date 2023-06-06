@@ -6,7 +6,7 @@ import pandas as pd
 from scipy.optimize import minimize
 
 from ..filters.kalman_qr import KalmanQR, BayesianFilter
-from ..statespace.base_statespace import StateSpace
+from ..statespace.base import StateSpace
 from ..utils.statistics import ttest
 from .base import BaseRegressor
 
@@ -36,33 +36,6 @@ class FreqRegressor(BaseRegressor):
         inputs: Union[str, list] = None,
         options: dict = None,
     ) -> Union[pd.DataFrame, pd.DataFrame, dict]:
-        """Fit the model
-
-        Args:
-            df: Training data
-            outputs: Outputs name(s)
-            inputs: Inputs name(s)
-            options:
-                - scipy.minimmize options
-                - **init** (str, default=`unconstrained`):
-                    - unconstrained: Uniform draw between [-1, 1] in the uncsontrained
-                      space
-                    - prior: Uniform draw from the prior distribution
-                    - zero: Set the unconstrained parameters to 0
-                    - fixed: The current parameter values are used
-                    - value: Uniform draw between the parameter value +/- 25%
-                    - prior_mass (float, default=0.95):
-                - **hpd**: (float, default=0.95)
-                    Highest Prior Density to draw sample from the prior (True if
-                    unimodal)
-
-        Returns:
-            3-elements tuple containing
-                - **df**: Fit summary
-                - **df_corr**: Correlation matrix
-                - **results**: Scipy optimize summary
-        """
-
         if options is None:
             options = {}
         else:
@@ -73,25 +46,26 @@ class FreqRegressor(BaseRegressor):
 
         init = options.pop("init", "fixed")
         hpd = options.pop("hpd", 0.95)
-        self.ss.parameters.eta = self._init_parameters(1, init, hpd)
-        data = self._prepare_data(df, inputs, outputs)
+        self.parameters.eta = self.parameters.init_parameters(1, init, hpd)
+        data = self.ss.prepare_data(df, inputs, outputs)
 
         results = minimize(
             fun=self._eval_log_posterior,
-            x0=self.ss.parameters.eta_free,
+            x0=self.parameters.eta_free,
             args=data,
             method="BFGS",
+            jac="3-point",
             options=options,
         )
 
         # inverse jacobian of the transform eta = f(theta)
-        inv_jac = np.diag(1.0 / np.array(self.ss.parameters.eta_jacobian))
+        inv_jac = np.diag(1.0 / np.array(self.parameters.eta_jacobian))
 
         # covariance matrix in the constrained space (e.g. theta)
         cov_theta = inv_jac @ results.hess_inv @ inv_jac
 
         # standard deviation of the constrained parameters
-        sig_theta = np.sqrt(np.diag(cov_theta)) * self.ss.parameters.scale
+        sig_theta = np.sqrt(np.diag(cov_theta)) * self.parameters.scale
         inv_sig_theta = np.diag(1.0 / np.sqrt(np.diag(cov_theta)))
 
         # correlation matrix of the constrained parameters
@@ -100,20 +74,20 @@ class FreqRegressor(BaseRegressor):
         df = pd.DataFrame(
             data=np.vstack(
                 [
-                    self.ss.parameters.theta_free,
+                    self.parameters.theta_free,
                     sig_theta,
-                    ttest(self.ss.parameters.theta_free, sig_theta, data[2].shape[1]),
+                    ttest(self.parameters.theta_free, sig_theta, data[2].shape[1]),
                     np.abs(results.jac),
-                    np.abs(self.ss.parameters.d_penalty),
+                    np.abs(self.parameters.d_penalty),
                 ]
             ).T,
             columns=["θ", "σ(θ)", "pvalue", "|g(η)|", "|dpen(θ)|"],
-            index=self.ss.parameters.names_free,
+            index=self.parameters.names_free,
         )
         df_corr = pd.DataFrame(
             data=corr_matrix,
-            index=self.ss.parameters.names_free,
-            columns=self.ss.parameters.names_free,
+            index=self.parameters.names_free,
+            columns=self.parameters.names_free,
         )
 
         self.summary_ = df

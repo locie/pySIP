@@ -5,7 +5,7 @@ import numpy as np
 from numpy.linalg import cond
 
 from ..utils.math import nearest_cholesky
-from .base_statespace import GPModel, RCModel, StateSpace
+from .base import GPModel, RCModel, StateSpace
 from . import discretization
 from .nodes import Par
 

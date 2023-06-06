@@ -3,7 +3,7 @@ from itertools import product
 
 import numpy as np
 
-from ..base_statespace import GPModel
+from ..base import GPModel
 from ..nodes import Par
 from .periodic import Periodic
 

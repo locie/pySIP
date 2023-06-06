@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from ..base_statespace import GPModel
+from ..base import GPModel
 from ..nodes import Par
 
 

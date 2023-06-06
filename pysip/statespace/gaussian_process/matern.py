@@ -4,7 +4,7 @@ import numpy as np
 
 from pysip.utils.math import nearest_cholesky
 
-from ..base_statespace import GPModel
+from ..base import GPModel
 
 
 @dataclass
