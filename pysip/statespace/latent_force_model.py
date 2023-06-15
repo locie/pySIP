@@ -1,3 +1,4 @@
+from copy import deepcopy
 from dataclasses import dataclass
 from typing import Tuple
 
@@ -53,8 +54,8 @@ class LatentForceModel(StateSpace):
         if not index:
             raise ValueError("`latent_force` is not an input of `rc`")
 
-        self._rc = rc
-        self._gp = gp
+        self._rc = deepcopy(rc)
+        self._gp = deepcopy(gp)
 
         # The GP have only one output
         for i, node in enumerate(self._gp.params):
@@ -75,10 +76,10 @@ class LatentForceModel(StateSpace):
             node.name = self._gp.name + "__" + node.name
             self.params.append(node.unpack())
 
-        self.inputs = self._rc.inputs
+        self.inputs = [*self._rc.inputs]
         for i in sorted(index, reverse=True):
             del self.inputs[i]
-        self.outputs = self._rc.outputs
+        self.outputs = [*self._rc.outputs]
 
         # Unpack list of Node as a list of string to rebuild list of Node
         self.states = [s.unpack() for s in self.states]
@@ -87,6 +88,7 @@ class LatentForceModel(StateSpace):
 
         # slicing columns in the input matrix corresponding to latent forces
         self.idx = np.full((self._rc.nu), False)
+
         self.idx[index] = True
 
         self.hold_order = self._rc.hold_order

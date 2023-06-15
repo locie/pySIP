@@ -7,12 +7,17 @@ from ..base import GPModel, Par
 class GPSum(GPModel):
     """Sum of two Gaussian Process model
 
-    Args:
-        gp1: GPModel instance
-        gp2: GPModel instance
+    Parameters
+    ----------
+    gp1 : GPModel
+        GPModel instance
+    gp2 : GPModel
+        GPModel instance
 
-    Notes:
-        The MEASURE_DEVIATION of `gp2` is fixed because it is already defined in `gp1`.
+    Notes
+    -----
+    The MEASURE_DEVIATION of the `gp2` is fixed
+    because it is already defined in `gp1`.
     """
 
     def __init__(self, gp1: GPModel, gp2: GPModel):

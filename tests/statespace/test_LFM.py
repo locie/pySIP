@@ -7,7 +7,8 @@ import pytest
 
 from pysip.regressors import FreqRegressor as Regressor
 from pysip.statespace import LatentForceModel, Matern32, R2C2_Qgh_Matern32, R2C2Qgh
-from pysip.utils import generate_random_binary, generate_sine, ned
+from pysip.utils.math import ned
+from pysip.utils.artificial_data import generate_sine, generate_random_binary
 
 sT = 24.0 * 60.0
 sC = 1e8 / sT

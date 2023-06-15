@@ -11,13 +11,18 @@ from .periodic import Periodic
 class GPProduct(GPModel):
     """Product of two Gaussian Process Covariance
 
-    Args:
-        gp1: GPModel instance
-        gp2: GPModel instance
+    Parameters
+    ----------
+    gp1 : GPModel
+        GPModel instance
+    gp2 : GPModel
+        GPModel instance
 
-    Notes:
-        The MEASURE_DEVIATION and MAGNITUDE_SCALE of the `gp2` are fixed
-        because they are already defined in `gp1`.
+    Notes
+    -----
+    The MEASURE_DEVIATION and MAGNITUDE_SCALE of the `gp2` are fixed
+    because they are already defined in `gp1`.
+
     """
 
     def __init__(self, gp1: GPModel, gp2: GPModel):

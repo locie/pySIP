@@ -2,13 +2,25 @@ import math
 from typing import NamedTuple
 import warnings
 from copy import deepcopy
-
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from typing import Sequence
 import numpy as np
 import pandas as pd
+from .statespace.base import StateSpace
+
 from numba.core.errors import NumbaPerformanceWarning
 
-from ..statespace.base import States
-from .base import BayesianFilter
+
+
+class States(NamedTuple):
+    A: np.ndarray
+    B0: np.ndarray
+    B1: np.ndarray
+    C: np.ndarray
+    D: np.ndarray
+    Q: np.ndarray
+    R: np.ndarray
 
 
 def _solve_triu_inplace(A, b):
@@ -39,14 +51,6 @@ def _predict(A, B0, B1, Q, x, P, u, dtu):
     x = A @ x + B0 @ u + B1 @ dtu
     return x, r
 
-
-class StepResult(NamedTuple):
-    x: np.ndarray
-    P: np.ndarray
-    k: np.ndarray
-    S: np.ndarray
-
-
 def _kalman_step(x, P, u, dtu, y, states, _Arru):
     if ~np.isnan(y).any():
         x, P, k, S = _update(states.C, states.D, states.R, x, P, u, y, _Arru)
@@ -59,13 +63,13 @@ def _kalman_step(x, P, u, dtu, y, states, _Arru):
 
 def _unpack_states(states, i):
     return States(
-        states.C,
-        states.D,
-        states.R,
         states.A[:, :, i],
         states.B0[:, :, i],
         states.B1[:, :, i],
+        states.C,
+        states.D,
         states.Q[:, :, i],
+        states.R,
     )
 
 
@@ -216,6 +220,133 @@ try:
     jit_module(nopython=True, nogil=True, cache=True)
 except ImportError:
     warnings.warn("Numba not installed, using pure python implementation")
+
+
+@dataclass
+class BayesianFilter(ABC):
+    """Bayesian Filter abstract class
+
+    This class defines the interface for all Bayesian filters. It is not meant to be
+    used directly, but should be inherited by all Bayesian filters.
+
+    All the methods defined here are abstract and must be implemented by the
+    inheriting class.
+    """
+    ss: StateSpace
+
+    def _proxy_params(
+        self,
+        dt: pd.Series,
+        vars: Sequence[pd.DataFrame],
+    ):
+        ss = self.ss
+        ss.update_continuous_ssm()
+        # use lru to avoid re_computation of discretization for identical dt
+        dts, idx = np.unique(dt, return_inverse=True)
+        A = np.zeros((ss.nx, ss.nx, dt.size))
+        B0 = np.zeros((ss.nx, ss.nu, dt.size))
+        B1 = np.zeros((ss.nx, ss.nu, dt.size))
+        Q = np.zeros((ss.nx, ss.nx, dt.size))
+        Ai, B0i, B1i, Qi = map(np.dstack, zip(*map(ss.discretization, dts)))
+        A[:] = Ai[:, :, idx]
+        B0[:] = B0i[:, :, idx]
+        B1[:] = B1i[:, :, idx]
+        Q[:] = Qi[:, :, idx]
+
+        vars = [var.to_numpy() for var in vars]
+        states = States(A, B0, B1, ss.C, ss.D, Q, ss.R)
+        return tuple([ss.x0, ss.P0, *vars, states])
+
+    @abstractmethod
+    def update(
+        self,
+        x: np.ndarray,
+        P: np.ndarray,
+        u: np.ndarray,
+        y: np.ndarray,
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        """Update the state and covariance of the current time step.
+
+        Parameters
+        ----------
+        x : np.ndarray
+            State (or endogeneous) vector.
+        P : np.ndarray
+            Covariance matrix.
+        u : np.ndarray
+            Output (or exogeneous) vector.
+        y : np.ndarray
+            Measurement (or observation) vector.
+
+        Returns
+        -------
+        tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]
+          - **x**: Updated state vector.
+          - **P**: Updated covariance matrix.
+          - **K**: Kalman gain.
+          - **S**: Innovation covariance.
+        """
+        pass
+
+    @abstractmethod
+    def predict(
+        self,
+        x: np.ndarray,
+        P: np.ndarray,
+        u: np.ndarray,
+        dtu: np.ndarray,
+        dt: float,
+    ) -> tuple[np.ndarray, np.ndarray]:
+        ...
+
+    @abstractmethod
+    def log_likelihood(
+        self,
+        dt: pd.Series,
+        u: pd.DataFrame,
+        dtu: pd.DataFrame,
+        y: pd.DataFrame,
+    ) -> float:
+        ...
+
+    @abstractmethod
+    def filtering(
+        self,
+        dt: pd.Series,
+        u: pd.DataFrame,
+        dtu: pd.DataFrame,
+        y: pd.DataFrame,
+    ):
+        ...
+
+    @abstractmethod
+    def smoothing(
+        self,
+        dt: pd.Series,
+        u: pd.DataFrame,
+        dtu: pd.DataFrame,
+        y: pd.DataFrame,
+    ):
+        ...
+
+    @abstractmethod
+    def simulate(
+        self,
+        dt: pd.Series,
+        u: pd.DataFrame,
+        dtu: pd.DataFrame,
+    ):
+        ...
+
+    @abstractmethod
+    def estimate_output(
+        self,
+        dt: pd.Series,
+        u: pd.DataFrame,
+        dtu: pd.DataFrame,
+        y: pd.DataFrame,
+    ):
+        ...
 
 
 class KalmanQR(BayesianFilter):

@@ -13,15 +13,18 @@ class Periodic(GPModel):
     `iv` is the modified Bessel function of the first kind.
     Useful relation: iv(J+1, x) = iv(J-1, x) - 2*J/x * iv(J, x)
 
-    Args:
-        J: Degree of approximation (default=7)
+    Parameters
+    ----------
+    J: int
+        Degree of approximation (default=7)
 
-    References:
-        Arno Solin and Simo Särkkä (2014). Explicit link between periodic
-        covariance functions and state space models. In Proceedings of the
-        Seventeenth International Conference on Artifcial Intelligence and
-        Statistics (AISTATS 2014). JMLR: W&CP, volume 33.
+    References
+    ----------
 
+    Arno Solin and Simo Särkkä (2014). Explicit link between periodic
+    covariance functions and state space models. In Proceedings of the
+    Seventeenth International Conference on Artifcial Intelligence and
+    Statistics (AISTATS 2014). JMLR: W&CP, volume 33.
     """
 
     J: int = field(default=7)

@@ -95,8 +95,8 @@ class Parameters:
         return self._parameters == other._parameters
 
     def __add__(self, other: Self) -> Self:
-        left_name = self._name if self._name else "left"
-        right_name = other._name if other._name else "right"
+        left_name = self.name if self.name else "left"
+        right_name = other.name if other.name else "right"
         return Parameters(
             parameters={left_name: self._parameters, right_name: other._parameters},
             name="__".join((left_name, right_name)),

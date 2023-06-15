@@ -12,7 +12,8 @@ from pysip.statespace import (
     QuasiPeriodic12,
     QuasiPeriodic32,
 )
-from pysip.utils import generate_sine, ned
+from pysip.utils.math import ned
+from pysip.utils.artificial_data import generate_sine
 
 
 @pytest.fixture

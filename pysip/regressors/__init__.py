@@ -3,4 +3,4 @@ from .bayesian import BayesRegressor
 
 FreqRegressor = Regressor
 
-__all__ = ["Regressor", "BayesRegressor", "FreqRegressor"]
+__all__ = ["BayesRegressor", "FreqRegressor"]

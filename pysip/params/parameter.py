@@ -75,7 +75,7 @@ class Parameter:
             self.eta = 0.0
         else:
             self.theta = self.loc + self.scale * self.value
-        if not self.transform.in_bounds(self.theta):
+        if not self.transform.in_bounds(self.value):
             raise ValueError(
                 f"Initial value {self.value} is out of bounds {self.bounds}"
             )

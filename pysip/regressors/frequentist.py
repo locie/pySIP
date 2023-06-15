@@ -9,8 +9,7 @@ import pandas as pd
 import xarray as xr
 from scipy.optimize import minimize
 
-from ..statespace_estimator import BayesianFilter
-from ..statespace_estimator.kalman_qr import KalmanQR
+from ..statespace_estimator import BayesianFilter, KalmanQR
 from ..params.parameters import Parameters
 from ..statespace.base import StateSpace
 from ..utils.statistics import ttest
@@ -29,10 +28,17 @@ class Regressor:
     ----------
     ss : StateSpace()
         State-space model
-    bayesian_filter : BayesianFilter()
-        Bayesian filter
+    inputs : str or list of str, optional
+        Input column names, by default None. If None, they are inferred from the
+        state-space model.
+    outputs : str or list of str, optional
+        Output column names, by default None. If None, they are inferred from the
+        state-space model.
     time_scale : str
         Time series frequency, e.g. 's': seconds, 'D': days, etc.
+    estimator_cls : Type[BayesianFilter], optional
+        Bayesian filter to use for prediction, by default KalmanQR available in
+        pysip.statespace_estimator.
     """
 
     ss: StateSpace

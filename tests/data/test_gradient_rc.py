@@ -6,7 +6,8 @@ import pytest
 from pysip.params import Beta, Gamma, InverseGamma, LogNormal, Normal
 from pysip.regressors import FreqRegressor as Regressor
 from pysip.statespace import model_registry
-from pysip.utils import generate_random_binary, generate_sine, ned
+from pysip.utils.math import ned
+from pysip.utils.artificial_data import generate_sine, generate_random_binary
 
 rc_models = {
     k: v

@@ -13,7 +13,7 @@ from jinja2 import Template
 
 from ..params import Parameters
 from ..utils.math import nearest_cholesky
-from ..utils import Namespace
+from ..utils.misc import Namespace
 from . import discretization
 
 
@@ -160,6 +160,7 @@ Parameters
         self.__doc__ = self._build_doc()
 
 
+
 def prepare_data(
     df: pd.DataFrame,
     inputs: Union[str, list],
@@ -232,6 +233,7 @@ class ContinuousStates(NamedTuple):
     Q: np.ndarray
     R: np.ndarray
 
+
 class DiscreteStates(NamedTuple):
     A: np.ndarray
     B0: np.ndarray
@@ -239,7 +241,7 @@ class DiscreteStates(NamedTuple):
     Q: np.ndarray
 
 
-@dataclass(config=ConfigDict(arbitrary_types_allowed=True))
+@dataclass(config=ConfigDict(arbitrary_types_allowed=True), repr=False)
 class StateSpace(metaclass=MetaStateSpace):
     """Linear Gaussian Continuous-Time State-Space Model"""
 
@@ -275,11 +277,46 @@ class StateSpace(metaclass=MetaStateSpace):
         self._diag = np.diag_indices_from(self.A)
         self.set_constant_continuous_ssm()
 
+    def __repr__(self):
+        tpl = Template(
+            """{{name}}
+{{'-' * name|length}}
+States:
+{% for state in states %}
+- {{state.name}}: {{state.description}}
+{% endfor %}
+
+Inputs:
+{% for input in inputs %}
+- {{input.name}}: {{input.description}}
+{% endfor %}
+
+Outputs:
+{% for output in outputs %}
+- {{output.name}}: {{output.description}}
+{% endfor %}
+
+Parameters:
+{% for parameter in parameters %}
+- {{parameter.name}}: {{parameter.value}}
+{% endfor %}""",
+            trim_blocks=True,
+            lstrip_blocks=True,
+        )
+        return tpl.render(
+            name=self.name,
+            states=self.states,
+            inputs=self.inputs,
+            outputs=self.outputs,
+            parameters=self.parameters,
+        )
+
     def __post_init__(self):
         if self.name == "":
             self.name = self.__class__.__name__
         self._coerce_attributes()
         self._init_states()
+
 
     @property
     def nx(self):
@@ -406,10 +443,8 @@ class StateSpace(metaclass=MetaStateSpace):
                 )
         return prepare_data(df, inputs, outputs, time_scale=time_scale)
 
-    def __repr__(self):
-        return f"{self.__class__.__name__}({self.name})"
 
-@dataclass(config=ConfigDict(arbitrary_types_allowed=True))
+@dataclass(config=ConfigDict(arbitrary_types_allowed=True), repr=False)
 class RCModel(StateSpace):
     """Dynamic thermal model"""
 

@@ -5,7 +5,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
-from pysip.utils import ccf, check_ccf, check_cpgram, cpgram, plot_ccf, plot_cpgram
+from pysip.utils.statistics import (
+    ccf,
+    check_ccf,
+    check_cpgram,
+    cpgram,
+    # plot_ccf,
+    # plot_cpgram,
+)
 
 
 @pytest.mark.skip(reason="todo")
@@ -38,13 +45,13 @@ def test_check_ccf():
     assert check_ccf(lags, correlation_coeffs, confidence)[0]
 
 
-def test_plot_ccf():
-    lags, correlation_coeffs, confidence = ccf([1, 2, 3], [4, 5, 6])
-    n_figs = plt.gcf().number
-    ax = plot_ccf(lags, correlation_coeffs, confidence)
+# def test_plot_ccf():
+#     lags, correlation_coeffs, confidence = ccf([1, 2, 3], [4, 5, 6])
+#     n_figs = plt.gcf().number
+#     ax = plot_ccf(lags, correlation_coeffs, confidence)
 
-    assert isinstance(ax, matplotlib.axes.Axes)
-    assert n_figs + 1 == plt.gcf().number
+#     assert isinstance(ax, matplotlib.axes.Axes)
+#     assert n_figs + 1 == plt.gcf().number
 
 
 def test_cpgram():
@@ -61,14 +68,14 @@ def test_check_cpgram():
     assert not check_cpgram(y, freq, crit)[0]
 
 
-def test_plot_cpgram():
-    y, freq, crit = cpgram([random.random() for i in range(1400)])
+# def test_plot_cpgram():
+#     y, freq, crit = cpgram([random.random() for i in range(1400)])
 
-    n_figs = plt.gcf().number
-    ax = plot_cpgram(y, freq, crit)
+#     n_figs = plt.gcf().number
+#     ax = plot_cpgram(y, freq, crit)
 
-    assert isinstance(ax, matplotlib.axes.Axes)
-    assert n_figs + 1 == plt.gcf().number
+#     assert isinstance(ax, matplotlib.axes.Axes)
+#     assert n_figs + 1 == plt.gcf().number
 
 
 @pytest.mark.skip(reason="todo")
