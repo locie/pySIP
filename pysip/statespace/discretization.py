@@ -83,8 +83,8 @@ def eigvals_2x2(X: np.ndarray) -> np.ndarray:
 
     References
     ----------
-    .. [1] M.J. Kronenbur. A Method for Fast Diagonalization ofa 2x2 or 3x3 Real
-           Symmetric Matrix
+    M.J. Kronenbur. A Method for Fast Diagonalization ofa 2x2 or 3x3 Real
+    Symmetric Matrix
     """
     x00 = X[0, 0]
     x01 = X[0, 1]
@@ -212,34 +212,6 @@ def expm_2x2(X: np.ndarray) -> np.ndarray:
     """
     w, v = eig_2x2(X)
     return v @ np.diag(np.exp(w)) @ inv_2x2(v)
-
-
-def dexpm_2x2(X: np.ndarray, dX: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-    """Derivative Matrix exponential of 2-dimensional square matrix
-
-    Parameters
-    ----------
-    X : numpy.ndarray
-        2-dimensional square matrix
-    dX : numpy.ndarray
-        Derivative of `X` stacked along the first dimension
-
-    Returns
-    -------
-    numpy.ndarray
-        Matrix exponential of `X`
-    numpy.ndarray
-        Derivative of the matrix exponential of `X`
-    """
-    w, v = eig_2x2(X)
-    u = inv_2x2(v)
-    exp_w = np.exp(w)
-    a = np.subtract.outer(exp_w, exp_w)
-    b = np.subtract.outer(w, w)
-    d = np.divide(a, b, out=np.zeros_like(a), where=b != 0)
-    np.fill_diagonal(d, exp_w)
-
-    return v @ np.diag(exp_w) @ u, v @ (u @ dX @ v * d) @ u
 
 
 def state_input(
@@ -405,12 +377,7 @@ def expm_triu(
     f22: np.ndarray,
 ) -> np.ndarray:
     """Compute the exponential of the upper triangular matrix A using the Parlett's
-    method
-
-    .. math::
-
-        F = \\exp(A) = \\exp \\left(\\begin{bmatrix} a11 & a12 \\\\ 0 & a22
-        \\end{bmatrix} \\right) = \\begin{bmatrix} f11 & f12 \\\\ 0 & f22 \\end{bmatrix}
+    method.
 
     Parameters
     ----------
@@ -424,6 +391,10 @@ def expm_triu(
     Returns
     -------
     F: Matrix exponential of A
+
+    References
+    ----------
+    A Schur-Parlett Algorithm for Computing Matrix Functions
     """
     F = block_diag(f11, f22)
     dim = a12.shape[0]

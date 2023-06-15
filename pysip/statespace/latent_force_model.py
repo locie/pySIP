@@ -5,9 +5,8 @@ import numpy as np
 from numpy.linalg import cond
 
 from ..utils.math import nearest_cholesky
-from .base import GPModel, RCModel, StateSpace
+from .base import GPModel, RCModel, StateSpace, Par
 from . import discretization
-from .nodes import Par
 
 
 @dataclass
@@ -16,10 +15,10 @@ class LatentForceModel(StateSpace):
 
     Parameters
     ----------
-    rc : RCModel()
-        ...
-    gp : GPModel()
-        ...
+    rc : RCModel
+        RCModel instance
+    gp : GPModel
+        GPModel instance
     latent_force : str
         The name of the input considered as the latent force
 

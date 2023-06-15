@@ -1,32 +1,169 @@
+from collections import defaultdict
 from dataclasses import field
+from enum import Enum
 from itertools import chain
-from typing import NamedTuple, Optional, Sequence, Tuple, Union
+from typing import Literal, NamedTuple, Optional, Sequence, Tuple, Union
 from typing_extensions import Self
 
 import numpy as np
 import pandas as pd
 from pydantic import ConfigDict, conint
 from pydantic.dataclasses import dataclass
+from jinja2 import Template
 
 from ..params import Parameters
 from ..utils.math import nearest_cholesky
+from ..utils import Namespace
 from . import discretization
-from .meta import MetaStateSpace
-from .nodes import Node
 
 
-def _check_data(dt, u, dtu, y):
-    for df in [dt, u, dtu]:
-        if not np.all(np.isfinite(df)):
-            raise ValueError(f"{df} contains undefinite values")
-    if not np.all(np.isnan(y[~np.isfinite(y)])):
-        raise TypeError("The output vector must contains numerical values or numpy.nan")
+model_registry = Namespace()
+
+
+class Io(Enum):
+    """Input/Output data type"""
+
+    TEMPERATURE = ("Temperature", "°C")
+    POWER = ("Power", "W")
+    ANY = ("Any type", "any")
+
+
+class Par(Enum):
+    """Parameter type"""
+
+    THERMAL_RESISTANCE = ("Thermal resistance", "°C/W")
+    THERMAL_TRANSMITTANCE = ("Thermal transmittance", "W/°C")
+    THERMAL_CAPACITY = ("Thermal capacity", "J/°C")
+    SOLAR_APERTURE = ("Solar aperture", "m²")
+    STATE_DEVIATION = ("State deviation", "any")
+    MEASURE_DEVIATION = ("Measure deviation", "any")
+    INITIAL_DEVIATION = ("Initial deviation", "any")
+    INITIAL_MEAN = ("Initial mean", "any")
+    COEFFICIENT = ("Coefficient", "any")
+    MAGNITUDE_SCALE = ("Magnitude scale", "any")
+    LENGTH_SCALE = ("Length scale", "any")
+    PERIOD = ("Period", "any")
+
+
+@dataclass
+class Node:
+    """Description of model variables
+
+    Parameters
+    ----------
+    category : Io or Par
+        Category of the node
+    name : str
+        Name of the node
+    description : str
+        Description of the node
+    """
+
+    category: Union[Io, Par] = field()
+    name: str = field(default="")
+    description: str = field(default="")
+
+    def __post_init__(self):
+        if isinstance(self.category, str):
+            try:
+                self.category = Io[self.category]
+            except KeyError:
+                self.category = Par[self.category]
+
+    def unpack(self):
+        """Unpack the Node"""
+        return self.category.name, self.name, self.description
+
+
+def statespace(cls, *args, **kwargs):
+    if cls not in model_registry:
+        return None
+    if args or kwargs:
+        return model_registry[cls](*args, **kwargs)
+    return model_registry[cls]
+
+
+class MetaStateSpace(type):
+    """Metaclass for the state-space models
+
+    Mainly used to build the documentation of the models from the sections
+    (inputs, outputs, states, params) available as class attributes. Will also add
+    the class to the registry.
+    """
+
+    def __new__(cls, name, bases, attrs):
+        # Add the class to the registry
+        new_class = super(MetaStateSpace, cls).__new__(cls, name, bases, attrs)
+        if "__base__" not in attrs:
+            model_registry[attrs.get("__name__") or attrs["__qualname__"]] = new_class
+        return new_class
+
+    def _format_section(self, section_name):
+        if not (nodes := getattr(self, section_name, False)):
+            return None
+        nodes = [Node(*x) for x in nodes]
+        return self._section_template.render(section_name=section_name, nodes=nodes)
+
+    @property
+    def _sections(self) -> dict:
+        return {
+            section: [Node(*x) for x in nodes]
+            for section in ["inputs", "outputs", "states"]
+            if (nodes := getattr(self, section, False))
+        }
+
+    @property
+    def _parameters_cat(self) -> dict:
+        parameters_cat = defaultdict(list)
+        for par in getattr(self, "params", []):
+            par = Node(*par)
+            parameters_cat[par.category].append(par)
+        return dict(parameters_cat)
+
+    def _build_doc(self):
+        _doc_template_str = """{{base_doc}}
+
+Variables
+---------
+{% for section, nodes in sections.items() %}
+- {{section.capitalize()}}
+{% for node in nodes %}
+    - ``{{node.name}}``: {{node.description}} `({{node.category.value[1]}})`
+{% endfor %}
+{% endfor %}
+
+{% if parameters_cat %}
+Parameters
+----------
+{% for category, parameters in parameters_cat.items() %}
+- {{category.value[0]}}
+{% for parameter in parameters %}
+    - ``{{parameter.name}}``: {{parameter.description}} `({{parameter.category.value[1]}})`
+{% endfor %}
+{% endfor %}
+{% endif %}
+    """
+        _doc_template = Template(
+            _doc_template_str,
+            trim_blocks=True,
+            lstrip_blocks=True,
+            keep_trailing_newline=False,
+        )
+
+        return _doc_template.render(
+            base_doc=self.__doc__,
+            sections=self._sections,
+            parameters_cat=self._parameters_cat,
+        )
+
+    def __init__(self, name, bases, attr):
+        self.__doc__ = self._build_doc()
 
 
 def prepare_data(
     df: pd.DataFrame,
     inputs: Union[str, list],
-    outputs: Union[str, list],
+    outputs: Union[str, list, bool],
     time_scale: str = "s",
 ):
     """Prepare data for the state-space model
@@ -74,21 +211,26 @@ def prepare_data(
     dtu = u.diff().shift(-1) / dt.to_numpy()[:, None]
     dtu.iloc[-1, :] = 0
 
-    y = pd.DataFrame(df[outputs])
+    for subdf in [dt, u, dtu]:
+        if not np.all(np.isfinite(subdf)):
+            raise ValueError(f"{subdf} contains undefinite values")
 
-    _check_data(dt, u, dtu, y)
+    if not outputs:
+        return dt, u, dtu
+
+    y = pd.DataFrame(df[outputs])
+    if not np.all(np.isnan(y[~np.isfinite(y)])):
+        raise TypeError("The output vector must contains numerical values or numpy.nan")
     return dt, u, dtu, y
 
 
-class States(NamedTuple):
+class ContinuousStates(NamedTuple):
+    A: np.ndarray
+    B: np.ndarray
     C: np.ndarray
     D: np.ndarray
-    R: np.ndarray
-    A: np.ndarray
-    B0: np.ndarray
-    B1: np.ndarray
     Q: np.ndarray
-
+    R: np.ndarray
 
 class DiscreteStates(NamedTuple):
     A: np.ndarray
@@ -130,8 +272,8 @@ class StateSpace(metaclass=MetaStateSpace):
         self.R = np.zeros((self.ny, self.ny))
         self.x0 = np.zeros((self.nx, 1))
         self.P0 = np.zeros((self.nx, self.nx))
-        self.set_constant_continuous_ssm()
         self._diag = np.diag_indices_from(self.A)
+        self.set_constant_continuous_ssm()
 
     def __post_init__(self):
         if self.name == "":
@@ -171,10 +313,10 @@ class StateSpace(metaclass=MetaStateSpace):
         -------
         DiscreteStates
             Discrete state-space model, a 4-elements namedtuple containing
-            - **A**: Discrete state matrix
-            - **B0**: Discrete input matrix (zero order hold)
-            - **B1**: Discrete input matrix (first order hold)
-            - **Q**: Upper Cholesky factor of the process noise covariance matrix
+            - A: Discrete state matrix
+            - B0: Discrete input matrix (zero order hold)
+            - B1: Discrete input matrix (first order hold)
+            - Q: Upper Cholesky factor of the process noise covariance matrix
         """
         self.update_continuous_ssm()
         return self.discretization(dt)
@@ -191,12 +333,12 @@ class StateSpace(metaclass=MetaStateSpace):
 
         Returns
         -------
-        DiscreteStates
-            Discrete state-space model, a 4-elements namedtuple containing
-            - **A**: Discrete state matrix
-            - **B0**: Discrete input matrix (zero order hold)
-            - **B1**: Discrete input matrix (first order hold)
-            - **Q**: Upper Cholesky factor of the process noise covariance matrix
+        Tuple[np.ndarray, ...]
+            a 4-elements tuple containing
+            - A: Discrete state matrix
+            - B0: Discrete input matrix (zero order hold)
+            - B1: Discrete input matrix (first order hold)
+            - Q: Upper Cholesky factor of the process noise covariance matrix
         """
 
         if self.nu == 0:
@@ -218,7 +360,7 @@ class StateSpace(metaclass=MetaStateSpace):
         self,
         df: pd.DataFrame,
         inputs: Optional[Sequence[str]] = None,
-        outputs: Optional[Sequence[str]] = None,
+        outputs: Optional[Union[Sequence[str], Literal[False]]] = None,
         time_scale: str = "s",
     ):
         """Prepare data for training
@@ -230,23 +372,27 @@ class StateSpace(metaclass=MetaStateSpace):
         inputs : Optional[Sequence[str]], optional
             List of input variables, by default None. If None, the inputs defined in
             the model are used.
-        outputs : Optional[Sequence[str]], optional
+        outputs : Optional[Sequence[str] or False], optional
             List of output variables, by default None. If None, the outputs defined in
-            the model are used.
+            the model are used. If False, no output is returned.
 
         Returns
         -------
-        Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]
-            Tuple containing the following dataframes:
-            - **dt**: Time step
-            - **u**: Input data
-            - **dtu**: Derivative of input data
-            - **y**: Output data
+        DataFrame:
+            time steps
+        DataFrame:
+            input data
+        DataFrame:
+            derivative of input data
+        DataFrame:
+            output data (only if outputs is not False)
         """
         if inputs is None:
             inputs = [par.name for par in self.inputs]
         if outputs is None:
             outputs = [par.name for par in self.outputs]
+        if outputs is False:
+            outputs = []
         if isinstance(inputs, str):
             inputs = [inputs]
         if isinstance(outputs, str):
@@ -258,8 +404,10 @@ class StateSpace(metaclass=MetaStateSpace):
                     "specify the inputs and outputs if they diverge from the model "
                     "definition."
                 )
-        dt, u, dtu, y = prepare_data(df, inputs, outputs, time_scale=time_scale)
-        return dt, u, dtu, y
+        return prepare_data(df, inputs, outputs, time_scale=time_scale)
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}({self.name})"
 
 @dataclass(config=ConfigDict(arbitrary_types_allowed=True))
 class RCModel(StateSpace):
@@ -268,7 +416,6 @@ class RCModel(StateSpace):
     latent_forces: str = ""
 
     def __post_init__(self):
-        print(self.name)
         super().__post_init__()
         eig = np.real(np.linalg.eigvals(self.A))
         if np.all(eig < 0) and eig.max() / eig.min():
@@ -276,16 +423,15 @@ class RCModel(StateSpace):
         else:
             self._method = "mfd"
 
-    def __repr__(self):
-        return f"\n{self.__class__.__name__}" + "-" * len(self.__class__.__name__)
-
     def __le__(self, gp):
         """Create a Latent Force Model"""
         from .latent_force_model import LatentForceModel
 
         return LatentForceModel(self, gp, self.latent_forces)
 
-    def discretization(self, dt: float) -> DiscreteStates:
+    def discretization(
+        self, dt: float
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """Discretization of RC model
 
         Parameters
@@ -295,12 +441,12 @@ class RCModel(StateSpace):
 
         Returns
         -------
-        DiscreteStates
-            Discrete state-space model, a 4-elements namedtuple containing
-            - **A**: Discrete state matrix
-            - **B0**: Discrete input matrix (zero order hold)
-            - **B1**: Discrete input matrix (first order hold)
-            - **Q**: Upper Cholesky factor of the process noise covariance matrix
+        Tuple[np.ndarray, ...]
+            a 4-elements tuple containing
+            - A: Discrete state matrix
+            - B0: Discrete input matrix (zero order hold)
+            - B1: Discrete input matrix (first order hold)
+            - Q: Upper Cholesky factor of the process noise covariance matrix
         """
 
         if self.method == "analytic":
@@ -318,7 +464,7 @@ class RCModel(StateSpace):
                 discretization.diffusion_mfd(self.A, self.Q.T @ self.Q, dt)
             )
 
-        return DiscreteStates(Ad, B0d, B1d, Qd)
+        return Ad, B0d, B1d, Qd
 
 
 class GPModel(StateSpace):
@@ -328,9 +474,6 @@ class GPModel(StateSpace):
         if hasattr(self, "J"):
             self.states = self.states_block * int(self.J + 1)
         super().__post_init__()
-
-    def __repr__(self):
-        return f"\n{self.__class__.__name__}" + "-" * len(self.__class__.__name__)
 
     def __mul__(self, gp: Self):
         if not isinstance(gp, GPModel):
@@ -360,12 +503,12 @@ class GPModel(StateSpace):
 
         Returns
         -------
-        DiscreteStates
-            Discrete state-space model, a 4-elements namedtuple containing
-            - **A**: Discrete state matrix
-            - **B0**: Discrete input matrix (zero order hold)
-            - **B1**: Discrete input matrix (first order hold)
-            - **Q**: Upper Cholesky factor of the process noise covariance matrix
+        Tuple[np.ndarray, ...]
+            a 4-elements tuple containing
+            - A: Discrete state matrix
+            - B0: Discrete input matrix (zero order hold)
+            - B1: Discrete input matrix (first order hold)
+            - Q: Upper Cholesky factor of the process noise covariance matrix
         """
         Ad = discretization.state(self.A, dt)
         B0d = np.zeros((self.nx, self.nu))

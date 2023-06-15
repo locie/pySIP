@@ -1,5 +1,6 @@
-from .base import BaseRegressor
+from .frequentist import Regressor
 from .bayesian import BayesRegressor
-from .frequentist import FreqRegressor
 
-__all__ = ['BaseRegressor', 'BayesRegressor', 'FreqRegressor']
+FreqRegressor = Regressor
+
+__all__ = ["Regressor", "BayesRegressor", "FreqRegressor"]

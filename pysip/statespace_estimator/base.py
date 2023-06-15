@@ -1,13 +1,18 @@
 """Bayesian Filter template"""
 
 
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
+from copy import deepcopy
+from dataclasses import dataclass
+from functools import lru_cache
+from typing import Sequence
 import numpy as np
 import pandas as pd
-from ..statespace.base import StateSpace
+from ..statespace.base import StateSpace, States
 
 
-class BayesianFilter(metaclass=ABCMeta):
+@dataclass
+class BayesianFilter(ABC):
     """Bayesian Filter abstract class
 
     This class defines the interface for all Bayesian filters. It is not meant to be
@@ -16,10 +21,35 @@ class BayesianFilter(metaclass=ABCMeta):
     All the methods defined here are abstract and must be implemented by the
     inheriting class.
     """
+    ss: StateSpace
+
+    def _proxy_params(
+        self,
+        dt: pd.Series,
+        vars: Sequence[pd.DataFrame],
+    ):
+        ss = self.ss
+        dtype = self.ss._coerce_dtypes()
+        ss.update_continuous_ssm()
+        # use lru to avoid re_computation of discretization for identical dt
+        dts, idx = np.unique(dt, return_inverse=True)
+        A = np.zeros((ss.nx, ss.nx, dt.size), dtype=dtype)
+        B0 = np.zeros((ss.nx, ss.nu, dt.size), dtype=dtype)
+        B1 = np.zeros((ss.nx, ss.nu, dt.size), dtype=dtype)
+        Q = np.zeros((ss.nx, ss.nx, dt.size), dtype=dtype)
+        Ai, B0i, B1i, Qi = map(np.dstack, zip(*map(ss.discretization, dts)))
+        A[:] = Ai[:, :, idx]
+        B0[:] = B0i[:, :, idx]
+        B1[:] = B1i[:, :, idx]
+        Q[:] = Qi[:, :, idx]
+
+        vars = [var.to_numpy(dtype) for var in vars]
+        states = States(ss.C, ss.D, ss.R, A, B0, B1, Q)
+        return tuple([ss.x0, ss.P0, *vars, states])
 
     @abstractmethod
     def update(
-        ss: StateSpace,
+        self,
         x: np.ndarray,
         P: np.ndarray,
         u: np.ndarray,
@@ -29,8 +59,6 @@ class BayesianFilter(metaclass=ABCMeta):
 
         Parameters
         ----------
-        ss : StateSpace
-            State space model.
         x : np.ndarray
             State (or endogeneous) vector.
         P : np.ndarray
@@ -52,7 +80,7 @@ class BayesianFilter(metaclass=ABCMeta):
 
     @abstractmethod
     def predict(
-        ss: StateSpace,
+        self,
         x: np.ndarray,
         P: np.ndarray,
         u: np.ndarray,
@@ -63,8 +91,6 @@ class BayesianFilter(metaclass=ABCMeta):
 
         Parameters
         ----------
-        ss : StateSpace
-            State space model.
         x : np.ndarray
             State (or endogeneous) vector.
         P : np.ndarray
@@ -86,7 +112,7 @@ class BayesianFilter(metaclass=ABCMeta):
 
     @abstractmethod
     def log_likelihood(
-        ss: StateSpace,
+        self,
         dt: pd.Series,
         u: pd.DataFrame,
         dtu: pd.DataFrame,
@@ -96,8 +122,6 @@ class BayesianFilter(metaclass=ABCMeta):
 
         Parameters
         ----------
-        ss : StateSpace
-            State space model.
         dt : pd.Series
             Time step sizes.
         u : pd.DataFrame
@@ -116,7 +140,7 @@ class BayesianFilter(metaclass=ABCMeta):
 
     @abstractmethod
     def filtering(
-        ss: StateSpace,
+        self,
         dt: pd.Series,
         u: pd.DataFrame,
         dtu: pd.DataFrame,
@@ -126,8 +150,6 @@ class BayesianFilter(metaclass=ABCMeta):
 
         Parameters
         ----------
-        ss : StateSpace
-            State space model.
         dt : pd.Series
             Time step sizes.
         u : pd.DataFrame
@@ -146,7 +168,7 @@ class BayesianFilter(metaclass=ABCMeta):
 
     @abstractmethod
     def smoothing(
-        ss: StateSpace,
+        self,
         dt: pd.Series,
         u: pd.DataFrame,
         dtu: pd.DataFrame,
@@ -156,8 +178,6 @@ class BayesianFilter(metaclass=ABCMeta):
 
         Parameters
         ----------
-        ss : StateSpace
-            State space model.
         dt : pd.Series
             Time step sizes.
         u : pd.DataFrame
@@ -175,7 +195,7 @@ class BayesianFilter(metaclass=ABCMeta):
 
     @abstractmethod
     def simulate(
-        ss: StateSpace,
+        self,
         dt: pd.Series,
         u: pd.DataFrame,
         dtu: pd.DataFrame,
@@ -184,8 +204,6 @@ class BayesianFilter(metaclass=ABCMeta):
 
         Parameters
         ----------
-        ss : StateSpace
-            State space model.
         dt : pd.Series
             Time step sizes.
         u : pd.DataFrame
@@ -201,8 +219,8 @@ class BayesianFilter(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def simulate_output(
-        ss: StateSpace,
+    def estimate_output(
+        self,
         dt: pd.Series,
         u: pd.DataFrame,
         dtu: pd.DataFrame,
@@ -213,8 +231,6 @@ class BayesianFilter(metaclass=ABCMeta):
 
         Parameters
         ----------
-        ss : StateSpace
-            State space model.
         dt : pd.Series
             Time step sizes.
         u : pd.DataFrame

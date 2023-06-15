@@ -1,63 +1,320 @@
-"""Frequentist regressor"""
-from typing import Tuple, Union
+"""Regressor template"""
+from copy import deepcopy
+import warnings
+from dataclasses import dataclass
+from typing import Literal, Optional, Sequence, Tuple, Union, Type
 
 import numpy as np
 import pandas as pd
+import xarray as xr
 from scipy.optimize import minimize
 
-from ..filters.kalman_qr import KalmanQR, BayesianFilter
+from ..statespace_estimator import BayesianFilter
+from ..statespace_estimator.kalman_qr import KalmanQR
+from ..params.parameters import Parameters
 from ..statespace.base import StateSpace
 from ..utils.statistics import ttest
-from .base import BaseRegressor
 
 
-class FreqRegressor(BaseRegressor):
-    """Frequentist Regressor
+@dataclass
+class Regressor:
+    """A regressor use a statespace model and a bayesian filter to predict the states of
+    the system given the exogeneous (or boundary) inputs and the initial conditions.
 
-    Args:
-        ss: StateSpace()
-        bayesian_filter: BayesianFilter()
-        time_scale: Time series frequency, e.g. 's': seconds, 'D': days, etc.
-            Works only for pandas.DataFrame with DateTime index
+    This base class does not have the ability to estimate the parameters of the
+    statespace model : see the derived classes for that.
+
+
+    Parameters
+    ----------
+    ss : StateSpace()
+        State-space model
+    bayesian_filter : BayesianFilter()
+        Bayesian filter
+    time_scale : str
+        Time series frequency, e.g. 's': seconds, 'D': days, etc.
     """
 
-    def __init__(
+    ss: StateSpace
+    inputs: Optional[Union[str, Sequence[str]]] = None
+    outputs: Optional[Union[str, Sequence[str]]] = None
+    time_scale: str = "s"
+    estimator_cls: Type[BayesianFilter] = KalmanQR
+
+    def __post_init__(self):
+        self.estimator = self.estimator_cls(self.ss)
+        if self.inputs is None:
+            self.inputs = [node.name for node in self.ss.inputs]
+        if self.outputs is None:
+            self.outputs = [node.name for node in self.ss.outputs]
+        self.states = [node.name for node in self.ss.states]
+        if isinstance(self.inputs, str):
+            self.inputs = [self.inputs]
+        if isinstance(self.outputs, str):
+            self.outputs = [self.outputs]
+
+    @property
+    def parameters(self) -> Parameters:
+        return self.ss.parameters
+
+    def prepare_data(self, df, with_outputs=True):
+        return self.ss.prepare_data(
+            df, self.inputs, self.outputs if with_outputs else False, self.time_scale
+        )
+
+    def simulate(self, df: pd.DataFrame) -> np.ndarray:
+        """Stochastic simulation of the state-space model
+
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            Dataframe containing the inputs and outputs
+        inputs : str or list of str, optional
+            Input column names, by default None. If None, the regressor's `inputs`
+            attribute is used.
+        time_scale : str, optional
+            Time series frequency, e.g. 's': seconds, 'D': days, etc., by default None.
+            If None, the regressor's `time_scale` attribute is used.
+
+        Returns
+        -------
+        xarray.Dataset
+            Dataset containing the simulated outputs and states
+        """
+
+        dt, u, dtu = self.prepare_data(df, with_outputs=False)
+        y_res, x_res = self.estimator.simulate(dt, u, dtu)
+        idx_name = df.index.name or "time"
+        y_da = xr.DataArray(
+            y_res[:, :, 0],
+            coords=[df.index, self.outputs],
+            dims=[idx_name, "outputs"],
+            name="y",
+        )
+        x_da = xr.DataArray(
+            x_res[:, :, 0],
+            coords=[df.index, self.states],
+            dims=[idx_name, "states"],
+            name="x",
+        )
+        return xr.merge([y_da, x_da])
+
+    def estimate_output(
         self,
-        ss: StateSpace,
-        bayesian_filter: BayesianFilter = KalmanQR,
-        time_scale: str = "s",
-    ):
-        super().__init__(ss, bayesian_filter, time_scale, False, True)
+        df: pd.DataFrame,
+        x0: np.ndarray = None,
+        P0: np.ndarray = None,
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """Estimate the output filtered distribution
+
+        Parameters
+        ----------
+
+
+        Returns
+        -------
+
+        """
+
+        dt, u, dtu, y = self.prepare_data(df)
+        y_res, x_res, P_res, y_std_res = self.estimator.estimate_output(dt, u, dtu, y)
+        idx_name = df.index.name or "time"
+        y_da = xr.DataArray(
+            y_res[:, :, 0],
+            coords=[df.index, self.outputs],
+            dims=[idx_name, "outputs"],
+            name="y",
+        )
+        x_da = xr.DataArray(
+            x_res[:, :, 0],
+            coords=[df.index, self.states],
+            dims=[idx_name, "states"],
+            name="x",
+        )
+        P_da = xr.DataArray(
+            P_res,
+            coords=[df.index, self.states, self.states],
+            dims=[idx_name, "states", "states"],
+            name="P",
+        )
+        y_std_da = xr.DataArray(
+            y_std_res[:, :, 0],
+            coords=[df.index, self.outputs],
+            dims=[idx_name, "outputs"],
+            name="y_std",
+        )
+        return xr.merge([y_da, x_da, P_da, y_std_da])
+
+    def estimate_states(
+        self,
+        df: pd.DataFrame,
+        x0: np.ndarray = None,
+        P0: np.ndarray = None,
+        smooth: bool = False,
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """Estimate the state filtered/smoothed distribution
+
+        Parameters
+        ----------
+        dt : float
+            Sampling time
+        u : array_like, shape (n_u, n_steps)
+            Input data
+        u1 : array_like, shape (n_u, n_steps)
+            Forward finite difference of the input data
+        y : array_like, shape (n_y, n_steps)
+            Output data
+        x0 : array_like, shape (n_x, )
+            Initial state mean different from `ss.x0`
+        P0 : array_like, shape (n_x, n_x)
+            Initial state deviation different from `ss.P0`
+        smooth : bool, optional
+            Use RTS smoother
+
+        Returns
+        -------
+        x : array_like, shape (n_x, n_steps)
+            Filtered or smoothed state mean
+        P : array_like, shape (n_x, n_x, n_steps)
+            Filtered or smoothed state covariance
+        """
+
+        dt, u, dtu, y = self.prepare_data(df)
+
+        if smooth:
+            x_res, P_res = self.estimator.smoothing(dt, u, dtu, y)
+        else:
+            x_res, P_res, *_ = self.estimator.filtering(dt, u, dtu, y)
+        idx_name = df.index.name or "time"
+        x_da = xr.DataArray(
+            x_res[:, :, 0],
+            coords=[df.index, self.states],
+            dims=[idx_name, "states"],
+            name="x",
+        )
+        P_da = xr.DataArray(
+            P_res,
+            coords=[df.index, self.states, self.states],
+            dims=[idx_name, "states", "states"],
+            name="P",
+        )
+        return xr.merge([x_da, P_da])
+
+
+
+    def _target(
+        self,
+        eta: np.ndarray,
+        dt: np.ndarray,
+        u: np.ndarray,
+        dtu: np.ndarray,
+        y: np.ndarray,
+    ) -> float:
+        """Evaluate the negative log-posterior
+
+        Parameters
+        ----------
+        eta : array_like, shape (n_eta, )
+            Unconstrained parameters
+        dt : float
+            Sampling time
+        u : array_like, shape (n_u, n_steps)
+            Input data
+        dtu : array_like, shape (n_u, n_steps)
+            Forward finite difference of the input data
+        y : array_like, shape (n_y, n_steps)
+            Output data
+
+        Returns
+        -------
+        log_posterior : float
+            The negative log-posterior
+        """
+        estimator = deepcopy(self.estimator)
+        estimator.ss.parameters.eta = eta
+        log_likelihood = estimator.log_likelihood(dt, u, dtu, y)
+        log_posterior = (
+            log_likelihood
+            - estimator.ss.parameters.prior
+            + estimator.ss.parameters.penalty
+        )
+
+        return log_posterior
 
     def fit(
         self,
         df: pd.DataFrame,
-        outputs: Union[str, list],
-        inputs: Union[str, list] = None,
         options: dict = None,
+        *,
+        init: Literal["unconstrained", "prior", "zero", "fixed", "value"] = "fixed",
+        hpd: float = 0.95,
+        **minimize_options,
     ) -> Union[pd.DataFrame, pd.DataFrame, dict]:
-        if options is None:
-            options = {}
-        else:
-            options = dict(options)
+        """Estimate the parameters of the state-space model.
 
-        options.setdefault("disp", True)
-        options.setdefault("gtol", 1e-4)
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            Training data
+        outputs : str or list of str, optional
+            Output name(s)
+        inputs : str or list of str, optional
+            Input name(s)
+        options : dict, optional, deprecated
+            Options for the minimization method. You should use named arguments instead.
+            Usage of this argument will raise a warning and will be removed in the
+            future.
+        init : str, optional
+            Method to initialize the parameters. Options are:
+            - 'unconstrained': initialize the parameters in the unconstrained space
+            - 'prior': initialize the parameters using the prior distribution
+            - 'zero': initialize the parameters to zero
+            - 'fixed': initialize the parameters to the fixed values
+            - 'value': initialize the parameters to the given values
+        hpd : float, optional
+            Highest posterior density interval. Used only when `init='prior'`.
+        minimize_options : dict, optional
+            Options for the minimization method. See `scipy.optimize.minimize` for
+            details. Compared to the original `scipy.optimize.minimize` function, the
+            following options are set by default:
+            - `method='BFGS'`
+            - `jac='3-point'`
+            - `disp=True`
+            - `gtol=1e-4`
 
-        init = options.pop("init", "fixed")
-        hpd = options.pop("hpd", 0.95)
+        Returns
+        -------
+        pandas.DataFrame
+            Dataframe with the estimated parameters, their standard deviation, the
+            p-value of the t-test and penalty values.
+        pandas.DataFrame
+            Dataframe with the correlation matrix of the estimated parameters.
+        dict
+            Results object from the minimization method. See `scipy.optimize.minimize`
+            for details.
+        """
+        if options is not None:
+            warnings.warn(
+                "Use of the options argument is deprecated and will raise an error in "
+                "the future. Prefer using named arguments (kwargs) instead.",
+                DeprecationWarning,
+            )
+            minimize_options.update(options)
+        minimize_options = {"disp": True, "gtol": 1e-4} | minimize_options
+
         self.parameters.eta = self.parameters.init_parameters(1, init, hpd)
-        data = self.ss.prepare_data(df, inputs, outputs)
+        data = self.prepare_data(df)
 
         results = minimize(
-            fun=self._eval_log_posterior,
+            fun=self._target,
             x0=self.parameters.eta_free,
             args=data,
             method="BFGS",
             jac="3-point",
-            options=options,
+            options=minimize_options,
         )
 
+        self.parameters.eta = results.x
         # inverse jacobian of the transform eta = f(theta)
         inv_jac = np.diag(1.0 / np.array(self.parameters.eta_jacobian))
 
@@ -70,7 +327,6 @@ class FreqRegressor(BaseRegressor):
 
         # correlation matrix of the constrained parameters
         corr_matrix = inv_sig_theta @ cov_theta @ inv_sig_theta
-        pd.set_option("display.float_format", "{:.3e}".format)
         df = pd.DataFrame(
             data=np.vstack(
                 [
@@ -99,65 +355,55 @@ class FreqRegressor(BaseRegressor):
     def eval_residuals(
         self,
         df: pd.DataFrame,
-        outputs: Union[str, list],
-        inputs: Union[str, list] = None,
         x0: np.ndarray = None,
         P0: np.ndarray = None,
     ) -> Tuple[np.ndarray, np.ndarray]:
         """Compute the standardized residuals
 
-        Args:
-            df: Data
-            outputs: Outputs name(s)
-            inputs: Inputs name(s)
-            x0: Initial state mean
-            P0: Initial state deviation
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            Training data
+        outputs : str or list of str, optional
+            Output name(s)
+        inputs : str or list of str, optional
+            Input name(s)
+        x0 : numpy.ndarray, optional
+            Initial state. If not provided, the initial state is taken from the
+            state-space model defaults.
+        P0 : numpy.ndarray, optional
+            Initial state covariance. If not provided, the initial state covariance is
+            taken from the state-space model defaults.
 
-        Returns:
-            2-element tuple containing
-                - **res**: Standardized residuals
-                - **res_std**: Residuals deviations
+        Returns
+        -------
+        res : numpy.ndarray
+            Standardized residuals
+        res_std : numpy.ndarray
+            Residuals deviations
         """
 
-        dt, u, u1, y, *_ = self._prepare_data(df, inputs, outputs, None)
-        ssm, index = self.ss.get_discrete_ssm(dt)
-        res, res_std = self.filter.filtering(ssm, index, u, u1, y)[2:]
+        dt, u, dtu, y = self.prepare_data(df)
+        residual, residual_std = self.estimator.filtering(dt, u, dtu, y)[2:]
 
-        return res.squeeze(), res_std.squeeze()
+        idx_name = df.index.name or "time"
+        res_da = xr.DataArray(
+            residual[:, :, 0],
+            coords=[df.index, self.outputs],
+            dims=[idx_name, "outputs"],
+            name="residual",
+        )
+        res_std_da = xr.DataArray(
+            residual_std,
+            coords=[df.index, self.outputs, self.outputs],
+            dims=[idx_name, "outputs", "outputs"],
+            name="residual_std",
+        )
+        return xr.merge([res_da, res_std_da])
 
-    def estimate_states(
+    def log_likelihood(
         self,
-        df: pd.DataFrame,
-        outputs: list,
-        inputs: list = None,
-        x0: np.ndarray = None,
-        P0: np.ndarray = None,
-        smooth: bool = False,
-    ) -> Tuple[np.ndarray, np.ndarray]:
-        """Estimate the state filtered/smoothed distribution
-
-        Args:
-            df: Data
-            inputs: Inputs names
-            outputs: Outputs names
-            x0: Initial state mean
-            P0: Initial state deviation
-            smooth: Use smoother
-
-        Returns:
-            2-element tuple containing
-                - state mean
-                - state covariance
-        """
-
-        dt, u, u1, y, *_ = self._prepare_data(df, inputs, outputs, None)
-        return self._estimate_states(dt, u, u1, y, x0, P0, smooth)
-
-    def eval_log_likelihood(
-        self,
-        df: pd.DataFrame,
-        outputs: Union[str, list],
-        inputs: Union[str, list] = None,
+        df: pd.DataFrame
     ) -> Union[float, np.ndarray]:
         """Evaluate the negative log-likelihood
 
@@ -171,14 +417,12 @@ class FreqRegressor(BaseRegressor):
             Negative log-likelihood or predictive density evaluated point-wise
         """
 
-        dt, u, u1, y = self._prepare_data(df, inputs, outputs)
-        return self._eval_log_likelihood(dt, u, u1, y)
+        dt, u, dtu, y = self.prepare_data(df)
+        return self.estimator.log_likelihood(dt, u, dtu, y)
 
     def predict(
         self,
         df: pd.DataFrame,
-        outputs: Union[str, list] = None,
-        inputs: Union[str, list] = None,
         tnew: Union[np.ndarray, pd.Series] = None,
         x0: np.ndarray = None,
         P0: np.ndarray = None,
@@ -186,35 +430,43 @@ class FreqRegressor(BaseRegressor):
     ) -> Tuple[np.ndarray, np.ndarray]:
         """State-space model output prediction
 
-        Args:
-            df: Data
-            outputs: Outputs name(s)
-            inputs: Inputs name(s)
-            tnew: New time instants
-            x0: Initial state mean
-            P0: Initial state deviation
-            smooth: Use smoother
-
-        Returns:
-            2-element tuple containing
-                - **y_mean**: Output mean
-                - **y_std**: Output deviation
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            Training data
+        tnew : numpy.ndarray or pandas.Series, optional
+            New time instants
+        x0 : numpy.ndarray, optional
+            Initial state. If not provided, the initial state is taken from the
+            state-space model.
+        P0 : numpy.ndarray, optional
+            Initial state covariance. If not provided, the initial state covariance is
+            taken from the state-space model.
+        smooth : bool, optional
+            If True, the Kalman smoother is used instead of the Kalman filter
         """
 
         if self.ss.ny > 1:
             raise NotImplementedError
-
-        dt, u, u1, y, index_back = self._prepare_data(df, inputs, outputs, tnew)
-        x, P = self._estimate_states(dt, u, u1, y, x0, P0, smooth)
-
-        # keep only the part corresponding to `tnew`
         if tnew is not None:
-            x = x[index_back, :, :]
-            P = P[index_back, :, :]
-            x = x[-tnew.shape[0] :, :, :]
-            P = P[-tnew.shape[0] :, :, :]
+            itp_df = pd.concat(
+                [df, df.reindex(tnew).drop(df.index, errors="ignore")]
+            ).sort_index()
+            itp_df[self.inputs] = itp_df[self.inputs].interpolate(method="linear")
+        else:
+            itp_df = df.copy()
 
-        y_mean = self.ss.C @ x
-        y_std = np.sqrt(self.ss.C @ P @ self.ss.C.T) + self.ss.R
-
-        return np.squeeze(y_mean), np.squeeze(y_std)
+        ds = self.estimate_states(itp_df, smooth=smooth)
+        idx_name = df.index.name or "time"
+        if tnew is not None:
+            ds = ds.sel(**{idx_name: tnew})
+        ds["y_mean"] = (
+            (idx_name, "outputs"),
+            (self.ss.C @ ds.x.values.reshape(-1, self.ss.nx, 1))[..., 0],
+        )
+        # ds["y_std"] = np.sqrt(self.ss.C @ ds.P @ self.ss.C.T) + self.ss.R
+        ds["y_std"] = (
+            (idx_name, "outputs", "outputs"),
+            np.sqrt(self.ss.C @ ds.P.values @ self.ss.C.T) + self.ss.R,
+        )
+        return ds

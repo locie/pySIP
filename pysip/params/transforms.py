@@ -32,7 +32,7 @@ transform based on the bounds of the parameter.
 """
 
 from abc import ABCMeta, abstractmethod
-import math
+import numpy as np
 from typing_extensions import Self
 
 from ..utils.misc import Namespace
@@ -217,16 +217,16 @@ class LogTransform(ParameterTransform):
     name = "log"
 
     def transform(self, θ: float) -> float:
-        return math.log(θ)
+        return np.log(θ)
 
     def untransform(self, η: float) -> float:
-        return math.exp(η)
+        return np.exp(η)
 
     def grad_transform(self, θ: float) -> float:
         return 1.0 / θ
 
     def grad_untransform(self, η: float) -> float:
-        return math.exp(η)
+        return np.exp(η)
 
     def penalty(self, θ: float) -> float:
         return 1e-12 / (θ - 1e-12)
@@ -242,16 +242,16 @@ class LowerTransform(ParameterTransform):
     name = "lower"
 
     def transform(self, θ: float) -> float:
-        return math.log(θ - self.lb)
+        return np.log(θ - self.lb)
 
     def untransform(self, η: float) -> float:
-        return math.exp(η) + self.lb
+        return np.exp(η) + self.lb
 
     def grad_transform(self, θ: float) -> float:
         return 1.0 / (θ - self.lb)
 
     def grad_untransform(self, η: float) -> float:
-        return math.exp(η)
+        return np.exp(η)
 
     def penalty(self, θ: float) -> float:
         return abs(self.lb) / (θ - self.lb)
@@ -270,16 +270,16 @@ class UpperTransform(ParameterTransform):
     name = "upper"
 
     def transform(self, θ: float) -> float:
-        return math.log(self.ub - θ)
+        return np.log(self.ub - θ)
 
     def untransform(self, η: float) -> float:
-        return self.ub - math.exp(η)
+        return self.ub - np.exp(η)
 
     def grad_transform(self, θ: float) -> float:
         return 1.0 / (self.ub - θ)  # TODO: check
 
     def grad_untransform(self, η: float) -> float:
-        return -math.exp(η)
+        return -np.exp(η)
 
     def penalty(self, θ: float) -> float:
         return abs(self.ub) / (self.ub - θ)
@@ -300,16 +300,16 @@ class LogitTransform(ParameterTransform):
     name = "logit"
 
     def transform(self, θ: float) -> float:
-        return math.log((θ - self.lb) / (self.ub - θ))
+        return np.log((θ - self.lb) / (self.ub - θ))
 
     def untransform(self, η: float) -> float:
-        return self.lb + (self.ub - self.lb) / (1 + math.exp(-η))
+        return self.lb + (self.ub - self.lb) / (1 + np.exp(-η))
 
     def grad_transform(self, θ: float) -> float:
         return (self.ub - self.lb) / ((θ - self.lb) * (self.ub - θ))
 
     def grad_untransform(self, η: float) -> float:
-        x = math.exp(-η)
+        x = np.exp(-η)
         return (self.ub - self.lb) * x / (1 + x) ** 2
 
     def penalty(self, θ: float) -> float:

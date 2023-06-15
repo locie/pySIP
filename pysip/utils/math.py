@@ -74,7 +74,7 @@ def nearest_cholesky(m, method="ldl") -> np.ndarray:
 
     x = (m + m.T) / 2.0
     if method == "ldl":
-        lu, d, _ = ldl(x, lower=True, hermitian=True)
+        lu, d, _ = ldl(x, lower=True, hermitian=False)
         return np.diag([np.sqrt(w) if w > 0 else 0 for w in d.diagonal()]) @ lu.T
     elif method == "eigen":
         eigvals, v = np.linalg.eigh(x)

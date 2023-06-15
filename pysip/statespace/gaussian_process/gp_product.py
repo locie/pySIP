@@ -3,8 +3,7 @@ from itertools import product
 
 import numpy as np
 
-from ..base import GPModel
-from ..nodes import Par
+from ..base import GPModel, Par
 from .periodic import Periodic
 
 

@@ -9,12 +9,12 @@ from tqdm import tqdm
 from ..mcmc.hamiltonian import EuclideanHamiltonian
 from ..mcmc.hmc import DynamicHMC, Fit_Bayes
 from ..mcmc.metrics import Dense, Diagonal
-from ..filters import BayesianFilter, KalmanQR
+from ..statespace_estimator import BayesianFilter, KalmanQR
 from ..statespace.base import StateSpace
-from .base import BaseRegressor
+from .frequentist import Regressor
 
 
-class BayesRegressor(BaseRegressor):
+class BayesRegressor(Regressor):
     """Bayesian Regressor
 
     Args:
