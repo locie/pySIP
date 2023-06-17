@@ -22,7 +22,7 @@ def matern52():
 def add(matern12, matern32):
     add = GPSum(matern12, matern32)
     add.parameters.theta = list(range(1, 7))
-    add.update_continuous_dssm()
+    add.update()
     return add
 
 
@@ -30,7 +30,7 @@ def add(matern12, matern32):
 def add_double(add, matern52):
     add_double = add + matern52
     add_double.parameters.theta = list(range(1, 10))
-    add_double.update_continuous_dssm()
+    add_double.update()
     return add_double
 
 
@@ -42,14 +42,14 @@ def suffix(s):
 
 
 def test_names(add, matern12, matern32):
-    assert add._names == suffix(matern12.name) + suffix(matern32.name)
+    assert add.parameters.ids == suffix(matern12.name) + suffix(matern32.name)
     assert list(add.parameters._parameters.keys()) == ["m12", "Matern32"]
     assert list(add.parameters._parameters["m12"].keys()) == matern_params
     assert list(add.parameters._parameters["Matern32"].keys()) == matern_params
 
 
 def test_names_double(add_double, add, matern12, matern32, matern52):
-    assert add_double._names == (
+    assert add_double.parameters.ids == (
         suffix(add.name + "__" + matern12.name)
         + suffix(add.name + "__" + matern32.name)
         + suffix(matern52.name)
@@ -60,25 +60,3 @@ def test_names_double(add_double, add, matern12, matern32, matern52):
     assert list(par["m52"].keys()) == matern_params
     assert list(par["m12__+__Matern32"]["m12"].keys()) == matern_params
     assert list(par["m12__+__Matern32"]["Matern32"].keys()) == matern_params
-
-
-def test_jacobian(add, matern12, matern32):
-    assert list(add.dP0.keys()) == suffix(matern12.name) + suffix(matern32.name)
-    for k in add.dP0:
-        assert add.dP0[k].shape == (
-            matern12.nx + matern32.nx,
-            matern12.nx + matern32.nx,
-        )
-
-
-def test_jacobian_double(add_double, add, matern12, matern32, matern52):
-    assert list(add_double.dP0.keys()) == (
-        suffix(add.name + "__" + matern12.name)
-        + suffix(add.name + "__" + matern32.name)
-        + suffix(matern52.name)
-    )
-    for k in add_double.dP0:
-        assert add_double.dP0[k].shape == (
-            matern12.nx + matern32.nx + matern52.nx,
-            matern12.nx + matern32.nx + matern52.nx,
-        )

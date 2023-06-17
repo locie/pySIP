@@ -118,7 +118,7 @@ class BayesRegressor(Regressor):
 
     #     # Safety against duplication of parameter names. Do not use
     #     # self.ss.parameters.names
-    #     names = [k for i, k in enumerate(self.ss._names) if self.ss.parameters.free[i]]
+    #     names = [k for i, k in enumerate(self.ss.names) if self.ss.parameters.free[i]]
     #     chains = self._array_to_dict(self._inv_transform_chains(uchains), names)
 
     #     return Fit_Bayes(chains, stats, options, n_warmup, self.ss.name)
@@ -173,7 +173,7 @@ class BayesRegressor(Regressor):
 
     #     # Safety against duplication of parameter names. Do not use
     #     # self.ss.parameters.names
-    #     names = [k for i, k in enumerate(self.ss._names) if self.ss.parameters.free[i]]
+    #     names = [k for i, k in enumerate(self.ss.names) if self.ss.parameters.free[i]]
     #     draws = {k: ps[:, i][np.newaxis, :] for i, k in enumerate(names)}
     #     ppc = {
     #         k.name: ppd[:, :, i][np.newaxis, :] for i, k in enumerate(self.ss.outputs)
@@ -213,7 +213,7 @@ class BayesRegressor(Regressor):
 
     #     chain, draw = list(trace.values())[0].shape
     #     n_draws = chain * draw
-    #     names = [n for n, f in zip(self.ss._names, self.ss.parameters.free) if f]
+    #     names = [n for n, f in zip(self.ss.names, self.ss.parameters.free) if f]
     #     samples = self._dict_to_array(trace, names)
 
     #     def posterior_pd(index):
@@ -255,7 +255,7 @@ class BayesRegressor(Regressor):
 
     #     dt, u, u1, y, *_ = self._prepare_data(df, inputs, outputs, None)
     #     chain, draw = list(trace.values())[0].shape
-    #     names = [n for n, f in zip(self.ss._names, self.ss.parameters.free) if f]
+    #     names = [n for n, f in zip(self.ss.names, self.ss.parameters.free) if f]
     #     samples = self._dict_to_array(trace, names)
 
     #     def eval_loglik_pw(index):

@@ -12,8 +12,10 @@ from pysip.utils.statistics import aic, ccf, check_ccf, check_cpgram, cpgram, lr
 
 @pytest.fixture
 def data_armadillo():
+    sT = 3600.0 * 24.0
     df = pd.read_csv("data/armadillo/armadillo_data_H2.csv").set_index("Time")
     df.drop(df.index[-1], axis=0, inplace=True)
+    df.index /= sT
     return df
 
 
@@ -46,28 +48,25 @@ def statespace_armadillo(parameters_armadillo):
 
 
 @pytest.fixture
-def regressor_armadillo(statespace_armadillo):
-    return Regressor(ss=statespace_armadillo)
+def regressor_armadillo(statespace_armadillo: Regressor):
+    return Regressor(
+        ss=statespace_armadillo, outputs="T_int", inputs=["T_ext", "P_hea"]
+    )
 
 
 def test_fit_predict(data_armadillo, regressor_armadillo):
-    sT = 3600.0 * 24.0
-    data_armadillo.index /= sT
-
     summary, corr, scipy_summary = regressor_armadillo.fit(
-        df=data_armadillo, outputs="T_int", inputs=["T_ext", "P_hea"]
+        df=data_armadillo,
     )
 
-    loglik = regressor_armadillo.eval_log_likelihood(
-        df=data_armadillo, outputs="T_int", inputs=["T_ext", "P_hea"]
-    )
+    loglik = regressor_armadillo.log_likelihood(df=data_armadillo)
 
-    ym, _ = regressor_armadillo.predict(df=data_armadillo, inputs=["T_ext", "P_hea"])
     y = data_armadillo["T_int"].values
 
-    res, _ = regressor_armadillo.eval_residuals(
-        df=data_armadillo, inputs=["T_ext", "P_hea"], outputs="T_int"
-    )
+    ym = regressor_armadillo.predict(df=data_armadillo).y_mean.values.squeeze()
+    res = regressor_armadillo.eval_residuals(
+        df=data_armadillo
+    ).residual.values.squeeze()
 
     assert scipy_summary.fun == pytest.approx(-316.68812014562525, rel=1e-3)
     assert loglik == pytest.approx(-328.97507135305074, rel=1e-3)

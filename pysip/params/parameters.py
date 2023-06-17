@@ -1,5 +1,7 @@
 from typing import List, Literal, Sequence, Union
 from typing_extensions import Self
+from flatten_dict import flatten
+from flatten_dict.reducers import make_reducer
 
 import numpy as np
 
@@ -235,15 +237,19 @@ class Parameters:
 
     @property
     def free(self) -> List[bool]:
-        return np.array([p.free for p in self.parameters])
+        return [p.free for p in self.parameters]
 
     @property
     def names(self) -> List[str]:
-        return np.array([p.name for p in self.parameters])
+        return [p.name for p in self.parameters]
+
+    @property
+    def ids(self) -> List[str]:
+        return list(flatten(self._parameters, reducer=make_reducer(delimiter="__")))
 
     @property
     def names_free(self) -> List[str]:
-        return np.array([p.name for p in self.parameters_free])
+        return [p.name for p in self.parameters_free]
 
     def prior_init(self, hpd=None):
         """Draw a random sample from the prior distribution for each parameter
@@ -268,7 +274,7 @@ class Parameters:
 
     @property
     def parameters_free(self) -> List[Parameter]:
-        return np.array([p for p in self.parameters if p.free])
+        return [p for p in self.parameters if p.free]
 
     def init_parameters(
         self,

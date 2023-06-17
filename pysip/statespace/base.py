@@ -107,9 +107,8 @@ class MetaStateSpace(type):
     @property
     def _sections(self) -> dict:
         return {
-            section: [Node(*x) for x in nodes]
+            section: [Node(*x) for x in getattr(self, section, [])]
             for section in ["inputs", "outputs", "states"]
-            if (nodes := getattr(self, section, False))
         }
 
     @property
@@ -160,7 +159,6 @@ Parameters
         self.__doc__ = self._build_doc()
 
 
-
 def prepare_data(
     df: pd.DataFrame,
     inputs: Union[str, list],
@@ -191,6 +189,7 @@ def prepare_data(
     y : pandas.DataFrame
         Outputs
     """
+    df = df.copy()
     time = df.index.to_series()
     if not isinstance(df, pd.DataFrame):
         raise TypeError("`df` must be a dataframe")
@@ -216,10 +215,10 @@ def prepare_data(
         if not np.all(np.isfinite(subdf)):
             raise ValueError(f"{subdf} contains undefinite values")
 
-    if not outputs:
-        return dt, u, dtu
-
-    y = pd.DataFrame(df[outputs])
+    if outputs:
+        y = pd.DataFrame(df[outputs])
+    else:
+        y = pd.DataFrame(data=np.full(len(df), np.nan), index=df.index)
     if not np.all(np.isnan(y[~np.isfinite(y)])):
         raise TypeError("The output vector must contains numerical values or numpy.nan")
     return dt, u, dtu, y
@@ -317,7 +316,6 @@ Parameters:
         self._coerce_attributes()
         self._init_states()
 
-
     @property
     def nx(self):
         return len(self.states)
@@ -338,6 +336,10 @@ Parameters:
         """Update the state-space model with the constrained parameters"""
         pass
 
+    def update(self):
+        """Update the state-space model with the constrained parameters"""
+        self.update_continuous_ssm()
+
     def get_discrete_ssm(self, dt: float) -> DiscreteStates:
         """Return the updated discrete state-space model
 
@@ -356,7 +358,7 @@ Parameters:
             - Q: Upper Cholesky factor of the process noise covariance matrix
         """
         self.update_continuous_ssm()
-        return self.discretization(dt)
+        return DiscreteStates(*self.discretization(dt))
 
     def discretization(
         self, dt: float
@@ -428,12 +430,12 @@ Parameters:
             inputs = [par.name for par in self.inputs]
         if outputs is None:
             outputs = [par.name for par in self.outputs]
-        if outputs is False:
-            outputs = []
         if isinstance(inputs, str):
             inputs = [inputs]
         if isinstance(outputs, str):
             outputs = [outputs]
+        if outputs is False:
+            outputs = []
         for key in chain(inputs, outputs):
             if key not in df.columns:
                 raise KeyError(

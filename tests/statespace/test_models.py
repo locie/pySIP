@@ -36,9 +36,7 @@ def test_model_has_correct_attributes(model):
     variables = ["inputs", "outputs", "states", "params"]
     methods = [
         "set_constant_continuous_ssm",
-        "set_constant_continuous_dssm",
         "update_continuous_ssm",
-        "update_continuous_dssm",
     ]
     for attr in variables + methods:
         assert hasattr(model, attr)
@@ -51,7 +49,7 @@ def test_inheritance(model, base):
 
 @model
 def test_docstring(model):
-    sections = ["Inputs", "Outputs", "States", "Model parameters"]
+    sections = ["Inputs", "Outputs", "States", "Parameters"]
     subsections = [
         "Thermal capacity",
         "Initial deviation",

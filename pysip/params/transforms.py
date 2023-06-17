@@ -35,15 +35,24 @@ from abc import ABCMeta, abstractmethod
 import numpy as np
 from typing_extensions import Self
 
-from ..utils.misc import Namespace
 
+class Transforms:
+    @classmethod
+    def register(cls, transform, name=None):
+        if name is None:
+            name = getattr(transform, "name", transform.__qualname__)
+        if hasattr(cls, name):
+            raise ValueError("Transform with that name already exists")
+        setattr(cls, name, transform)
 
-Transforms = Namespace()
+    @classmethod
+    def get(cls, name):
+        return getattr(cls, name)
 
 
 # decorator to register transforms
 def register_transform(cls):
-    Transforms[cls.name] = cls
+    Transforms.register(cls)
     return cls
 
 
@@ -276,7 +285,7 @@ class UpperTransform(ParameterTransform):
         return self.ub - np.exp(η)
 
     def grad_transform(self, θ: float) -> float:
-        return 1.0 / (self.ub - θ)  # TODO: check
+        return -1.0 / (self.ub - θ)  # TODO: check
 
     def grad_untransform(self, η: float) -> float:
         return -np.exp(η)
@@ -339,13 +348,13 @@ def auto_transform(bounds):
     """
     lb, ub = bounds
     if lb is None and ub is None:
-        return Transforms["none"](bounds)
+        return Transforms.get("none")(bounds)
     if lb == 0.0 and ub is None:
-        return Transforms["log"](bounds)
+        return Transforms.get("log")(bounds)
     if ub is None and lb > 0.0:
-        return Transforms["lower"](bounds)
+        return Transforms.get("lower")(bounds)
     if lb is None and ub > 0.0:
-        return Transforms["upper"](bounds)
+        return Transforms.get("upper")(bounds)
     if lb is not None and ub is not None:
-        return Transforms["logit"](bounds)
+        return Transforms.get("logit")(bounds)
     raise ValueError("No transform found for bounds {}".format(bounds))

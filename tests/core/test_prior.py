@@ -1,4 +1,3 @@
-import numdifftools as nd
 import numpy as np
 import pytest
 from scipy import stats
@@ -45,12 +44,3 @@ def test_log_pdf(Prior, log, dlog, scipy_fun, N):
     assert prior.dlog_pdf(0.3) == pytest.approx(dlog)
     assert prior.mean == pytest.approx(np.mean(rvs), abs=3 * np.std(rvs) / np.sqrt(N))
     assert prior.log_pdf(x) == pytest.approx(scipy_fun.logpdf(x))
-
-
-@pytest.mark.skip(reason="Difference of behavior with Linux, MacOS and windows")
-@pytest.mark.parametrize("Prior", [Normal, Gamma, Beta, InverseGamma, LogNormal])
-def test_dlog_pdf(Prior):
-    prior = Prior()
-    nd_prior = nd.Gradient(prior.log_pdf)
-    x = np.random.uniform()
-    assert prior.dlog_pdf(x) == pytest.approx(nd_prior(x), rel=1e-6)

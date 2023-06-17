@@ -109,15 +109,15 @@ def test_disc_LTI(model: StateSpace, random_dt):
     dt = random_dt
 
     model.parameters.eta = np.random.uniform(-1, 1, model.parameters.n_par)
-    ssm = model.get_discrete_ssm()
+    ssm = model.get_discrete_ssm(dt)
 
     QQ = model.Q.T @ model.Q
 
-    Qd = ssm.Q[0].T @ ssm.Q[0]
+    Qd = ssm.Q.T @ ssm.Q
 
     Qd_mfd = discretization.diffusion_mfd(model.A, QQ, dt)
-    Qd_lyap = discretization.diffusion_lyap(model.A, QQ, ssm.A[0])
-    Qd_kron = discretization.diffusion_kron(model.A, QQ, ssm.A[0])
+    Qd_lyap = discretization.diffusion_lyap(model.A, QQ, ssm.A)
+    Qd_kron = discretization.diffusion_kron(model.A, QQ, ssm.A)
 
 
     assert np.allclose(Qd_kron, Qd)
@@ -126,6 +126,6 @@ def test_disc_LTI(model: StateSpace, random_dt):
 
     if isinstance(model, GPModel):
         Pinf = model.P0.T @ model.P0
-        Qd_statio = discretization.diffusion_stationary(Pinf, ssm.A[0])
+        Qd_statio = discretization.diffusion_stationary(Pinf, ssm.A)
 
         assert np.allclose(Qd_statio, Qd)

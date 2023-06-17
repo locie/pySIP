@@ -1,13 +1,8 @@
-from copy import deepcopy
-
-import numdifftools as nd
 import numpy as np
 import pandas as pd
 import pytest
 
-from pysip.regressors import FreqRegressor as Regressor
 from pysip.statespace import LatentForceModel, Matern32, R2C2_Qgh_Matern32, R2C2Qgh
-from pysip.utils.math import ned
 from pysip.utils.artificial_data import generate_sine, generate_random_binary
 
 sT = 24.0 * 60.0
@@ -42,7 +37,6 @@ def artificial_data():
 
 @pytest.fixture
 def models():
-
     p = np.random.uniform(-1, 1, 13)
 
     p_truth = [
@@ -83,13 +77,11 @@ def models():
 
     truth = R2C2_Qgh_Matern32(p_truth)
     truth.parameters.eta = p
-    truth.update_continuous_ssm()
-    truth.update_continuous_dssm()
+    truth.update()
 
     lfm = LatentForceModel(R2C2Qgh(p_rc), Matern32(p_gp), "Qgh")
     lfm.parameters.eta = p
-    lfm.update_continuous_ssm()
-    lfm.update_continuous_dssm()
+    lfm.update()
 
     return truth, lfm
 
@@ -97,16 +89,14 @@ def models():
 @pytest.fixture
 def models_by_operator():
     truth = R2C2_Qgh_Matern32()
-    theta = np.random.random(len(truth._names))
+    theta = np.random.random(len(truth.parameters.ids))
 
     truth.parameters.theta_free = theta
-    truth.update_continuous_ssm()
-    truth.update_continuous_dssm()
+    truth.update()
 
     lfm = R2C2Qgh(latent_forces="Qgh") <= Matern32()
     lfm.parameters.theta_free = theta
-    lfm.update_continuous_ssm()
-    lfm.update_continuous_dssm()
+    lfm.update()
     return truth, lfm
 
 
@@ -123,7 +113,7 @@ def LFM_creation(models):
     assert truth.states == lfm.states
     assert truth.inputs == lfm.inputs
     assert truth.outputs == lfm.outputs
-    assert truth.parameters.theta_free == lfm.parameters.theta_free
+    assert np.allclose(truth.parameters.theta_free, lfm.parameters.theta_free)
 
     assert np.allclose(truth.A, lfm.A)
     assert np.allclose(truth.B, lfm.B)
@@ -133,40 +123,3 @@ def LFM_creation(models):
     assert np.allclose(truth.R, lfm.R)
     assert np.allclose(truth.x0, lfm.x0)
     assert np.allclose(truth.P0, lfm.P0)
-    for k in truth._names:
-        assert np.allclose(truth.dA[k], lfm.dA[k])
-        assert np.allclose(truth.dB[k], lfm.dB[k])
-        assert np.allclose(truth.dC[k], lfm.dC[k])
-        assert np.allclose(truth.dD[k], lfm.dD[k])
-        assert np.allclose(truth.dQ[k], lfm.dQ[k])
-        assert np.allclose(truth.dR[k], lfm.dR[k])
-        assert np.allclose(truth.dx0[k], lfm.dx0[k])
-        assert np.allclose(truth.dP0[k], lfm.dP0[k])
-
-
-def test_LFM_gradient(artificial_data, models):
-    reg_truth = Regressor(ss=models[0])
-    reg_truth._use_penalty = False
-    reg_truth._use_jacobian = True
-    dt, u, u1, y, *_ = reg_truth._prepare_data(artificial_data, ["To", "Qh"], "Ti")
-
-    reg_lfm = Regressor(ss=models[1])
-    reg_lfm._use_penalty = False
-    reg_lfm._use_jacobian = True
-
-    eta_truth = deepcopy(reg_truth.ss.parameters.eta_free)
-    eta_lfm = deepcopy(reg_lfm.ss.parameters.eta_free)
-
-    grad_truth = reg_truth._eval_dlog_posterior(eta_truth, dt, u, u1, y)[1]
-    grad_lfm = reg_lfm._eval_dlog_posterior(eta_lfm, dt, u, u1, y)[1]
-
-    fct = nd.Gradient(reg_truth._eval_log_posterior)
-    grad_truth_approx = fct(eta_truth, dt, u, u1, y)
-
-    assert np.all(eta_truth == eta_lfm)
-    assert ned(grad_truth, grad_lfm) < 1e-7
-    assert ned(grad_truth, grad_truth_approx) < 1e-7
-    assert np.all(np.sign(grad_truth) == np.sign(grad_truth_approx))
-    assert np.all(np.sign(grad_truth) == np.sign(grad_lfm))
-    assert grad_truth == pytest.approx(grad_truth_approx, rel=1e-6)
-    assert grad_truth == pytest.approx(grad_lfm, rel=1e-6)

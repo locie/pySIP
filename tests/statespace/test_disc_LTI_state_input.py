@@ -10,7 +10,7 @@ from pysip.statespace import (
     TwTiTh_RoRiRhAwAicv,
     TwTiTm_RoRiRmAwAicv,
 )
-from pysip.statespace.discretization import *
+from pysip.statespace import discretization
 
 sT = 3600.0 * 24.0
 
@@ -120,57 +120,25 @@ def random_dt():
 
 @pytest.mark.parametrize("model", model_list)
 @pytest.mark.parametrize("order_hold", [0, 1])
-def test_disc_state_input(model, order_hold, random_dt):
+def test_discretization_state_input(model, order_hold, random_dt):
     dt = random_dt
     model.parameters.eta = np.random.uniform(-1, 1, model.parameters.n_par)
-    model.update_continuous_ssm()
-    model.update_continuous_dssm()
-    dA = np.array(
-        [model.dA[n] for n, f in zip(model._names, model.parameters.free) if f]
-    )
-    dB = np.array(
-        [model.dB[n] for n, f in zip(model._names, model.parameters.free) if f]
-    )
+    model.update()
 
     tic = time()
-    Ad_expm, B0d_expm, B1d_expm = disc_state_input(
+    Ad_expm, B0d_expm, B1d_expm = discretization.state_input(
         model.A, model.B, dt, order_hold, "expm"
     )
     toc = time() - tic
     print(f"expm: {toc:.4e}")
 
     tic = time()
-    (
-        Ad_expm_bis,
-        B0d_expm_bis,
-        B1d_expm_bis,
-        dAd_expm,
-        dB0d_expm,
-        dB1d_expm,
-    ) = disc_d_state_input(model.A, model.B, dA, dB, dt, order_hold, "expm")
-    toc = time() - tic
-    print(f"dexpm: {toc:.4e}")
-
-    tic = time()
-    Ad, B0d, B1d = disc_state_input(model.A, model.B, dt, order_hold, "analytic")
-    toc = time() - tic
-    print(f"analytic: {toc:.4e}")
-
-    tic = time()
-    Ad_bis, B0d_bis, B1d_bis, dAd, dB0d, dB1d = disc_d_state_input(
-        model.A, model.B, dA, dB, dt, order_hold, "analytic"
+    Ad, B0d, B1d = discretization.state_input(
+        model.A, model.B, dt, order_hold, "analytic"
     )
     toc = time() - tic
-    print(f"danalytic: {toc:.4e}")
-
-    assert np.allclose(Ad_expm, Ad_expm_bis)
-    assert np.allclose(B0d_expm, B0d_expm_bis)
-    assert np.allclose(B1d_expm, B1d_expm_bis)
+    print(f"analytic: {toc:.4e}")
 
     assert np.allclose(Ad_expm, Ad)
     assert np.allclose(B0d_expm, B0d)
     assert np.allclose(B1d_expm, B1d)
-
-    assert np.allclose(dAd_expm, dAd)
-    assert np.allclose(dB0d_expm, dB0d)
-    assert np.allclose(dB1d_expm, dB1d)

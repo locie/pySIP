@@ -63,7 +63,27 @@ class Regressor:
     def parameters(self) -> Parameters:
         return self.ss.parameters
 
-    def prepare_data(self, df, with_outputs=True):
+    def prepare_data(self, df, with_outputs=True) -> Tuple[pd.DataFrame, ...]:
+        """Prepare data for training
+
+        Parameters
+        ----------
+        df : pd.DataFrame
+            Dataframe containing the data
+        with_outputs : bool, optional
+            Whether to return the outputs, by default True
+
+        Returns
+        -------
+        DataFrame:
+            time steps
+        DataFrame:
+            input data
+        DataFrame:
+            derivative of input data
+        DataFrame:
+            output data (filled with NaNs if with_outputs=False)
+        """
         return self.ss.prepare_data(
             df, self.inputs, self.outputs if with_outputs else False, self.time_scale
         )
@@ -88,7 +108,7 @@ class Regressor:
             Dataset containing the simulated outputs and states
         """
 
-        dt, u, dtu = self.prepare_data(df, with_outputs=False)
+        dt, u, dtu, _ = self.prepare_data(df, with_outputs=False)
         y_res, x_res = self.estimator.simulate(dt, u, dtu)
         idx_name = df.index.name or "time"
         y_da = xr.DataArray(
@@ -157,7 +177,8 @@ class Regressor:
         x0: np.ndarray = None,
         P0: np.ndarray = None,
         smooth: bool = False,
-    ) -> Tuple[np.ndarray, np.ndarray]:
+        use_outputs: bool = True,
+    ) -> xr.Dataset:
         """Estimate the state filtered/smoothed distribution
 
         Parameters
@@ -185,7 +206,7 @@ class Regressor:
             Filtered or smoothed state covariance
         """
 
-        dt, u, dtu, y = self.prepare_data(df)
+        dt, u, dtu, y = self.prepare_data(df, with_outputs=use_outputs)
 
         if smooth:
             x_res, P_res = self.estimator.smoothing(dt, u, dtu, y)
@@ -205,8 +226,6 @@ class Regressor:
             name="P",
         )
         return xr.merge([x_da, P_da])
-
-
 
     def _target(
         self,
@@ -338,7 +357,7 @@ class Regressor:
                 [
                     self.parameters.theta_free,
                     sig_theta,
-                    ttest(self.parameters.theta_free, sig_theta, data[2].shape[1]),
+                    ttest(self.parameters.theta_free, sig_theta, len(data[0])),
                     np.abs(results.jac),
                     np.abs(self.parameters.d_penalty),
                 ]
@@ -407,10 +426,7 @@ class Regressor:
         )
         return xr.merge([res_da, res_std_da])
 
-    def log_likelihood(
-        self,
-        df: pd.DataFrame
-    ) -> Union[float, np.ndarray]:
+    def log_likelihood(self, df: pd.DataFrame) -> Union[float, np.ndarray]:
         """Evaluate the negative log-likelihood
 
         Args:
@@ -426,6 +442,16 @@ class Regressor:
         dt, u, dtu, y = self.prepare_data(df)
         return self.estimator.log_likelihood(dt, u, dtu, y)
 
+    def log_posterior(
+        self,
+        df: pd.DataFrame,
+    ) -> Union[float, np.ndarray]:
+        return (
+            self.log_likelihood(df)
+            - self.ss.parameters.prior
+            + self.ss.parameters.penalty
+        )
+
     def predict(
         self,
         df: pd.DataFrame,
@@ -433,7 +459,8 @@ class Regressor:
         x0: np.ndarray = None,
         P0: np.ndarray = None,
         smooth: bool = False,
-    ) -> Tuple[np.ndarray, np.ndarray]:
+        use_outputs: bool = False,
+    ) -> xr.Dataset:
         """State-space model output prediction
 
         Parameters
@@ -462,7 +489,7 @@ class Regressor:
         else:
             itp_df = df.copy()
 
-        ds = self.estimate_states(itp_df, smooth=smooth)
+        ds = self.estimate_states(itp_df, smooth=smooth, use_outputs=use_outputs)
         idx_name = df.index.name or "time"
         if tnew is not None:
             ds = ds.sel(**{idx_name: tnew})
@@ -470,7 +497,6 @@ class Regressor:
             (idx_name, "outputs"),
             (self.ss.C @ ds.x.values.reshape(-1, self.ss.nx, 1))[..., 0],
         )
-        # ds["y_std"] = np.sqrt(self.ss.C @ ds.P @ self.ss.C.T) + self.ss.R
         ds["y_std"] = (
             (idx_name, "outputs", "outputs"),
             np.sqrt(self.ss.C @ ds.P.values @ self.ss.C.T) + self.ss.R,

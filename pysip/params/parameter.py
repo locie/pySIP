@@ -68,7 +68,7 @@ class Parameter:
         bounds = values.get("bounds")
         if transform == "auto":
             return auto_transform(bounds)
-        return Transforms[transform](bounds)
+        return Transforms.get(transform)(bounds)
 
     def __post_init_post_parse__(self):
         if self.value is None:

@@ -1,3 +1,4 @@
+from copy import deepcopy
 from dataclasses import dataclass
 from itertools import product
 
@@ -32,8 +33,8 @@ class GPProduct(GPModel):
         if not isinstance(gp2, GPModel):
             raise TypeError("`gp2` must be an GPModel instance")
 
-        self._gp1 = gp1
-        self._gp2 = gp2
+        self._gp1 = deepcopy(gp1)
+        self._gp2 = deepcopy(gp2)
 
         for node in self._gp2.params:
             if node.category == Par.MAGNITUDE_SCALE:

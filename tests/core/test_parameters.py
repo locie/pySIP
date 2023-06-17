@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 
 from pysip.params import Parameters
@@ -15,7 +16,6 @@ def parameters_beta():
 
 @pytest.fixture
 def parameters_with_transforms():
-
     parameters = [
         {"name": "a", "value": 1.0, "transform": "log"},
         {"name": "b", "value": 2.0, "transform": "logit", "bounds": (1.0, 3.0)},
@@ -25,7 +25,7 @@ def parameters_with_transforms():
 
 
 def test_parameters(parameters):
-    assert parameters.theta == [0, 0, 0]
+    assert np.allclose(parameters.theta, [0, 0, 0])
 
 
 def test_repr(parameters, parameters_beta, parameters_with_transforms):
@@ -73,18 +73,16 @@ def test_set_parameter(parameters):
 
 
 def test_set_theta(parameters):
-    assert parameters.theta == [0, 0, 0]
-
+    assert np.allclose(parameters.theta, [0, 0, 0])
     parameters.theta = [1.0, 0.0, 0.0]
-
-    assert parameters.theta == [1.0, 0.0, 0.0]
+    assert np.allclose(parameters.theta, [1.0, 0.0, 0.0])
 
 
 def test_add(parameters, parameters_with_transforms):
     new_parameters = parameters + parameters_with_transforms
 
     assert isinstance(new_parameters, Parameters)
-    assert new_parameters.theta == [0.0, 0.0, 0.0, 1.0, 2.0]
+    assert np.allclose(new_parameters.theta, [0.0, 0.0, 0.0, 1.0, 2.0])
 
 
 def test_add_recursive(parameters, parameters_beta, parameters_with_transforms):
@@ -92,19 +90,19 @@ def test_add_recursive(parameters, parameters_beta, parameters_with_transforms):
     new_parameters = new_parameters + parameters_with_transforms
 
     assert isinstance(new_parameters, Parameters)
-    assert new_parameters.theta == [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.0]
+    assert np.allclose(new_parameters.theta, [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.0])
 
 
 def test_add_set_theta(parameters, parameters_beta):
     new_parameters = parameters + parameters_beta
 
-    assert new_parameters.theta == [0, 0, 0, 0, 0, 0]
+    assert np.allclose(new_parameters.theta, [0, 0, 0, 0, 0, 0])
 
     new_parameters.theta = [1.0, 0.0, 0.0, 2.0, 3.0, 0.0]
 
-    assert new_parameters.theta == [1.0, 0.0, 0.0, 2.0, 3.0, 0.0]
-    assert parameters.theta == [1.0, 0.0, 0.0]
-    assert parameters_beta.theta == [2.0, 3.0, 0.0]
+    assert np.allclose(new_parameters.theta, [1.0, 0.0, 0.0, 2.0, 3.0, 0.0])
+    assert np.allclose(parameters.theta, [1.0, 0.0, 0.0])
+    assert np.allclose(parameters_beta.theta, [2.0, 3.0, 0.0])
 
 
 def test_add_set_parameters(parameters, parameters_with_transforms):
