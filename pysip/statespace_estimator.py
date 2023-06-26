@@ -208,7 +208,7 @@ def _estimate_output(
         u_i = np.ascontiguousarray(u[i]).reshape(-1, 1)
         dtu_i = np.ascontiguousarray(dtu[i]).reshape(-1, 1)
         states_i = _unpack_states(states, i)
-        x, P, _, _ = _kalman_step(x, P, u_i, dtu_i, y_i, states_i, _Arru)
+        _, _, _, _, x, P = _kalman_step(x, P, u_i, dtu_i, y_i, states_i, _Arru)
         y_m = states_i.C @ x
         y_std = np.sqrt(states_i.C @ P.T @ P @ states_i.C.T) + states_i.R
         y_res[i] = y_m

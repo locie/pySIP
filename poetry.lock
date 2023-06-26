@@ -115,6 +115,18 @@ files = [
 ]
 
 [[package]]
+name = "cachetools"
+version = "5.3.1"
+description = "Extensible memoizing collections and decorators"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "cachetools-5.3.1-py3-none-any.whl", hash = "sha256:95ef631eeaea14ba2e36f06437f36463aac3a096799e876ee55e5cdccb102590"},
+    {file = "cachetools-5.3.1.tar.gz", hash = "sha256:dce83f2d9b4e1f732a8cd44af8e8fab2dbe46201467fc98b3ef8f269092bf62b"},
+]
+
+[[package]]
 name = "certifi"
 version = "2022.9.24"
 description = "Python package for providing Mozilla's CA Bundle."
@@ -265,6 +277,18 @@ files = [
 unicode-backport = ["unicodedata2"]
 
 [[package]]
+name = "cloudpickle"
+version = "2.2.1"
+description = "Extended pickling support for Python objects"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "cloudpickle-2.2.1-py3-none-any.whl", hash = "sha256:61f594d1f4c295fa5cd9014ceb3a1fc4a70b0de1164b94fbc2d854ccba056f9f"},
+    {file = "cloudpickle-2.2.1.tar.gz", hash = "sha256:d89684b8de9e34a2a43b3460fbca07d09d6e25ce858df4d5a44240403b6178f5"},
+]
+
+[[package]]
 name = "colorama"
 version = "0.4.6"
 description = "Cross-platform colored terminal text."
@@ -275,6 +299,20 @@ files = [
     {file = "colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"},
     {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
 ]
+
+[[package]]
+name = "cons"
+version = "0.4.6"
+description = "An implementation of Lisp/Scheme-like cons in Python."
+category = "main"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "cons-0.4.6.tar.gz", hash = "sha256:669fe9d5ee916d5e42b9cac6acc911df803d04f2e945c1604982a04d27a29b47"},
+]
+
+[package.dependencies]
+logical-unification = ">=0.4.0"
 
 [[package]]
 name = "contourpy"
@@ -520,6 +558,21 @@ files = [
 ]
 
 [[package]]
+name = "etuples"
+version = "0.3.9"
+description = "Python S-expression emulation using tuple-like objects."
+category = "main"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "etuples-0.3.9.tar.gz", hash = "sha256:a474e586683d8ba8d842ba29305005ceed1c08371a4b4b0e0e232527137e5ea3"},
+]
+
+[package.dependencies]
+cons = "*"
+multipledispatch = "*"
+
+[[package]]
 name = "exceptiongroup"
 version = "1.0.4"
 description = "Backport of PEP 654 (exception groups)"
@@ -550,10 +603,22 @@ files = [
 tests = ["asttokens", "littleutils", "pytest", "rich"]
 
 [[package]]
+name = "fastprogress"
+version = "1.0.3"
+description = "A nested progress with plotting options for fastai"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "fastprogress-1.0.3-py3-none-any.whl", hash = "sha256:6dfea88f7a4717b0a8d6ee2048beae5dbed369f932a368c5dd9caff34796f7c5"},
+    {file = "fastprogress-1.0.3.tar.gz", hash = "sha256:7a17d2b438890f838c048eefce32c4ded47197ecc8ea042cecc33d3deb8022f5"},
+]
+
+[[package]]
 name = "filelock"
 version = "3.8.0"
 description = "A platform independent file lock."
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -952,6 +1017,40 @@ files = [
 ]
 
 [[package]]
+name = "logical-unification"
+version = "0.4.6"
+description = "Logical unification in Python"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "logical-unification-0.4.6.tar.gz", hash = "sha256:908435123f8a106fa4dcf9bf1b75c7beb309fa2bbecf277868af8f1c212650a0"},
+]
+
+[package.dependencies]
+multipledispatch = "*"
+toolz = "*"
+
+[[package]]
+name = "loguru"
+version = "0.7.0"
+description = "Python logging made (stupidly) simple"
+category = "main"
+optional = false
+python-versions = ">=3.5"
+files = [
+    {file = "loguru-0.7.0-py3-none-any.whl", hash = "sha256:b93aa30099fa6860d4727f1b81f8718e965bb96253fa190fab2077aaad6d15d3"},
+    {file = "loguru-0.7.0.tar.gz", hash = "sha256:1612053ced6ae84d7959dd7d5e431a0532642237ec21f7fd83ac73fe539e03e1"},
+]
+
+[package.dependencies]
+colorama = {version = ">=0.3.4", markers = "sys_platform == \"win32\""}
+win32-setctime = {version = ">=1.0.0", markers = "sys_platform == \"win32\""}
+
+[package.extras]
+dev = ["Sphinx (==5.3.0)", "colorama (==0.4.5)", "colorama (==0.4.6)", "freezegun (==1.1.0)", "freezegun (==1.2.2)", "mypy (==v0.910)", "mypy (==v0.971)", "mypy (==v0.990)", "pre-commit (==3.2.1)", "pytest (==6.1.2)", "pytest (==7.2.1)", "pytest-cov (==2.12.1)", "pytest-cov (==4.0.0)", "pytest-mypy-plugins (==1.10.1)", "pytest-mypy-plugins (==1.9.3)", "sphinx-autobuild (==2021.3.14)", "sphinx-rtd-theme (==1.2.0)", "tox (==3.27.1)", "tox (==4.4.6)"]
+
+[[package]]
 name = "markupsafe"
 version = "2.1.1"
 description = "Safely add untrusted strings to HTML/XML markup."
@@ -1077,6 +1176,40 @@ files = [
 
 [package.dependencies]
 traitlets = "*"
+
+[[package]]
+name = "minikanren"
+version = "1.0.3"
+description = "Relational programming in Python"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "miniKanren-1.0.3.tar.gz", hash = "sha256:1ec8bdb01144ad5e8752c7c297fb8a122db920f859276d25a72d164e998d7f6e"},
+]
+
+[package.dependencies]
+cons = ">=0.4.0"
+etuples = ">=0.3.1"
+logical-unification = ">=0.4.1"
+multipledispatch = "*"
+toolz = "*"
+
+[[package]]
+name = "multipledispatch"
+version = "0.6.0"
+description = "Multiple dispatch"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "multipledispatch-0.6.0-py2-none-any.whl", hash = "sha256:407e6d8c5fa27075968ba07c4db3ef5f02bea4e871e959570eeb69ee39a6565b"},
+    {file = "multipledispatch-0.6.0-py3-none-any.whl", hash = "sha256:a55c512128fb3f7c2efd2533f2550accb93c35f1045242ef74645fc92a2c3cba"},
+    {file = "multipledispatch-0.6.0.tar.gz", hash = "sha256:a7ab1451fd0bf9b92cab3edbd7b205622fb767aeefb4fb536c2e3de9e0a38bea"},
+]
+
+[package.dependencies]
+six = "*"
 
 [[package]]
 name = "nest-asyncio"
@@ -1686,6 +1819,29 @@ matplotlib = "*"
 numpy = "*"
 
 [[package]]
+name = "pymc"
+version = "5.5.0"
+description = "Probabilistic Programming in Python: Bayesian Modeling and Probabilistic Machine Learning with PyTensor"
+category = "main"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "pymc-5.5.0-py3-none-any.whl", hash = "sha256:c571228d718774c603b00429f5ef59ba745a4b0dddf1e536636ee7bec8ff5008"},
+    {file = "pymc-5.5.0.tar.gz", hash = "sha256:7fe2ac72de8a5d04b76566fa44f64a400d67939c8393e6487d8a99f920f4f277"},
+]
+
+[package.dependencies]
+arviz = ">=0.13.0"
+cachetools = ">=4.2.1"
+cloudpickle = "*"
+fastprogress = ">=0.2.0"
+numpy = ">=1.15.0"
+pandas = ">=0.24.0"
+pytensor = ">=2.12.0,<2.13"
+scipy = ">=1.4.1"
+typing-extensions = ">=3.7.4"
+
+[[package]]
 name = "pyparsing"
 version = "3.0.9"
 description = "pyparsing module - Classes and methods to define and execute parsing grammars"
@@ -1699,6 +1855,56 @@ files = [
 
 [package.extras]
 diagrams = ["jinja2", "railroad-diagrams"]
+
+[[package]]
+name = "pytensor"
+version = "2.12.3"
+description = "Optimizing compiler for evaluating mathematical expressions on CPUs and GPUs."
+category = "main"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "pytensor-2.12.3-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:927821bab3617739013950fba0bf9d458a7075576360786ccc7e5a8b7d54f481"},
+    {file = "pytensor-2.12.3-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:bb5fd6c750d8247ec05869022ca37e52e59437ef871d7e8e7ed1c5df058699ea"},
+    {file = "pytensor-2.12.3-cp310-cp310-musllinux_1_1_i686.whl", hash = "sha256:1036caf00d42510b3516b56b7132d2325960b6b294342cb9a2cbe3d4492c2a2e"},
+    {file = "pytensor-2.12.3-cp310-cp310-musllinux_1_1_x86_64.whl", hash = "sha256:1cb717b9a76940249df58a2cd521ca2bbdc340efecdbacb540c628796530a05b"},
+    {file = "pytensor-2.12.3-cp310-cp310-win_amd64.whl", hash = "sha256:3171c2e962e735342a19a86ef1dcb1aac543fcfab150347e726c94cd6ce02b24"},
+    {file = "pytensor-2.12.3-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:75151f3cdae910a096cea7ee4d86f6f2ea9948ab2fee25a31753bbadff331eb4"},
+    {file = "pytensor-2.12.3-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:dc91d5c880a6c3a835184a65602b10cd72237f7cc3a306b4d139420211ea187f"},
+    {file = "pytensor-2.12.3-cp311-cp311-musllinux_1_1_i686.whl", hash = "sha256:08a5f41814936243fcbd21fe8e18c787c567be21c7d684fc21a8826e96373a55"},
+    {file = "pytensor-2.12.3-cp311-cp311-musllinux_1_1_x86_64.whl", hash = "sha256:4c09eeb4bc14e2e023b72a7ddc21a417d089271f1f57c3dd4f7dce1ee84530d9"},
+    {file = "pytensor-2.12.3-cp311-cp311-win_amd64.whl", hash = "sha256:cad11e19164bb5728df40b66ae1fe9d2ad0b2e47d37d07ded6f1e1e1de3fb953"},
+    {file = "pytensor-2.12.3-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:67ea093c9b81a55f191629ffc026f3484d5ee07894d020c006f7eda099b84b4d"},
+    {file = "pytensor-2.12.3-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:47ddde19efd76ea68f9f3a851cf2eaa0808ca939d7c565561ac931080e177062"},
+    {file = "pytensor-2.12.3-cp38-cp38-musllinux_1_1_i686.whl", hash = "sha256:83a2fd36aa87900dc18d27cbb4499dfb3c7117da0a2d1d0472f0ec03e308bbe7"},
+    {file = "pytensor-2.12.3-cp38-cp38-musllinux_1_1_x86_64.whl", hash = "sha256:30008db34a1dbd8a81a2cd6133995f7a275cf0691f9f322009263a5b170b086f"},
+    {file = "pytensor-2.12.3-cp38-cp38-win_amd64.whl", hash = "sha256:4ca575080dd76c39bcba563410e73d23aa96f45f07f171adb71cade130aa8df5"},
+    {file = "pytensor-2.12.3-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:46c48e48c9809b760c5535d6e91e96d365ddf909367afb74c29f541a5e681042"},
+    {file = "pytensor-2.12.3-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:cc6848fd95befc49ff30174978ff3d8c2c22ef93c25ed61d31491769c2a67126"},
+    {file = "pytensor-2.12.3-cp39-cp39-musllinux_1_1_i686.whl", hash = "sha256:ba37c0d8b674c4e34a096c7c7dfaa46a0705023d8afc39ddfe1537ed69ef21ff"},
+    {file = "pytensor-2.12.3-cp39-cp39-musllinux_1_1_x86_64.whl", hash = "sha256:7f27bd14ff8a5ea6b4f24d92851ab37bfba03baa319a72a031cae7dc650f4d5c"},
+    {file = "pytensor-2.12.3-cp39-cp39-win_amd64.whl", hash = "sha256:0e18f4926c85bfcf85a4815fa390cb65257b589221a47dd64bfe996cdea8f867"},
+    {file = "pytensor-2.12.3.tar.gz", hash = "sha256:fa82d29ef0594e0a2751eaad40882dcd6af51333c28be0d79c1d0de9f3a81a86"},
+]
+
+[package.dependencies]
+cons = "*"
+etuples = "*"
+filelock = "*"
+logical-unification = "*"
+miniKanren = "*"
+numpy = ">=1.17.0"
+scipy = ">=0.14"
+setuptools = ">=48.0.0"
+typing-extensions = "*"
+
+[package.extras]
+complete = ["pytensor[jax]", "pytensor[numba]"]
+development = ["pytensor[complete]", "pytensor[rtd]", "pytensor[tests]"]
+jax = ["jax", "jaxlib"]
+numba = ["numba (>=0.55)", "numba-scipy (>=0.3.0)"]
+rtd = ["pydot", "pydot-ng", "pydot2", "pygments", "sphinx (>=5.1.0,<6)"]
+tests = ["coverage (>=5.1)", "pre-commit", "pytest", "pytest-benchmark", "pytest-cov (>=2.6.1)"]
 
 [[package]]
 name = "pytest"
@@ -2289,6 +2495,18 @@ files = [
 ]
 
 [[package]]
+name = "toolz"
+version = "0.12.0"
+description = "List processing tools and functional utilities"
+category = "main"
+optional = false
+python-versions = ">=3.5"
+files = [
+    {file = "toolz-0.12.0-py3-none-any.whl", hash = "sha256:2059bd4148deb1884bb0eb770a3cde70e7f954cfbbdc2285f1f2de01fd21eb6f"},
+    {file = "toolz-0.12.0.tar.gz", hash = "sha256:88c570861c440ee3f2f6037c4654613228ff40c93a6c25e0eba70d17282c6194"},
+]
+
+[[package]]
 name = "tornado"
 version = "6.2"
 description = "Tornado is a Python web framework and asynchronous networking library, originally developed at FriendFeed."
@@ -2409,6 +2627,21 @@ files = [
 ]
 
 [[package]]
+name = "win32-setctime"
+version = "1.1.0"
+description = "A small Python utility to set file creation time on Windows"
+category = "main"
+optional = false
+python-versions = ">=3.5"
+files = [
+    {file = "win32_setctime-1.1.0-py3-none-any.whl", hash = "sha256:231db239e959c2fe7eb1d7dc129f11172354f98361c4fa2d6d2d7e278baa8aad"},
+    {file = "win32_setctime-1.1.0.tar.gz", hash = "sha256:15cf5750465118d6929ae4de4eb46e8edae9a5634350c01ba582df868e932cb2"},
+]
+
+[package.extras]
+dev = ["black (>=19.3b0)", "pytest (>=4.6.2)"]
+
+[[package]]
 name = "xarray"
 version = "2022.11.0"
 description = "N-D labeled arrays and datasets in Python"
@@ -2501,4 +2734,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "daee436d0400291b89a4e25aa91bc728d7910fbaac8d5562c37f1aa5a62473e0"
+content-hash = "8a789fc917aac394c36985c11e86f7180b7cb69a4475bfc9c4c22f0772fecb86"
