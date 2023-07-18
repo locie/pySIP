@@ -1,9 +1,10 @@
 from collections import namedtuple
-from pydantic import ValidationError
 
 import pytest
+from pydantic import ValidationError
 
-from pysip.params import Normal, Parameter
+from pysip.params import Parameter
+from pysip.params.prior import Normal
 
 defaults = namedtuple("Defaults", "name value scale bounds prior theta")(
     name="name",

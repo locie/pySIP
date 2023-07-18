@@ -229,7 +229,7 @@ class Parameters:
     def prior(self) -> float:
         return np.sum(
             [
-                p.prior.log_pdf(p.value)
+                p.prior.logpdf(p.value)
                 for p in self.parameters_free
                 if p.prior is not None
             ]

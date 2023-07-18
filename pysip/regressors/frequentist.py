@@ -273,6 +273,8 @@ class Regressor:
         *,
         init: Literal["unconstrained", "prior", "zero", "fixed", "value"] = "fixed",
         hpd: float = 0.95,
+        jac="2-point",
+        method="BFGS",
         **minimize_options,
     ) -> Union[pd.DataFrame, pd.DataFrame, dict]:
         """Estimate the parameters of the state-space model.
@@ -334,8 +336,8 @@ class Regressor:
             fun=self._target,
             x0=self.parameters.eta_free,
             args=data,
-            method="BFGS",
-            jac="3-point",
+            method=method,
+            jac=jac,
             options=minimize_options,
         )
 

@@ -25,6 +25,7 @@ flatten-dict = "^0.4.2"
 pymc = "^5.5.0"
 pytensor = "^2.12.3"
 loguru = "^0.7.0"
+makefun = "^1.15.1"
 
 
 [tool.poetry.group.docs.dependencies]

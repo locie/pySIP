@@ -3,7 +3,7 @@ from typing import Literal, Optional, Tuple
 from pydantic import ConfigDict, confloat, validator
 from pydantic.dataclasses import dataclass
 
-from .prior import BasePrior
+from pysip.params.prior import BasePrior
 from .transforms import FixedTransform, ParameterTransform, Transforms, auto_transform
 
 
@@ -27,8 +27,8 @@ class Parameter:
         Bijections transform θ -> η and untransform η -> θ
     bounds : tuple
         Parameters bounds
-    prior : Distribution
-        Prior distribution
+    prior : rv_continuous
+        Prior distribution, using a scipy.stats distribution object.
 
     Attributes
     ----------

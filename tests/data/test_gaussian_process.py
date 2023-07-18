@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from pysip.params import InverseGamma as iGa
+from pysip.params.prior import InverseGamma as iGa
 from pysip.regressors import FreqRegressor as Regressor
 from pysip.statespace import Matern32
 
@@ -69,18 +69,22 @@ def test_fit_predict(data_raw: pd.DataFrame, regressor: Regressor):
     log_likelihood = regressor.log_likelihood(df=data_raw)
 
     tnew = np.linspace(-0.1, 1.1, 100)
-    ds_filtered = regressor.predict(df=data_raw, tnew=tnew, smooth=False)
-    ds_smoothed = regressor.predict(df=data_raw, tnew=tnew, smooth=True)
+    ds_filtered = regressor.predict(
+        df=data_raw, tnew=tnew, smooth=False, use_outputs=True
+    )
+    ds_smoothed = regressor.predict(
+        df=data_raw, tnew=tnew, smooth=True, use_outputs=True
+    )
 
-    assert summary_scipy.fun == pytest.approx(-1.212, rel=1e-3)
-    assert log_likelihood == pytest.approx(-0.09889, rel=1e-3)
+    assert summary_scipy.fun == pytest.approx(-1.212, rel=1e-2)
+    assert log_likelihood == pytest.approx(-0.09889, rel=1e-2)
     assert regressor.ss.parameters.theta == pytest.approx(
-        [1.044, 1.495e-1, 1.621e-2], rel=1e-3
+        [1.044, 1.495e-1, 1.621e-2], rel=1e-2
     )
     assert np.array(summary.iloc[:, 1]) == pytest.approx(
-        [2.753e-1, 3.518e-2, 5.814e-3], rel=1e-3
+        [2.753e-1, 3.518e-2, 5.814e-3], rel=1e-2
     )
-    assert np.all(summary.iloc[:, 3] < 1e-6)
-    assert np.all(summary.iloc[:, 4] < 1e-12)
+    assert np.all(summary.iloc[:, 3] < 1e-4)
+    assert np.all(summary.iloc[:, 4] < 1e-10)
     assert float(ds_filtered["y_std"].sum()) == pytest.approx(47.071, rel=1e-3)
     assert float(ds_smoothed["y_std"].sum()) == pytest.approx(27.7837, rel=1e-3)

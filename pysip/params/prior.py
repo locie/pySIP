@@ -1,8 +1,8 @@
-from numbers import Real
-from typing import Callable
-
+from inspect import Parameter, Signature
+from makefun import with_signature
 import numpy as np
-from scipy import optimize, special, stats
+import pymc as pm
+from scipy import stats
 
 __ALL__ = ["Normal", "Gamma", "Beta", "InverseGamma", "LogNormal"]
 
@@ -10,23 +10,29 @@ __ALL__ = ["Normal", "Gamma", "Beta", "InverseGamma", "LogNormal"]
 class BasePrior:
     """Prior class template
 
-    The notation from the following book are used throughout the module:
-
-    Appendix A - Gelman, A., Stern, H.S., Carlin, J.B., Dunson, D.B., Vehtari, A.
-    and Rubin, D.B., 2013. Bayesian data analysis. Chapman and Hall/CRC.
+    This contains both the scipy distribution (to compute standard numerical operations)
+    as well as the pymc distribution factory (to be used with the bayesian inference
+    engine).
     """
 
+    @property
+    def scipy_dist(self) -> stats.rv_continuous:
+        raise NotImplementedError
+
+    @property
+    def pymc_dist(self) -> type:
+        raise NotImplementedError
+
+    @property
+    def shape_parameters(self) -> tuple:
+        raise NotImplementedError
+
+    def __eq__(self, __value: object) -> bool:
+        return self.shape_parameters == __value.shape_parameters
+
+    @property
     def mean(self) -> float:
-        """mean"""
-        raise NotImplementedError
-
-    def mode(self) -> float:
-        """mode"""
-        raise NotImplementedError
-
-    def variance(self) -> float:
-        """variance"""
-        raise NotImplementedError
+        return self.scipy_dist.mean()
 
     def pdf(self, x: float) -> float:
         """Evaluate the probability density function
@@ -34,25 +40,17 @@ class BasePrior:
         Args:
             x: Quantiles
         """
-        return np.exp(self.log_pdf(x))
+        return self.scipy_dist.pdf(x)
 
-    def log_pdf(self, x: float) -> float:
+    def logpdf(self, x: float) -> float:
         """Evaluate the logarithm of the  probability density function
 
         Args:
             x: Quantiles
         """
-        raise NotImplementedError
+        return self.scipy_dist.logpdf(x)
 
-    def dlog_pdf(self, x: float) -> float:
-        """Partial derivative of the logarithm of the probability density function
-
-        Args:
-            x: Quantiles
-        """
-        raise NotImplementedError
-
-    def random(self, n: int, hpd: float) -> np.ndarray:
+    def random(self, n=1, hpd=None) -> np.ndarray:
         """Draw random samples from the prior distribution
 
         Args:
@@ -60,23 +58,6 @@ class BasePrior:
             hpd: Highest Prior Density for drawing sample from (true for unimodal
                 distribution)
         """
-        raise NotImplementedError
-
-    def _random(
-        self, n: int, hpd: float, f_rvs: Callable, f_ppf: Callable
-    ) -> np.ndarray:
-        """Draw random samples from a given distribution
-
-        Args:
-            n: Number of samples
-            hpd: Highest probability density to draw sample from
-            f_rvs: Random variable function
-            f_ppf: Inverse of cumulative distribution function
-
-        Returns:
-            rvs: Random variable samples
-        """
-
         if not isinstance(n, int) or n <= 0:
             raise TypeError("`n` must an integer greater or equal to 1")
 
@@ -84,389 +65,145 @@ class BasePrior:
             raise ValueError("`hpd must be between ]0, 1]")
 
         if hpd is None or hpd == 1.0:
-            rvs = f_rvs(n)
-        else:
-            low = (1.0 - hpd) / 2.0
-            rvs = f_ppf(np.random.uniform(low=low, high=1.0 - low, size=n))
+            return self.scipy_dist.rvs(n)
 
-        return rvs
+        low = (1.0 - hpd) / 2.0
+        return self.scipy_dist.ppf(np.random.uniform(low=low, high=1.0 - low, size=n))
 
 
-class Normal(BasePrior):
-    """Normal distribution
+class PriorMeta(type):
+    def __new__(cls, name, bases, attrs):
+        annots = attrs.get("__annotations__")
+        scipy_dist = annots.pop("scipy_dist")
+        pymc_dist = annots.pop("pymc_dist")
+        dist_args = annots
+        defaults = {
+            k: default
+            for k in dist_args.keys()
+            if (default := attrs.get(k, False)) is not False
+        }
 
-    Args:
-        mu: Location parameter
-        sigma: Scale parameter > 0
-    """
+        def make_scipy_dist(self):
+            return scipy_dist(*[getattr(self, k) for k in dist_args.keys()])
 
-    def __eq__(self, other):
-        return self._m == other._m and self._s == other._s
+        def make_pymc_dist_factory(self):
+            return lambda name: pymc_dist(
+                name, *[getattr(self, k) for k in dist_args.keys()]
+            )
 
-    def __init__(self, mu: float = 0.0, sigma: float = 1.0):
-
-        if not isinstance(mu, (int, float)):
-            raise TypeError("The location parameter `mu` must be a float")
-
-        if not isinstance(sigma, (int, float)):
-            raise TypeError("The scale parameter `sigma` must be a float")
-
-        if sigma <= 0.0:
-            raise ValueError("The scale parameter `sigma` must be > 0")
-
-        self._m = float(mu)
-        self._s = float(sigma)
-        self._s2 = self._s**2
-        self._cst = -0.5 * np.log(2.0 * np.pi * self._s2)
-
-    def __repr__(self):
-        return "N({:.2g}, {:.2g})".format(self._m, self._s)
-
-    @property
-    def mean(self):
-        return self._m
-
-    @property
-    def mode(self):
-        return self._m
-
-    @property
-    def variance(self):
-        return self._s2
-
-    def log_pdf(self, x):
-        return self._cst - 0.5 * (x - self._m) ** 2 / self._s2
-
-    def dlog_pdf(self, x):
-        return -(x - self._m) / self._s2
-
-    def random(self, n=1, hpd=None):
-        def f_rvs(n):
-            return stats.norm.rvs(loc=self._m, scale=self._s, size=n)
-
-        def f_ppf(u):
-            return stats.norm.ppf(u, loc=self._m, scale=self._s)
-
-        return self._random(n, hpd, f_rvs, f_ppf)
-
-    def find_hyperparameters(
-        self, lb: Real = 0, ub: Real = 1, lb_prob: Real = 0.01, ub_prob: Real = 0.01
-    ):
-        """Find hyper-parameter values based on lower and upper bounds
-        Args:
-            lb: Lower bound
-            ub: Upper bound
-            lb_prob: Probability at the lower bound
-            ub_prob: Probability at the upper bound
-        """
-
-        def delta_tail(x, lb, ub, lb_prob, ub_prob):
-            mean, sigma = np.exp(x)
-            e0 = stats.norm.cdf(lb, loc=mean, scale=sigma) - lb_prob
-            e1 = stats.norm.sf(ub, loc=mean, scale=sigma) - ub_prob
-            return np.array([e0, e1])
-
-        self._m = (ub - lb) / 2.0
-
-        x, info, *_ = optimize.fsolve(
-            func=delta_tail,
-            x0=[np.log(self._m), np.log(self._s)],
-            args=(lb, ub, lb_prob, ub_prob),
-            maxfev=5000,
-            full_output=True,
+        sign = Signature(
+            parameters=[
+                Parameter("self", Parameter.POSITIONAL_OR_KEYWORD),
+                *[
+                    Parameter(
+                        k,
+                        Parameter.POSITIONAL_OR_KEYWORD,
+                        annotation=annot,
+                        default=defaults.get(k, Parameter.empty),
+                    )
+                    for k, annot in dist_args.items()
+                ],
+            ]
         )
 
-        if np.max(info["fvec"]) < 1e-6:
-            self._m, self._s = np.exp(x)
-            self._s2 = self._s**2
-            self._cst = -0.5 * np.log(2.0 * np.pi * self._s2)
+        @with_signature(sign)
+        def __init__(self, **kwargs):
+            for k, v in kwargs.items():
+                setattr(self, k, v)
 
-            print(f"solution found: mu={self._m:.4f}, sigma={self._s:.4f}")
-        else:
-            print("\nTry different initial values")
+        def shape_parameters(self):
+            return tuple([getattr(self, arg) for arg in dist_args.keys()])
+
+        attrs["__init__"] = __init__
+        attrs["shape_parameters"] = property(shape_parameters)
+        attrs["scipy_dist"] = property(make_scipy_dist)
+        attrs["pymc_dist"] = property(make_pymc_dist_factory)
+        return super().__new__(cls, name, bases, attrs)
+
+    def params_repr(self):
+        return ", ".join(f"{param}={getattr(self, param):.3e}" for param in self.params)
 
 
-class Gamma(BasePrior):
-    """Gamma distribution
+class Normal(BasePrior, metaclass=PriorMeta):
+    """Normal prior distribution
 
-    Args:
-        a: Shape parameter > 0
-        b: Inverse scale parameter > 0
+    Parameters
+    ----------
+    mu: float
+        Mean of the normal distribution
+    sigma: float
+        Standard deviation of the normal distribution
     """
 
-    def __init__(self, a: float = 3.0, b: float = 1.0):
-
-        if not isinstance(a, (int, float)):
-            raise TypeError("The shape parameter `a` must be a float")
-
-        if not isinstance(b, (int, float)):
-            raise TypeError("The inverse scale parameter `b` must be a float")
-
-        if a <= 0.0:
-            raise ValueError("The shape parameter `a` must be > 0")
-
-        if b <= 0.0:
-            raise ValueError("The inverse scale parameter `b` must be > 0")
-
-        self._a = float(a)
-        self._b = float(b)
-        self._cst = self._a * np.log(self._b) - special.gammaln(self._a)
-
-    def __repr__(self):
-        return "Ga({:.2g}, {:.2g})".format(self._a, self._b)
-
-    def __eq__(self, other):
-        return self._a == other._a and self._b == other._b
-
-    @property
-    def mean(self):
-        return self._a / self._b
-
-    @property
-    def mode(self):
-        if self._a < 1:
-            raise ValueError("The mode can't be computed for a < 1 !")
-        return (self._a - 1.0) / self._b
-
-    @property
-    def variance(self):
-        return self._a / self._b**2
-
-    def log_pdf(self, x):
-        return self._cst + (self._a - 1.0) * np.log(x) - self._b * x
-
-    def dlog_pdf(self, x):
-        return (self._a - 1.0) / x - self._b
-
-    def random(self, n=1, hpd=None):
-        def f_rvs(n):
-            return stats.gamma.rvs(a=self._a, scale=1.0 / self._b, size=n)
-
-        def f_ppf(u):
-            return stats.gamma.ppf(u, a=self._a, scale=1.0 / self._b)
-
-        return self._random(n, hpd, f_rvs, f_ppf)
+    mu: float = 0.0
+    sigma: float = 1.0
+    scipy_dist: stats.norm
+    pymc_dist: pm.Normal
 
 
-class Beta(BasePrior):
-    """Beta distribution
+class Gamma(BasePrior, metaclass=PriorMeta):
+    """Gamma prior distribution
 
-    Args:
-        a, b: Prior sample sizes > 0
+    Parameters
+    ----------
+    alpha: float
+        Shape parameter of the gamma distribution
+    beta: float
+        Rate parameter of the gamma distribution
     """
 
-    def __init__(self, a: float = 3.0, b: float = 3.0):
-
-        if not isinstance(a, (int, float)):
-            raise TypeError("The prior sample sizes parameter `a` must be a float")
-
-        if not isinstance(b, (int, float)):
-            raise TypeError("The prior sample sizes parameter `b` must be a float")
-
-        self._a = float(a)
-        self._b = float(b)
-        self._cst = special.betaln(self._a, self._b)
-
-    def __repr__(self):
-        return "B({:.2g}, {:.2g})".format(self._a, self._b)
-
-    def __eq__(self, other):
-        return self._a == other._a and self._b == other._b
-
-    @property
-    def mean(self):
-        return self._a / (self._a + self._b)
-
-    @property
-    def mode(self):
-        return (self._a - 1.0) / (self._a + self._b - 2.0)
-
-    @property
-    def variance(self):
-        return (
-            self._a * self._b / ((self._a + self._b) ** 2 * (self._a + self._b + 1.0))
-        )
-
-    def log_pdf(self, x):
-        return (
-            (self._a - 1.0) * np.log(x)
-            + (self._b - 1.0) * np.log(1.0 - x)
-            - self._cst
-            - (self._a + self._b - 1.0) * np.log(1.0)
-        )
-
-    def dlog_pdf(self, x):
-        return (self._a - 1.0) / x + (1.0 - self._b) / (1.0 - x)
-
-    def random(self, n=1, hpd=None):
-        def f_rvs(n):
-            return stats.beta.rvs(a=self._a, b=self._b, size=n)
-
-        def f_ppf(u):
-            return stats.beta.ppf(u, a=self._a, b=self._b)
-
-        return self._random(n, hpd, f_rvs, f_ppf)
+    alpha: float = 3.0
+    beta: float = 1.0
+    scipy_dist: lambda a, b: stats.gamma(a=a, scale=1.0 / b)
+    pymc_dist: pm.Gamma
 
 
-class InverseGamma(BasePrior):
-    """Inverse Gamma distribution
+class Beta(BasePrior, metaclass=PriorMeta):
+    """Beta prior distribution
 
-    Args:
-        a: Shape parameter > 0
-        b: Scale parameter > 0
+    Parameters
+    ----------
+    alpha: float
+        Shape parameter of the beta distribution
+    beta: float
+        Shape parameter of the beta distribution
     """
 
-    def __init__(self, a: float = 3.0, b: float = 1.0):
-
-        if not isinstance(a, (int, float)):
-            raise TypeError("The shape parameter `a` must be a float")
-
-        if not isinstance(b, (int, float)):
-            raise TypeError("The scale parameter `b` must be a float")
-
-        if a <= 0.0:
-            raise ValueError("The shape parameter `a` must be > 0")
-
-        if b <= 0.0:
-            raise ValueError("The scale parameter `b` must be > 0")
-
-        self._a = float(a)
-        self._b = float(b)
-        self._cst = self._a * np.log(self._b) - special.gammaln(self._a)
-
-    def __repr__(self):
-        return "iGa({:.2g}, {:.2g})".format(self._a, self._b)
-
-    def __eq__(self, other):
-        return self._a == other._a and self._b == other._b
-
-    @property
-    def mean(self):
-        if self._a <= 1:
-            raise ValueError("The mean can't be computed for a <= 1 !")
-        return self._b / (self._a - 1.0)
-
-    @property
-    def mode(self):
-        return self._b / (self._a + 1.0)
-
-    @property
-    def variance(self):
-        if self._a <= 2:
-            raise ValueError("The variance can't be computed for a <= 2 !")
-        return self._b**2 / ((self._a - 1.0) ** 2 * (self._a - 2.0))
-
-    def log_pdf(self, x):
-        return self._cst - (self._a + 1.0) * np.log(x) - self._b / x
-
-    def dlog_pdf(self, x):
-        return -(self._a + 1.0) / x + self._b / x**2
-
-    def random(self, n=1, hpd=None):
-        def f_rvs(n):
-            return stats.invgamma.rvs(a=self._a, scale=self._b, size=n)
-
-        def f_ppf(u):
-            return stats.invgamma.ppf(u, a=self._a, scale=self._b)
-
-        return self._random(n, hpd, f_rvs, f_ppf)
-
-    def find_hyperparameters(self, lb, ub, lb_prob=0.01, ub_prob=0.01):
-        """Find hyperparameters
-
-        Args:
-            lb: Lower value
-            ub: Upper value
-            lb_prob: Expected prior mass below `lb`
-            ub_prob: Expected prior mass above `ub`
-
-        Notes:
-            If a solution is found, the values of the shape and scale
-            hyperparameters are updated internally
-
-        References:
-            Michael Betancourt, Robust Gaussian Processes in Stan, Part 3,
-            https://betanalpha.github.io/assets/case_studies/gp_part3/part3.html
-        """
-
-        def delta_tail(x, lb, ub, lb_prob, ub_prob):
-            a = np.exp(x[0])
-            b = np.exp(x[1])
-            e0 = stats.invgamma.cdf(lb, a=a, scale=b) - lb_prob
-            e1 = 1.0 - stats.invgamma.cdf(ub, a=a, scale=b) - ub_prob
-            return np.array([e0, e1])
-
-        x, info, *_ = optimize.fsolve(
-            func=delta_tail,
-            x0=[np.log(self._a), np.log(self._b)],
-            args=(lb, ub, lb_prob, ub_prob),
-            maxfev=1000,
-            full_output=True,
-        )
-
-        if np.max(info["fvec"]) < 1e-6:
-            self._a, self._b = np.exp(x)
-            self._cst = self._a * np.log(self._b) - special.gammaln(self._a)
-
-            print(f"solution found: shape={self._a:.4f}, scale={self._b:.4f}")
-        else:
-            print("\nTry different initial values")
+    alpha: float = 3.0
+    beta: float = 3.0
+    scipy_dist: stats.beta
+    pymc_dist: pm.Beta
 
 
-class LogNormal(BasePrior):
-    """LogNormal distribution
+class InverseGamma(BasePrior, metaclass=PriorMeta):
+    """Inverse Gamma prior distribution
 
-    Args:
-        mu: Location parameter
-        sigma: Scale parameter > 0
+    Parameters
+    ----------
+    alpha: float
+        Shape parameter of the inverse gamma distribution
+    beta: float
+        Scale parameter of the inverse gamma distribution
     """
 
-    def __eq__(self, other):
-        return self._m == other._m and self._s == other._s
+    alpha: float = 3.0
+    beta: float = 1.0
+    scipy_dist: lambda a, b: stats.invgamma(a=a, scale=b)
+    pymc_dist: pm.InverseGamma
 
-    def __init__(self, mu: float = 0.0, sigma: float = 1.0):
 
-        if not isinstance(mu, (int, float)):
-            raise TypeError("The location parameter `mu` must be a real number")
+class LogNormal(BasePrior, metaclass=PriorMeta):
+    """Log Normal prior distribution
 
-        if not isinstance(sigma, (int, float)):
-            raise TypeError("The scale parameter `sigma` must be a real number")
+    Parameters
+    ----------
+    mu: float
+        Mean of the log normal distribution
+    sigma: float
+        Standard deviation of the log normal distribution
+    """
 
-        if sigma <= 0.0:
-            raise ValueError("The scale parameter `sigma` must be > 0")
-
-        self._m = float(mu)
-        self._s = float(sigma)
-        self._s2 = self._s**2
-        self._cst = -0.5 * np.log(2.0 * np.pi * self._s2)
-
-    def __repr__(self):
-        return "LN({:.2g}, {:.2g})".format(self._m, self._s)
-
-    @property
-    def mean(self):
-        return np.exp(self._m + self._s2 / 2.0)
-
-    @property
-    def mode(self):
-        return np.exp(self._m - self._s2)
-
-    @property
-    def variance(self):
-        return np.exp(2.0 * self._m + self._s2) * (np.exp(self._s2) - 1.0)
-
-    def log_pdf(self, x):
-        logx = np.log(x)
-        return self._cst - 0.5 * (logx - self._m) ** 2 / self._s2 - logx
-
-    def dlog_pdf(self, x):
-        return -((np.log(x) - self._m) / self._s2 + 1.0) / x
-
-    def random(self, n=1, hpd=None):
-        def f_rvs(n):
-            return stats.lognorm.rvs(loc=self._m, s=self._s, size=n)
-
-        def f_ppf(u):
-            return stats.lognorm.ppf(u, s=self._s, loc=self._m)
-
-        return self._random(n, hpd, f_rvs, f_ppf)
+    mu: float = 0.0
+    sigma: float = 1.0
+    scipy_dist: lambda mu, sigma: stats.lognorm(scale=np.exp(mu), s=sigma)
+    pymc_dist: pm.Lognormal

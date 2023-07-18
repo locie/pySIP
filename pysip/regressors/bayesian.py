@@ -1,127 +1,138 @@
+from concurrent.futures import ProcessPoolExecutor
+from functools import partial
+import warnings
+from copy import deepcopy
+import numpy as np
+from multiprocessing import cpu_count
+
+import pymc as pm
+import pytensor.tensor as pt
+from scipy.optimize import approx_fprime
 from .frequentist import Regressor
 
 
+def _make_estimate(theta, data, estimator):
+    estimator = deepcopy(estimator)
+    estimator.ss.parameters.theta_free = theta
+    y_res, *_ = estimator.estimate_output(*data)
+    return y_res
+
+
+class FdiffLoglikeGrad(pt.Op):
+    itypes = [pt.dvector]
+    otypes = [pt.dvector]
+
+    def __init__(self, reg: Regressor, df, eps=None):
+        self.estimator = reg.estimator
+        self.data = reg.prepare_data(df)
+        self.eps = eps
+
+    def perform(self, _, inputs, outputs):
+        def _target(eta) -> float:
+            estimator = deepcopy(self.estimator)
+            estimator.ss.parameters.theta_free = eta
+            return estimator.log_likelihood(*self.data)
+
+        (eta,) = inputs  # this will contain my variables
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            outputs[0][0] = approx_fprime(eta, _target, self.eps)
+
+
+class Loglike(pt.Op):
+    itypes = [pt.dvector]
+    otypes = [pt.dscalar]
+
+    def __init__(self, reg: Regressor, df, eps=None):
+        self.estimator = reg.estimator
+        self.data = reg.prepare_data(df)
+        self.eps = eps
+        self.logpgrad = FdiffLoglikeGrad(reg, df, eps)
+
+    def perform(self, _, inputs, outputs):
+        estimator = deepcopy(self.estimator)
+        (eta,) = inputs
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            estimator.ss.parameters.theta_free = eta
+            logl = estimator.log_likelihood(*self.data)
+        outputs[0][0] = np.array(logl)
+
+    def grad(self, inputs, g):
+        (eta,) = inputs
+        return [g[0] * self.logpgrad(eta)]
+
+
 class BayesRegressor(Regressor):
-    """Bayesian Regressor
+    @property
+    def pymc_model(reg):
+        class PyMCModel(pm.Model):
+            def __init__(self, df):
+                super().__init__()
+                theta = []
+                for name, par in zip(
+                    reg.parameters.names_free, reg.parameters.parameters_free
+                ):
+                    # theta.append(pm.Normal(name, par.eta, 1))
+                    theta.append(par.prior.pymc_dist(name))
+                theta = pt.as_tensor_variable(theta)
+                pm.Potential("likelihood", -Loglike(reg, df)(theta))
 
-    Args:
-        ss: StateSpace()
-        bayesian_filter: BayesianFilter()
-        time_scale: Time series frequency, e.g. 's': seconds, 'D': days, etc.
-            Works only for pandas.DataFrame with DateTimeIndex
-    """
-    pass
-    # def __init__(
-    #     self,
-    #     ss: StateSpace,
-    #     bayesian_filter: BayesianFilter = KalmanQR,
-    #     time_scale: str = "s",
-    # ):
-    #     super().__init__(ss, bayesian_filter, time_scale, True, False)
+        return PyMCModel
 
-    # def fit(
-    #     self,
-    #     df: pd.DataFrame,
-    #     outputs: Union[str, list],
-    #     inputs: Union[str, list] = None,
-    #     options: dict = None,
-    # ) -> Fit_Bayes:
-    #     """Bayesian inference of the state-space model
+    def sample(self, df, draws=1000, tune=500, chains=4, **kwargs):
+        cores = min(kwargs.pop("cores", cpu_count()), chains)
+        with self.pymc_model(df):
+            self._trace = pm.sample(
+                draws=draws, tune=tune, chains=chains, cores=cores, **kwargs
+            )
+        return self.trace
 
-    #     Args:
-    #         df: Training data outputs: Outputs name(s) inputs: Inputs name(s) options:
-    #             - **stepsize** (float, default=0.25 / n_par**0.25)
-    #                 Step-size of the leapfrog integrator
-    #             - **dense_mass_matrix** (bool, default=False)
-    #                 Estimate the dense mass matrix during adaptation. By default, only
-    #                 the diagonal elements are estimated.
-    #             - **max_tree_depth** (int, default=10)
-    #                 Maximum tree depth
-    #             - **dH_max** (float, default=1000)
-    #                 Maximum energy change allowed in a trajectory. Larger deviations are
-    #                 considered as diverging transitions.
-    #             - **accp_target** (float, default=0.8):
-    #                 Target average acceptance probability. Valid values are between ]0,
-    #                 1[
-    #             - **t0** (float, default=10.0):
-    #                 Adaptation iteration offset (primal-dual averaging algorithm
-    #                 parameter)
-    #             - **gamma** (float, default=0.05):
-    #                 Adaptation regularization scale (primal-dual averaging algorithm
-    #                 parameter)
-    #             - **kappa** (float, default=0.75):
-    #                 Adaptation relaxation exponent (primal-dual averaging algorithm
-    #                 parameter)
-    #             - **mu** (float, default=log(10 * stepsize)):
-    #                 Asymptotic mean of the step-size (primal-dual averaging algorithm
-    #                 parameter)
-    #             - **n_cpu**: (int, default=-1):
-    #                 Number of cpu to use. To use all available cpu, set the value to -1,
-    #                 otherwise valid values are between [1, +Inf[
-    #             - **init_buffer**: (int, default=75)
-    #                 Width of initial fast adaptation interval
-    #             - **term_buffer**: (int, default=150)
-    #                 Width of final fast adaptation interval
-    #             - **window**: (int, default=25)
-    #                 Initial width of slow adaptation interval
-    #             - **init** (str, default=`unconstrained`):
-    #                 - unconstrained: Uniform draw between [-1, 1] in the uncsontrained
-    #                   space
-    #                 - prior: Uniform draw from the prior distribution
-    #                 - zero: Set the unconstrained parameters to 0
-    #                 - fixed: The current parameter values are used
-    #                 - value: Uniform draw between the parameter value +/- 25%
-    #                 - prior_mass (float, default=0.95):
-    #             - **hpd**: (float, default=0.95)
-    #                 Highest Prior Density to draw sample from the prior (True if
-    #                 unimodal)
+    def prior_predictive(self, df, samples=1000, **kwargs):
+        with self.pymc_model(df):
+            self._prior_trace = pm.sample_prior_predictive(samples=samples, **kwargs)
+        parameters = self.trace.prior.to_dataframe().to_numpy()
+        data = self.prepare_data(df)
+        with ProcessPoolExecutor() as executor:
+            results = list(
+                executor.map(
+                    partial(_make_estimate, data=data, estimator=self.estimator),
+                    parameters,
+                )
+            )
+        return results
 
-    #     Returns:
-    #         Fit_Bayes(): An instance summarizing the results from the Bayesian inference
-    #     """
-    #     if options is None:
-    #         options = {}
-    #     else:
-    #         options = dict(options)
+    def posterior_predictive(self, df, **kwargs):
+        parameters = self.trace.posterior.to_dataframe().to_numpy()
+        data = self.prepare_data(df)
 
-    #     # options is saved in Fit_bayes for reproducible experiments
-    #     options.setdefault("n_draws", 2000)
-    #     options.setdefault("n_chains", 4)
-    #     options.setdefault("n_warmup", 1000)
-    #     options.setdefault("init", "unconstrained")
-    #     options.setdefault("hpd", 0.95)
-    #     options.setdefault("dense_mass_matrix", False)
-    #     if not isinstance(options["dense_mass_matrix"], bool):
-    #         raise TypeError("`dense_mass_matrix` must be a boolean")
+        with ProcessPoolExecutor() as executor:
+            results = list(
+                executor.map(
+                    partial(_make_estimate, data=data, estimator=self.estimator),
+                    parameters,
+                )
+            )
+        return results
 
-    #     n_draws = options.get("n_draws")
-    #     n_chains = options.get("n_chains")
-    #     n_warmup = options.get("n_warmup")
-    #     init = options.get("init")
-    #     hpd = options.get("hpd")
+    @property
+    def prior_trace(self):
+        return getattr(self, "_prior_trace", None)
 
-    #     dt, u, u1, y, *_ = self._prepare_data(df, inputs, outputs, None)
+    @property
+    def posterior_trace(self):
+        return getattr(self, "_posterior_trace", None)
 
-    #     # An additional initial position is required for the adaptation
-    #     q0 = self._init_parameters(n_chains, init, hpd)
-
-    #     def dV(q):
-    #         return self._eval_dlog_posterior(q, dt, u, u1, y)
-
-    #     if options["dense_mass_matrix"] is True:
-    #         metric = Dense(inverse_metric=np.identity(q0.shape[0]))
-    #     else:
-    #         metric = Diagonal(inverse_metric=np.ones(q0.shape[0]))
-
-    #     dhmc = DynamicHMC(EuclideanHamiltonian(potential=dV, metric=metric))
-    #     uchains, stats, options = dhmc.sample(q0, n_draws, n_chains, n_warmup, options)
-
-    #     # Safety against duplication of parameter names. Do not use
-    #     # self.ss.parameters.names
-    #     names = [k for i, k in enumerate(self.ss.names) if self.ss.parameters.free[i]]
-    #     chains = self._array_to_dict(self._inv_transform_chains(uchains), names)
-
-    #     return Fit_Bayes(chains, stats, options, n_warmup, self.ss.name)
+    @property
+    def trace(self):
+        main_trace = getattr(self, "_trace", None)
+        if main_trace is None:
+            raise ValueError("Model has not been fitted yet")
+        if (prior_trace := self.prior_trace) is not None:
+            main_trace.extend(prior_trace)
+        if (posterior_trace := self.prior_trace) is not None:
+            main_trace.extend(posterior_trace)
+        return main_trace
 
     # def prior_predictive(
     #     self,
@@ -319,77 +330,3 @@ class BayesRegressor(Regressor):
     #         xsd[n] = np.squeeze(out[n][1])
 
     #     return xm, xsd
-
-    # def _inv_transform_chains(self, eta_traces: np.ndarray) -> np.ndarray:
-    #     """Transform samples to the constrained space
-
-    #     Args:
-    #         eta_traces: Unconstrained Markov chain traces of shape (n_chains, n_par,
-    #           n_draws)
-
-    #     Returns:
-    #         theta_traces: Constrained Markov chain traces of shape (n_chains, n_par,
-    #           n_draws)
-    #     """
-    #     if not isinstance(eta_traces, np.ndarray):
-    #         raise TypeError("`eta_traces` must be a numpy array")
-
-    #     sizes = eta_traces.shape
-    #     if len(sizes) != 3:
-    #         raise ValueError(
-    #             "`eta_traces` must be an array of shape (n_chains, n_par, n_draws)"
-    #         )
-    #     theta_traces = np.zeros(sizes)
-
-    #     for c in range(sizes[0]):
-    #         for d in range(sizes[2]):
-    #             self.ss.parameters.eta = eta_traces[c, :, d]
-    #             theta_traces[c, :, d] = self.ss.parameters.theta_free
-
-    #     return theta_traces
-
-    # def _array_to_dict(self, chains: np.ndarray, names: Union[str, list]) -> dict:
-    #     """Convert 3d numpy array to dictionary
-
-    #     Args:
-    #         chains: Numpy array of shape (n_chains, n_par, n_draws)
-    #         names: Parameter names list of size n_par
-
-    #     Returns:
-    #         Markov chains traces, [n_par keys](n_chains, n_draws)
-    #     """
-    #     if not isinstance(chains, np.ndarray):
-    #         raise TypeError("`chains` must be a numpy array")
-
-    #     if not isinstance(names, (str, list)):
-    #         raise TypeError("`names` must be a string of a list of strings")
-
-    #     if isinstance(names, str):
-    #         names = [names]
-
-    #     if len(names) != chains.shape[1]:
-    #         raise ValueError("The length of `names` does not match `chains.shape[1]`")
-
-    #     return {k: chains[:, i, :] for i, k in enumerate(names)}
-
-    # def _dict_to_array(self, chains: dict, names: Union[str, list]) -> np.ndarray:
-    #     """Convert dict [n_par keys](n_chains, n_draws) to numpy array (n_par, chain *
-    #     draw)
-
-    #     Args:
-    #         chains: Markov Chain traces, chains[key](n_chains, n_draws)
-    #         names: Parameter names to convert into numpy array
-
-    #     Returns:
-    #         Markov Chain traces (n_par, chain * draw)
-    #     """
-    #     if not isinstance(chains, dict):
-    #         raise TypeError("`chains` must be a dictionary")
-
-    #     if not isinstance(names, (str, list)):
-    #         raise TypeError("`names` must be a string of a list of strings")
-
-    #     if isinstance(names, str):
-    #         names = [names]
-
-    #     return np.asarray([v.ravel() for k, v in chains.items() if k in names])
