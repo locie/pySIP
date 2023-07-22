@@ -26,10 +26,6 @@ class Matern12(GPModel):
     def set_constant_continuous_ssm(self):
         self.C[0, 0] = 1.0
 
-    def set_constant_continuous_dssm(self):
-        self.dR["sigv"][0, 0] = 1.0
-        self.dP0["mscale"][:] = 1.0
-
     def update_continuous_ssm(self):
         mscale, lscale, sigv, *_ = self.parameters.theta
 
@@ -61,10 +57,6 @@ class Matern32(GPModel):
     def set_constant_continuous_ssm(self):
         self.A[0, 1] = 1.0
         self.C[0, 0] = 1.0
-
-    def set_constant_continuous_dssm(self):
-        self.dP0["mscale"][0, 0] = 1.0
-        self.dR["sigv"][0, 0] = 1.0
 
     def update_continuous_ssm(self):
         mscale, lscale, sigv, *_ = self.parameters.theta
