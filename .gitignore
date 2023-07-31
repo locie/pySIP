@@ -10,3 +10,5 @@ data/*
 *.npz
 build/*
 dist/*
+_proto/
+.vscode/
