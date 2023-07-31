@@ -5,11 +5,12 @@ for modeling physical systems. However, the exact dynamics of such systems are
 uncertain and only measured at discrete-time instants through non-ideal sensors.
 In this case, stochastic differential equations provide a modeling framework
 which is more robust to these uncertainties. The stochastic part of the
-state-space model can accomodate for unmodeled disturbances, which do not have a
-significant influence on the system dynamics. Otherwise, unmeasured disturbances
-can be modeled as temporal **Gaussian Processes** with certain parametrized
-covariance structure. The resulting **Latent Force Model** is a combination of
-parametric grey-box model and non-parametric Gaussian process model.
+state-space model can accommodate for unmodeled disturbances, which do not have
+a significant influence on the system dynamics. Otherwise, unmeasured
+disturbances can be modeled as temporal **Gaussian Processes** with certain
+parametrized covariance structure. The resulting **Latent Force Model** is a
+combination of parametric grey-box model and non-parametric Gaussian process
+model.
 
 **pySIP** provides a framework for **infering continuous time linear stochastic
 state-space models**. For that purpose, it is possible to chose between a
@@ -42,7 +43,8 @@ stable state.
 
 Main changes are:
 
-- using [pymc3] for the bayesian inference (all the mcmc module have been removed)
+- using [pymc3] for the bayesian inference (all the mcmc module have been
+  removed)
 - removing all analytical jacobian computation (using numerical approximation of
   the jacobian instead)
 - full Regressor class rework : there is no more separation between the
