@@ -26,66 +26,41 @@ are being prioritized. Nevertheless, any model following the formalism of
 **pySIP** is currently under development and in beta version. Please feel free
 to contact us if you want to be involved in the current development process.
 
-## Getting started
+You can find the documentation [here](https://locie.github.io/pySIP/) : it
+contains a quick start guide, a cookbook (under construction), a tour of the
+library internals (under construction) and a reference documentation.
 
-```python
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-from pysip.statespace import TwTi_RoRi
-from pysip.regressors import FreqRegressor as Regressor
+## IMPORTANT - Migration to v1.0.0
 
-# Load and prepare the data
-df = pd.read_csv('data/armadillo/armadillo_data_H2.csv').set_index('Time')
-df.drop(df.index[-1], axis=0, inplace=True)
-inputs = ['T_ext', 'P_hea']
-outputs = 'T_int'
-sT = 3600.0 * 24.0
-df.index /= sT  # Change time scale to days
+The version 1.0.0 of pySIP is a major update of the library. It focused on
+(slightly) reducing the scope of the library and delegating some tasks to other
+libraries (mainly scipy for the distribution, numba for the code acceleration
+and pymc for the bayesian inference).
 
-# Parameter settings for second order dynamic thermal model
-parameters = [
-    dict(name='Ro', scale=1e-2, transform='log'),
-    dict(name='Ri', scale=1e-3, transform='log'),
-    dict(name='Cw', scale=1e7 / sT, transform='log'),
-    dict(name='Ci', scale=1e6 / sT, transform='log'),
-    dict(name='sigw_w', scale=1e-3 * sT ** 0.5, transform='log'),
-    dict(name='sigw_i', value=0.0, transform='fixed'),
-    dict(name='sigv', scale=1e-2, transform='log'),
-    dict(name='x0_w', loc=25.0, scale=7.0, transform='none'),
-    dict(name='x0_i', value=26.7, transform='fixed'),
-    dict(name='sigx0_w', value=0.1, transform='fixed'),
-    dict(name='sigx0_i', value=0.1, transform='fixed'),
-]
+Regression are expected to happen, but the library should be in road to a more
+stable state.
 
-# Instantiate the model and use the first order hold approximation
-model = TwTi_RoRi(parameters, hold_order=1)
-reg = Regressor(model)
-fit_summary, corr_matrix, opt_summary = reg.fit(df=df, inputs=inputs, outputs=outputs)
-print(f'\n{fit_summary}')
+Main changes are:
 
-# Predict the indoor temperature each minute
-dt = 60 / 3600
-tnew = np.arange(df.index[0], df.index[-1], dt)
-ym, ysd = reg.predict(df=df, inputs=inputs, tnew=tnew)
+- using [pymc3] for the bayesian inference (all the mcmc module have been removed)
+- removing all analytical jacobian computation (using numerical approximation of
+  the jacobian instead)
+- full Regressor class rework : there is no more separation between the
+  `FrequentistRegressor` and the `BayesianRegressor`. The regressor has now the
+  ability to perform both frequentist (with the `regressor.fit` method) and
+  bayesian (with the `regressor.sample` method) inference.
+- the KalmanQR class is now accelerated using numba
+- the library use `pandas.DataFrame` or `xarray.Dataset` as output for the
+  `Regressor` class, allowing easier manipulation of the results.
 
-sns.set_style('darkgrid')
-sns.set_context('talk')
-plt.plot(df.index, df['T_int'], color='darkred', label='data')
-plt.plot(tnew, ym, color='navy')
-plt.fill_between(tnew, ym - 2 * ysd, ym + 2 * ysd, color='darkblue', alpha=0.2, label=r'95% CI')
-plt.xlabel('time [days]')
-plt.ylabel('temperature [°C]')
-plt.tight_layout()
-sns.despine()
-plt.legend(loc='best', fancybox=True, framealpha=0.5)
-```
+Do not hesitate to open an issue if you encounter any problem with the new
+version. If you encounter a regression, it should be possible to re-introduce
+the functionality. When the version will be in the main branch, a gitter channel
+will be created to help the migration.
 
-## Reference documentation
-
-For details about the pySIP API, see the [reference
-documentation](https://locie.github.io/pySIP/).
+A release tag is available for the previous version of the library (v0.9.0). It
+will also be updated on pip : if you are not ready to migrate to the new
+version, you can install the previous version using `pip install pysip==0.9.0`.
 
 ## Contributors
 
@@ -94,8 +69,13 @@ documentation](https://locie.github.io/pySIP/).
 Chambéry, France,
 * [Maxime Janvier](https://github.com/mjanv) - [Lancey Energy
   Storage](https://www.lancey.fr/en/)
+* [Nicolas Cellier](https://github.com/celliern) - [IMT Mines Albi -
+  CGI](https://orcid.org/0000-0002-3759-3546) (current maintainer)
 
 ## Funding
 
 * Auvergne Rhône-Alpes, project HESTIA-Diag, habitat Econome avec Système
 Thermique Innovant Adapté pour le Diagnostic
+
+
+[pymc3]: https://docs.pymc.io/
