@@ -489,6 +489,7 @@ class Regressor:
         x0: np.ndarray = None,
         P0: np.ndarray = None,
         smooth: bool = False,
+        use_outputs: bool = True,
     ) -> xr.Dataset:
         """State-space model output prediction
 
@@ -525,7 +526,9 @@ class Regressor:
             itp_df[self.inputs] = itp_df[self.inputs].interpolate(method="linear")
         else:
             itp_df = df.copy()
-        ds = self.estimate_states(itp_df, smooth=smooth, x0=x0, P0=P0)
+        ds = self.estimate_states(
+            itp_df, smooth=smooth, x0=x0, P0=P0, use_outputs=use_outputs
+        )
         idx_name = df.index.name or "time"
         if tnew is not None:
             ds = ds.sel(**{idx_name: tnew})
