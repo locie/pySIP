@@ -297,7 +297,7 @@ def _estimate_output(x0, P0, u, dtu, y, states) -> OutputEstimateResult:
         x = res_filter.x[i]
         P = res_filter.P[i]
         states_i = _unpack_states(states, i)
-        output_res.y[i] = states_i.C @ x
+        output_res.y[i] = states_i.C @ x - states_i.D @ u[i]
         output_res.y_std[i] = np.sqrt(states_i.C @ P @ states_i.C.T) + states_i.R
 
     return output_res
@@ -463,6 +463,7 @@ class KalmanQR:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=NumbaPerformanceWarning)
             x0, P0, u, dtu, y, states = self._proxy_params(dt, (u, dtu, y))
+
             return _log_likelihood(x0, P0, u, dtu, y, states)
 
     def filtering(
@@ -516,6 +517,7 @@ class KalmanQR:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=NumbaPerformanceWarning)
             x0, P0, u, dtu, y, states = self._proxy_params(dt, (u, dtu, y), x0, P0)
+
             return _filtering(x0, P0, u, dtu, y, states)
 
     def smoothing(
@@ -573,6 +575,7 @@ class KalmanQR:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=NumbaPerformanceWarning)
             x0, P0, u, dtu, y, states = self._proxy_params(dt, (u, dtu, y), x0, P0)
+
             return _smoothing(x0, P0, u, dtu, y, states)
 
     def simulate(
@@ -672,4 +675,5 @@ class KalmanQR:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=NumbaPerformanceWarning)
             x0, P0, u, dtu, y, states = self._proxy_params(dt, (u, dtu, y), x0, P0)
+
             return _estimate_output(x0, P0, u, dtu, y, states)

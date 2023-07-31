@@ -2,14 +2,20 @@ Stochastic state-space Inference and Prediction
 ===============================================
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Getting started
+   :maxdepth: 3
+   :caption: pySIP documentation
 
    content/quickstart
    content/advanced
    content/contribute
-   examples
+   cookbook
+
+.. toctree::
+   :maxdepth: 4
+   :caption: Reference
+
    api
+   model_list
 
 
 Indices and tables

@@ -6,19 +6,13 @@ Installation
 
 Two options are available:
 
-1. Install the package from PyPI:
-
-.. code-block:: bash
-
-    pip install pysip
-
-2. Install the package from git main branch:
+1. Install the package from git main branch:
 
 .. code-block:: bash
 
     pip install git+https://github.com/locie/pySIP
 
-3. Install the package from source:
+2. Install the package from source:
 
 .. code-block:: bash
 
@@ -26,7 +20,7 @@ Two options are available:
     cd pysip
     pip install .
 
-Note that the last two options need git to be installed on your system.
+Note that these two options need git on your system.
 
 Usage
 -----

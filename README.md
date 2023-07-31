@@ -62,7 +62,8 @@ will be created to help the migration.
 
 A release tag is available for the previous version of the library (v0.9.0). It
 will also be updated on pip : if you are not ready to migrate to the new
-version, you can install the previous version using `pip install pysip==0.9.0`.
+version, you can install the previous version using `pip install
+git+https://github.com/locie/pySIP@v0.9.0`.
 
 ## Contributors
 

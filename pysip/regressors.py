@@ -12,6 +12,7 @@ import numpy as np
 import pandas as pd
 import pymc as pm
 import pytensor.tensor as pt
+from sphinx.search import it
 import xarray as xr
 from scipy.optimize import approx_fprime, minimize
 
@@ -287,7 +288,7 @@ class Regressor:
         *,
         init: Literal["unconstrained", "prior", "zero", "fixed", "value"] = "fixed",
         hpd: float = 0.95,
-        jac="2-point",
+        jac="3-point",
         method="BFGS",
         **minimize_options,
     ) -> Union[pd.DataFrame, pd.DataFrame, dict]:
@@ -488,7 +489,6 @@ class Regressor:
         x0: np.ndarray = None,
         P0: np.ndarray = None,
         smooth: bool = False,
-        use_outputs: bool = False,
     ) -> xr.Dataset:
         """State-space model output prediction
 
@@ -525,10 +525,7 @@ class Regressor:
             itp_df[self.inputs] = itp_df[self.inputs].interpolate(method="linear")
         else:
             itp_df = df.copy()
-
-        ds = self.estimate_states(
-            itp_df, smooth=smooth, use_outputs=use_outputs, x0=x0, P0=P0
-        )
+        ds = self.estimate_states(itp_df, smooth=smooth, x0=x0, P0=P0)
         idx_name = df.index.name or "time"
         if tnew is not None:
             ds = ds.sel(**{idx_name: tnew})
@@ -536,9 +533,18 @@ class Regressor:
             (idx_name, "outputs"),
             (self.ss.C @ ds.x.values.reshape(-1, self.ss.nx, 1))[..., 0],
         )
+
         ds["y_std"] = (
-            (idx_name, "outputs", "outputs"),
-            np.sqrt(self.ss.C @ ds.P.values @ self.ss.C.T) + self.ss.R,
+            (idx_name, "outputs"),
+            np.sqrt(
+                np.einsum(
+                    "...yx,...xx,...xy->...y",
+                    self.ss.C,
+                    ds.P.values,
+                    self.ss.C.T,
+                )
+            )
+            + self.ss.R,
         )
         return ds
 
@@ -559,7 +565,7 @@ class Regressor:
         return PyMCModel
 
     def sample(self, df, draws=1000, tune=500, chains=4, **kwargs):
-        """ Sample from the posterior distribution
+        """Sample from the posterior distribution
 
         Parameters
         ----------
@@ -596,7 +602,7 @@ class Regressor:
         return self.trace
 
     def prior_predictive(self, df, samples=1000, **kwargs):
-        """ Sample from the prior predictive distribution
+        """Sample from the prior predictive distribution
 
         Parameters
         ----------
@@ -638,7 +644,7 @@ class Regressor:
         ).to_dataset("outputs")
 
     def posterior_predictive(self, df, **kwargs):
-        """ Sample from the posterior predictive distribution
+        """Sample from the posterior predictive distribution
 
         Parameters
         ----------
