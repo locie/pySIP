@@ -1,5 +1,5 @@
-PySIP Internals
-===============
+PySIP advanced usage and internals
+==================================
 
 Parameters and Priors
 ---------------------

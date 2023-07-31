@@ -16,13 +16,13 @@ Two options are available:
 
 .. code-block:: bash
 
-    pip install git+...
+    pip install git+https://github.com/locie/pySIP
 
 3. Install the package from source:
 
 .. code-block:: bash
 
-    git clone
+    git clone https://github.com/locie/pySIP
     cd pysip
     pip install .
 
@@ -44,14 +44,14 @@ First, we have to create the data, and store it in a `pandas.DataFrame` object.
 
 .. code:: python
 
-    import numpy as np
-    from pysip import Regressor
-    from pysip.statespace import Matern32
+    >>> import numpy as np
+    >>> from pysip import Regressor
+    >>> from pysip.statespace import Matern32
 
-    N = 200
-    t = np.linspace(0, 1, N)
-    y = np.sin(12 * t) + 0.66 * np.cos(25 * t) + np.random.randn(N) * 0.1
-    df = pd.DataFrame(index=t, data=y, columns=["y"])
+    >>> N = 200
+    >>> t = np.linspace(0, 1, N)
+    >>> y = np.sin(12 * t) + 0.66 * np.cos(25 * t) + np.random.randn(N) * 0.1
+    >>> df = pd.DataFrame(index=t, data=y, columns=["y"])
 
 In that simple case, we only have one output variable, and no internal state or
 input but the package can handle multiple inputs, states and outputs.
@@ -72,20 +72,18 @@ containing the following keys:
   Bayesian parameter estimation).
 
 Our model needs three parameters: the Matern32 length scale, the Matern32 scale
-and the noise standard deviation. We will use the following priors: a Gamma
-distribution for the length scale, an Inverse Gamma distribution for the scale
-and the noise standard deviation.
+and the noise standard deviation. First, no need to include priors : they are
+only needed for Bayesian parameter estimation.
 
 .. code:: python
 
-    from pysip.params.prior import Gamma, InverseGamma
-
-    par = [
-        dict(name="mscale", value=1.11, bounds=(0, None), prior=Gamma(4, 4)),
-        dict(name="lscale", value=0.15, bounds=(0, None), prior=InverseGamma(3.5, 0.5)),
-        dict(name="sigv", value=0.1, bounds=(0, None), prior=InverseGamma(3.5, 0.5)),
-    ]
-    model = Matern32(par)
+    >>> par = [
+    ...     dict(name="mscale", value=1.11, bounds=(0, None)),
+    ...     dict(name="lscale", value=0.15, bounds=(0, None)),
+    ...     dict(name="sigv", value=0.1, bounds=(0, None)),
+    ... ]
+    >>> model = Matern32(par)
+    Matern32(hold_order=0, method='mfd', name='Matern32')
 
 Model evaluation
 ~~~~~~~~~~~~~~~~
@@ -104,10 +102,8 @@ plotting and post-processing. More detail are available in the method docstrings
 
 .. code:: python
 
-    reg = Regressor(model, outputs=["y"])
-    res = reg.estimate_output(df)
-    res["y"].plot()
-
+    >>> reg = Regressor(model, outputs=["y"])
+    >>> nofit_estimation = reg.estimate_output(df)
 
 
 Simple (frequentist) parameter estimation
@@ -119,10 +115,27 @@ can now estimate the parameters using the `fit` method of the `Regressor` class.
 This method will use the `scipy.optimize.minimize` function to find the
 parameters that minimize the negative log-likelihood of the model given the
 data.
+After that, the model (and the regressor)
 
 .. code:: python
 
-    optim_info = reg.fit(df)
+    >>> summary = reg.fit(df)[0]
+    >>> summary
+                θ      σ(θ)    pvalue    |g(η)|     |dpen(θ)|
+    mscale  1.041769  1.041769  0.322431  0.000020  9.214196e-17
+    lscale  0.142355  0.142355  0.322431  0.000020  4.934663e-15
+    sigv    0.090430  0.090430  0.322431  0.000003  1.222867e-14
+    >>> fit_estimation = reg.estimate_output(df)
+
+We can see how are the prediction compared to the data
+
+.. figure:: ../_static/figures/quickstart_matern_estimation.svg
+    :align: center
+
+    Fit comparison
+
+The starting values have been chosen to be not too close to the true values, so
+we can see that the difference between the fit and the initial values.
 
 Bayesian parameter estimation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -136,3 +149,86 @@ and the prior parameter distributions.
 This allows to estimate the mean value of the parameters, but also to estimate
 the uncertainty on the parameters fit : instead of a unique value, we will
 have multiple samples of plausible parameter sets.
+
+First, we add the prior distributions to the parameters configuration. They
+should be instances of the `pysip.params.prior.Prior` class, and chosen
+according to the prior knowledge on the parameters. For example, a uniform
+distribution is a good choice for a parameter where we have no prior knowledge
+but their hypothetical bounds. A normal distribution is a good choice for a
+parameter where we have a prior knowledge on the mean value and the standard
+deviation.
+
+.. code:: python
+
+    >>> from pysip.params.prior import Gamma, InverseGamma, Uniform
+
+    >>> par = [
+    ...     dict(name="mscale", value=5.11, bounds=(0, None), prior=Gamma(4, 4)),
+    ...     dict(name="lscale", value=2.15, bounds=(0, None), prior=Uniform(0.01, 5)),
+    ...     dict(name="sigv", value=0.3, bounds=(0, None), prior=InverseGamma(3.5, 0.5)),
+    ... ]
+    >>> model = Matern32(par)
+    >>> reg = Regressor(model, outputs=["y"])
+
+A `Regressor.prior_predictive` method is available, to sample the prior
+distribution of the parameters and evaluate the model with those parameters.
+
+.. code:: python
+
+    >>> prior_estimation = reg.prior_predictive(df)
+
+Then, the `Regressor.sample` method will use the `pymc` package to sample the
+posterior distribution of the parameters, given the data and the prior. The
+prior distribution will be updated during the `tune` phase, and then the
+posterior distribution will be sampled during the `draw` phase.
+
+These two phases are controlled by the `tune` and `draw` arguments of the
+`Regressor.sample` method. These operations can be repeated multiple times using
+the `chains`` argument (default: 4). If there is enough cores available, the
+chains will be run in parallel. The number of cores used can be controlled using
+the `cores` argument (default: all available cores).
+
+.. code:: python
+
+    >>> reg.sample(df)
+    >>> posterior_estimation = reg.posterior_predictive(df)
+
+After that, the model can be evaluated on the posterior distribution of the
+parameters, using the `Regressor.posterior_predictive` method.
+
+All the data from borh the prior and posterior predictive evaluations can be
+be found under the `Regressor.trace` attribute. It is a `arviz.InferenceData`, a
+format used by the `arviz` package to store the results of Bayesian inference
+that heavily use the `xarray` format. You can find more information about the
+`arviz` package in the `arviz` documentation : there is a lot of specialized
+analysis and plotting method available.
+
+We can plot the posterior distribution of the parameters, and compare it to the
+prior distribution.
+
+.. figure:: ../_static/figures/quickstart_matern_parameters_dist.svg
+    :align: center
+
+    Posterior distribution of the parameters
+
+We can see that the prior distribution of the parameters is spraded over a large
+range of values, while the posterior distribution is more concentrated around
+the true values. This is especially true for the `lscale` parameter, where we
+used a uniform prior distribution with a large range of values.
+
+We can also plot the prior and the posterior predictive distribution of the
+outputs, and compare it to the data.
+
+.. figure:: ../_static/figures/quickstart_matern_prior_posterior.svg
+    :align: center
+
+    Posterior predictive distribution of the outputs
+
+As expected, the prior predictive distribution is far from the data, with a huge
+standard deviation. The posterior predictive distribution is much closer to the
+data, with a smaller standard deviation.
+
+The results here are impressive, but this is a toy model fit on an artificial
+dataset. You can see more complex examples in the cookbook section of the
+documentation, and have more detail on the internal and the advanced usage of
+the package the next sections.

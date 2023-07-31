@@ -122,8 +122,9 @@ class MetaStateSpace(type):
     def _build_doc(self):
         _doc_template_str = """{{base_doc}}
 
-Variables
----------
+Model Variables
+---------------
+
 {% for section, nodes in sections.items() %}
 - {{section.capitalize()}}
 {% for node in nodes %}
@@ -132,12 +133,15 @@ Variables
 {% endfor %}
 
 {% if parameters_cat %}
-Parameters
-----------
+
+Model Parameters
+----------------
+
 {% for category, parameters in parameters_cat.items() %}
 - {{category.value[0]}}
 {% for parameter in parameters %}
-    - ``{{parameter.name}}``: {{parameter.description}} `({{parameter.category.value[1]}})`
+    - ``{{parameter.name}}``: {{parameter.description}}
+      `({{parameter.category.value[1]}})`
 {% endfor %}
 {% endfor %}
 {% endif %}

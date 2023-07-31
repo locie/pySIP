@@ -37,11 +37,11 @@ extensions = [
     "sphinx.ext.coverage",
     "sphinx.ext.mathjax",
     "sphinx.ext.viewcode",
-    "sphinx.ext.graphviz",
     "sphinx.ext.napoleon",
+    "sphinx.ext.autosummary",
     "sphinxcontrib.tikz",
     "sphinx_autodoc_typehints",
-    "numpydoc",
+    "myst_parser",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -116,9 +116,3 @@ html_sidebars = {
         "searchbox.html",
     ]  # needs 'show_related': True theme option to display
 }
-
-
-# -- Options for HTMLHelp output ------------------------------------------
-
-# Output file base name for HTML help builder.
-htmlhelp_basename = "ThermalBayesianoptimizationdoc"

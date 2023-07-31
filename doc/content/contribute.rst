@@ -33,4 +33,4 @@ See `LICENSE <LICENSE>`_ for more details.
 Code of Conduct
 ---------------
 
-This project follows the `Contributor Covenant <code_of_conduct.md>`_.
+This project follows the `Contributor Covenant <../code_of_conduct>`_.

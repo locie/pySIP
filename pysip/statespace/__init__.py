@@ -1,6 +1,9 @@
 from .base import GPModel, RCModel, StateSpace, model_registry
-from .gaussian_process import GPProduct, GPSum
-from .latent_force_model import LatentForceModel, R2C2_Qgh_Matern32
+from .latent_force_model import LatentForceModel
+
+from .gaussian_process import __all__ as gaussian_process
+from .thermal_network import __all__ as thermal_network
+
 
 from inspect import isclass
 from pkgutil import iter_modules
@@ -19,12 +22,8 @@ for _, module_name, _ in iter_modules([package_dir]):
 Models = model_registry
 
 __all__ = [
-    "GPModel",
-    "RCModel",
     "StateSpace",
-    "GPProduct",
-    "GPSum",
-    "LatentForceModel",
-    "R2C2_Qgh_Matern32",
-    "Models"
+    "Models",
+    *thermal_network,
+    *gaussian_process,
 ]

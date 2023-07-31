@@ -24,52 +24,11 @@ class States(NamedTuple):
     R: np.ndarray
 
 
-def _allocate_filter_res(n_timesteps, nx, ny):
-    return FilteringResult(
-        np.empty((n_timesteps, nx, 1)),
-        np.empty((n_timesteps, nx, nx)),
-        np.empty((n_timesteps, nx, 1)),
-        np.empty((n_timesteps, nx, nx)),
-        np.empty((n_timesteps, ny, 1)),
-        np.empty((n_timesteps, ny, ny)),
-    )
-
-
-def _get_filter_estimate(filter_estimate, i):
-    return FilteringResult(
-        filter_estimate.x_update[i],
-        filter_estimate.P_update[i],
-        filter_estimate.x_predict[i],
-        filter_estimate.P_predict[i],
-        filter_estimate.k[i],
-        filter_estimate.S[i],
-    )
-
-
-def _set_filter_estimate(filter_estimate, i, value):
-    (
-        filter_estimate.x_update[i],
-        filter_estimate.P_update[i],
-        filter_estimate.x_predict[i],
-        filter_estimate.P_predict[i],
-        filter_estimate.k[i],
-        filter_estimate.S[i],
-    ) = value
-
-
-class FilteringResult(NamedTuple):
-    x_update: np.ndarray
-    P_update: np.ndarray
-    x_predict: np.ndarray
-    P_predict: np.ndarray
+class KalmanResult(NamedTuple):
+    x: np.ndarray
+    P: np.ndarray
     k: np.ndarray
     S: np.ndarray
-
-    def __getitem__(self, i):
-        return _get_filter_estimate(self, i)
-
-    def __setitem__(self, i, value):
-        _set_filter_estimate(self, i, value)
 
     def to_xarray(self, idx_name, time, states, outputs):
         coords = {
@@ -79,10 +38,8 @@ class FilteringResult(NamedTuple):
         }
         ds = xr.Dataset(
             {
-                "x_update": ((idx_name, "states"), self.x_update[:, :, 0]),
-                "x_predict": ((idx_name, "states"), self.x_predict[:, :, 0]),
-                "P_update": ((idx_name, "states", "states"), self.P_update),
-                "P_predict": ((idx_name, "states", "states"), self.P_predict),
+                "x": ((idx_name, "states"), self.x[:, :, 0]),
+                "P": ((idx_name, "states", "states"), self.P),
                 "k": ((idx_name, "outputs"), self.k[:, :, 0]),
                 "S": ((idx_name, "outputs", "outputs"), self.S),
             },
@@ -91,60 +48,27 @@ class FilteringResult(NamedTuple):
         return ds
 
 
-def _smooth_from_filter(filter_estimate):
-    return SmoothingResult(
-        filter_estimate.x_update,
-        filter_estimate.P_update,
-        filter_estimate.x_predict,
-        filter_estimate.P_predict,
-        filter_estimate.x_predict.copy(),
-        filter_estimate.P_predict.copy(),
-        filter_estimate.k,
-        filter_estimate.S,
+def _allocate_kalman_res(n_timesteps, nx, ny):
+    return KalmanResult(
+        np.empty((n_timesteps, nx, 1)),
+        np.empty((n_timesteps, nx, nx)),
+        np.empty((n_timesteps, ny, 1)),
+        np.empty((n_timesteps, ny, ny)),
     )
 
 
-def _get_smoother_estimate(smoother_estimate, i):
-    return SmoothingResult(
-        smoother_estimate.x_update[i],
-        smoother_estimate.P_update[i],
-        smoother_estimate.x_predict[i],
-        smoother_estimate.P_predict[i],
-        smoother_estimate.x_smooth[i],
-        smoother_estimate.P_smooth[i],
-        smoother_estimate.k[i],
-        smoother_estimate.S[i],
-    )
-
-
-def _set_smoother_estimate(smoother_estimate, i, value):
+def _pack_kalman_res(res, i, value):
     (
-        smoother_estimate.x_update[i],
-        smoother_estimate.P_update[i],
-        smoother_estimate.x_predict[i],
-        smoother_estimate.P_predict[i],
-        smoother_estimate.x_smooth[i],
-        smoother_estimate.P_smooth[i],
-        smoother_estimate.k[i],
-        smoother_estimate.S[i],
+        res.x[i],
+        res.P[i],
+        res.k[i],
+        res.S[i],
     ) = value
 
 
-class SmoothingResult(NamedTuple):
-    x_update: np.ndarray
-    P_update: np.ndarray
-    x_predict: np.ndarray
-    P_predict: np.ndarray
-    x_smooth: np.ndarray
-    P_smooth: np.ndarray
-    k: np.ndarray
-    S: np.ndarray
-
-    def __getitem__(self, i):
-        return _get_smoother_estimate(self, i)
-
-    def __setitem__(self, i, value):
-        _set_smoother_estimate(self, i, value)
+class SimulationResults(NamedTuple):
+    y: np.ndarray
+    x: np.ndarray
 
     def to_xarray(self, idx_name, time, states, outputs):
         coords = {
@@ -154,14 +78,8 @@ class SmoothingResult(NamedTuple):
         }
         ds = xr.Dataset(
             {
-                "x_update": ((idx_name, "states"), self.x_update[:, :, 0]),
-                "x_predict": ((idx_name, "states"), self.x_predict[:, :, 0]),
-                "x_smooth": ((idx_name, "states"), self.x_smooth[:, :, 0]),
-                "P_update": ((idx_name, "states", "states"), self.P_update),
-                "P_predict": ((idx_name, "states", "states"), self.P_predict),
-                "P_smooth": ((idx_name, "states", "states"), self.P_smooth),
-                "k": ((idx_name, "outputs"), self.k[:, :, 0]),
-                "S": ((idx_name, "outputs", "outputs"), self.S),
+                "x": ((idx_name, "states"), self.x[:, :, 0]),
+                "y": ((idx_name, "outputs"), self.y[:, :, 0]),
             },
             coords=coords,
         )
@@ -175,76 +93,13 @@ def _allocate_simulation_res(n_timesteps, nx, ny):
     )
 
 
-def _get_simulation_res(simulation_res, i):
-    return SimulationResults(
-        simulation_res.y[i],
-        simulation_res.x[i],
-    )
-
-
-def _set_simulation_res(simulation_res, i, value):
-    (
-        simulation_res.y[i],
-        simulation_res.x[i],
-    ) = value
-
-
-class SimulationResults(NamedTuple):
-    y: np.ndarray
-    x: np.ndarray
-
-    def __getitem__(self, i):
-        return _get_simulation_res(self, i)
-
-    def __setitem__(self, i, value):
-        _set_simulation_res(self, i, value)
-
-    def to_xarray(self, idx_name, time, states, outputs):
-        coords = {
-            idx_name: time,
-            "states": states,
-            "outputs": outputs,
-        }
-        ds = xr.Dataset(
-            {
-                "x": ((idx_name, "states"), self.x[:, :, 0]),
-                "y": ((idx_name, "outputs"), self.y[:, :, 0]),
-            },
-            coords=coords,
-        )
-        return ds
-
-
-def _output_from_filter(filter_res, ny):
-    return OutputEstimateResult(
-        filter_res.x_update,
-        filter_res.P_update,
-        np.empty((filter_res.x_update.shape[0], ny, 1)),
-        np.empty((filter_res.x_update.shape[0], ny, 1)),
-    )
+def _pack_simulate(res, i, value):
+    res.y[i], res.x[i] = value
 
 
 class OutputEstimateResult(NamedTuple):
-    x: np.ndarray
-    P: np.ndarray
     y: np.ndarray
     y_std: np.ndarray
-
-    def __getitem__(self, i):
-        return OutputEstimateResult(
-            self.x[i],
-            self.P[i],
-            self.y[i],
-            self.y_std[i],
-        )
-
-    def __setitem__(self, i, value):
-        (
-            self.x[i],
-            self.P[i],
-            self.y[i],
-            self.y_std[i],
-        ) = value
 
     def to_xarray(self, idx_name, time, states, outputs):
         coords = {
@@ -254,14 +109,23 @@ class OutputEstimateResult(NamedTuple):
         }
         ds = xr.Dataset(
             {
-                "x": ((idx_name, "states"), self.x[:, :, 0]),
-                "P": ((idx_name, "states", "states"), self.P),
                 "y": ((idx_name, "outputs"), self.y[:, :, 0]),
                 "y_std": ((idx_name, "outputs"), self.y_std[:, :, 0]),
             },
             coords=coords,
         )
         return ds
+
+
+def _pack_output_res(res, i, value):
+    res.y[i], res.y_std[i] = value
+
+
+def _allocate_output_res(n_timestep, ny):
+    return OutputEstimateResult(
+        np.empty((n_timestep, ny, 1)),
+        np.empty((n_timestep, ny, 1)),
+    )
 
 
 #### Pure python / numpy implementation of the Kalman filter ####
@@ -335,9 +199,9 @@ def _log_likelihood(x0, P0, u, dtu, y, states) -> float:
     _Arru = np.zeros((nx + ny, nx + ny), dtype=dtype)
     log_likelihood = 0.5 * n_timesteps * math.log(2.0 * math.pi)
     for i in range(n_timesteps):
-        y_i = np.ascontiguousarray(y[i]).reshape(-1, 1)
-        u_i = np.ascontiguousarray(u[i]).reshape(-1, 1)
-        dtu_i = np.ascontiguousarray(dtu[i]).reshape(-1, 1)
+        y_i = np.ascontiguousarray(y)[i].reshape(-1, 1)
+        u_i = np.ascontiguousarray(u)[i].reshape(-1, 1)
+        dtu_i = np.ascontiguousarray(dtu)[i].reshape(-1, 1)
         states_i = _unpack_states(states, i)
         if ~np.isnan(y_i).any():
             x, P, k, S = _update(
@@ -356,37 +220,48 @@ def _log_likelihood(x0, P0, u, dtu, y, states) -> float:
     return log_likelihood
 
 
-def _filtering(x0, P0, u, dtu, y, states) -> FilteringResult:
+def _filtering(x0, P0, u, dtu, y, states) -> KalmanResult:
     x = x0
     P = P0
     n_timesteps = y.shape[0]
     ny, nx = states.C.shape
     dtype = states.A.dtype
     _Arru = np.zeros((nx + ny, nx + ny), dtype=dtype)
-    res = _allocate_filter_res(n_timesteps, nx, ny)
+    res = _allocate_kalman_res(n_timesteps, nx, ny)
     for i in range(n_timesteps):
-        y_i = np.ascontiguousarray(y[i]).reshape(-1, 1)
-        u_i = np.ascontiguousarray(u[i]).reshape(-1, 1)
-        dtu_i = np.ascontiguousarray(dtu[i]).reshape(-1, 1)
+        y_i = np.ascontiguousarray(y)[i].reshape(-1, 1)
+        u_i = np.ascontiguousarray(u)[i].reshape(-1, 1)
+        dtu_i = np.ascontiguousarray(dtu)[i].reshape(-1, 1)
         states_i = _unpack_states(states, i)
         x_up, P_up, k, S, x, P = _kalman_step(x, P, u_i, dtu_i, y_i, states_i, _Arru)
-        _set_filter_estimate(res, i, (x_up, P_up.T @ P_up, x, P.T @ P, k, S))
+        _pack_kalman_res(res, i, (x_up, P_up.T @ P_up, k, S))
     return res
 
 
-def _smoothing(x0, P0, u, dtu, y, states) -> SmoothingResult:
+def _smoothing(x0, P0, u, dtu, y, states) -> tuple[np.ndarray, np.ndarray]:
+    x = x0
+    P = P0
     n_timesteps = y.shape[0]
-    res = _smooth_from_filter(_filtering(x0, P0, u, dtu, y, states))
-
-    xf = res.x_smooth
-    Pf = res.P_smooth
-    xp = np.vstack((x0[None, ...], res.x_predict))
-    Pp = np.vstack(((P0.T @ P0)[None, ...], res.P_predict))
+    ny, nx = states.C.shape
+    dtype = states.A.dtype
+    _Arru = np.zeros((nx + ny, nx + ny), dtype=dtype)
+    xp = np.empty((n_timesteps, nx, 1), dtype=dtype)
+    Pp = np.empty((n_timesteps, nx, nx), dtype=dtype)
+    res = _allocate_kalman_res(n_timesteps, nx, ny)
+    for i in range(n_timesteps):
+        y_i = np.ascontiguousarray(y)[i].reshape(-1, 1)
+        u_i = np.ascontiguousarray(u)[i].reshape(-1, 1)
+        dtu_i = np.ascontiguousarray(dtu)[i].reshape(-1, 1)
+        states_i = _unpack_states(states, i)
+        xp[i] = x
+        Pp[i] = P.T @ P
+        x_up, P_up, k, S, x, P = _kalman_step(x, P, u_i, dtu_i, y_i, states_i, _Arru)
+        _pack_kalman_res(res, i, (x_up, P_up.T @ P_up, k, S))
 
     for i in range(n_timesteps - 2, -1, -1):
-        G = np.linalg.solve(Pp[i + 1], states.A[:, :, i] @ Pf[i]).T
-        xf[i, :, :] += G @ (xf[i + 1, :, :] - xp[i + 1, :, :])
-        Pf[i, :, :] += G @ (Pf[i + 1, :, :] - Pp[i + 1, :, :]) @ G.T
+        G = np.linalg.solve(Pp[i + 1], states.A[:, :, i] @ res.P[i]).T
+        res.x[i, :, :] += G @ (res.x[i + 1, :, :] - xp[i + 1, :, :])
+        res.P[i, :, :] += G @ (res.P[i + 1, :, :] - Pp[i + 1, :, :]) @ G.T
     return res
 
 
@@ -396,8 +271,8 @@ def _simulate(x0, u, dtu, states) -> SimulationResults:
     ny, nx = states.C.shape
     res = _allocate_simulation_res(n_timesteps, nx, ny)
     for i in range(n_timesteps):
-        u_i = np.ascontiguousarray(u[i]).reshape(-1, 1)
-        dtu_i = np.ascontiguousarray(dtu[i]).reshape(-1, 1)
+        u_i = np.ascontiguousarray(u)[i].reshape(-1, 1)
+        dtu_i = np.ascontiguousarray(dtu)[i].reshape(-1, 1)
         states_i = _unpack_states(states, i)
         y = states_i.C @ x - states_i.D @ u_i
         x = (
@@ -406,7 +281,8 @@ def _simulate(x0, u, dtu, states) -> SimulationResults:
             + states_i.B1 @ dtu_i
             + states_i.Q @ np.random.randn(nx, 1)
         )
-        _set_simulation_res(res, i, (y, x))
+        _pack_simulate(res, i, (y, x))
+    # add noise to the output
     res.y += states.R @ np.random.randn(n_timesteps, ny, 1)
     return res
 
@@ -414,17 +290,17 @@ def _simulate(x0, u, dtu, states) -> SimulationResults:
 def _estimate_output(x0, P0, u, dtu, y, states) -> OutputEstimateResult:
     n_timesteps = y.shape[0]
     ny = states.C.shape[0]
-    res = _output_from_filter(_filtering(x0, P0, u, dtu, y, states), ny)
-    for i in range(n_timesteps):
-        x = res.x[i]
-        P = res.P[i]
-        states_i = _unpack_states(states, i)
-        y = states_i.C @ x
-        y_std = np.sqrt(states_i.C @ P @ states_i.C.T) + states_i.R
-        res.y[i] = y
-        res.y_std[i] = y_std
 
-    return res
+    res_filter = _filtering(x0, P0, u, dtu, y, states)
+    output_res = _allocate_output_res(n_timesteps, ny)
+    for i in range(n_timesteps):
+        x = res_filter.x[i]
+        P = res_filter.P[i]
+        states_i = _unpack_states(states, i)
+        output_res.y[i] = states_i.C @ x
+        output_res.y_std[i] = np.sqrt(states_i.C @ P @ states_i.C.T) + states_i.R
+
+    return output_res
 
 
 # All above will be jitted by numba, if available. Otherwise, the pure python / numpy
@@ -464,7 +340,6 @@ class KalmanQR:
     ):
         ss = self.ss
         ss.update()
-        # use lru to avoid re_computation of discretization for identical dt
         dts, idx = np.unique(dt, return_inverse=True)
         A = np.zeros((ss.nx, ss.nx, dt.size))
         B0 = np.zeros((ss.nx, ss.nu, dt.size))
@@ -598,7 +473,7 @@ class KalmanQR:
         y: pd.DataFrame,
         x0: np.ndarray | None = None,
         P0: np.ndarray | None = None,
-    ) -> FilteringResult:
+    ) -> KalmanResult:
         """Filter the data using the state space model and the Kalman filter.
 
         Parameters
@@ -651,7 +526,7 @@ class KalmanQR:
         y: pd.DataFrame,
         x0: np.ndarray | None = None,
         P0: np.ndarray | None = None,
-    ) -> SmoothingResult:
+    ) -> KalmanResult:
         """Smooth the data using the state space model and the Kalman filter.
 
         Parameters

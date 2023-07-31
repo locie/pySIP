@@ -24,11 +24,11 @@ from .utils.statistics import ttest
 def _make_estimate(theta, data, estimator):
     estimator = deepcopy(estimator)
     estimator.ss.parameters.theta_free = theta
-    y_res, *_ = estimator.estimate_output(*data)
-    return y_res
+    res = estimator.estimate_output(*data)
+    return res.y[None, ..., 0]
 
 
-class FdiffLoglikeGrad(pt.Op):
+class _FdiffLoglikeGrad(pt.Op):
     itypes = [pt.dvector]
     otypes = [pt.dvector]
 
@@ -49,7 +49,7 @@ class FdiffLoglikeGrad(pt.Op):
             outputs[0][0] = approx_fprime(eta, _target, self.eps)
 
 
-class Loglike(pt.Op):
+class _Loglike(pt.Op):
     itypes = [pt.dvector]
     otypes = [pt.dscalar]
 
@@ -57,7 +57,7 @@ class Loglike(pt.Op):
         self.estimator = reg.estimator
         self.data = reg.prepare_data(df)
         self.eps = eps
-        self.logpgrad = FdiffLoglikeGrad(reg, df, eps)
+        self.logpgrad = _FdiffLoglikeGrad(reg, df, eps)
 
     def perform(self, _, inputs, outputs):
         estimator = deepcopy(self.estimator)
@@ -142,7 +142,7 @@ class Regressor:
             df, self.inputs, self.outputs if with_outputs else False, self.time_scale
         )
 
-    def simulate(self, df: pd.DataFrame) -> np.ndarray:
+    def simulate(self, df: pd.DataFrame) -> xr.Dataset:
         """Stochastic simulation of the state-space model
 
         Parameters
@@ -173,16 +173,26 @@ class Regressor:
         x0: np.ndarray = None,
         P0: np.ndarray = None,
         use_outputs: bool = True,
-    ) -> Tuple[np.ndarray, np.ndarray]:
+    ) -> xr.Dataset:
         """Estimate the output filtered distribution
 
         Parameters
         ----------
-
+        df : pandas.DataFrame
+            Training data
+        x0 : numpy.ndarray, optional
+            Initial state. If not provided, the initial state is taken from the
+            state-space model defaults.
+        P0 : numpy.ndarray, optional
+            Initial state covariance. If not provided, the initial state covariance is
+            taken from the state-space model defaults.
+        use_outputs : bool, optional
+            Whether to use the data outputs to do the estimation, by default True
 
         Returns
         -------
-
+        xr.Dataset
+            Dataset containing the estimated outputs and their covariance
         """
 
         dt, u, dtu, y = self.prepare_data(df, with_outputs=use_outputs)
@@ -219,10 +229,8 @@ class Regressor:
 
         Returns
         -------
-        x : array_like, shape (n_x, n_steps)
-            Filtered or smoothed state mean
-        P : array_like, shape (n_x, n_x, n_steps)
-            Filtered or smoothed state covariance
+        xr.Dataset
+            Dataset containing the estimated states and their covariance
         """
 
         dt, u, dtu, y = self.prepare_data(df, with_outputs=use_outputs)
@@ -390,7 +398,7 @@ class Regressor:
         df: pd.DataFrame,
         x0: np.ndarray = None,
         P0: np.ndarray = None,
-    ) -> Tuple[np.ndarray, np.ndarray]:
+    ) -> xr.Dataset:
         """Compute the standardized residuals
 
         Parameters
@@ -410,10 +418,8 @@ class Regressor:
 
         Returns
         -------
-        res : numpy.ndarray
-            Standardized residuals
-        res_std : numpy.ndarray
-            Residuals deviations
+        xr.Dataset
+            Dataset containing the residuals and their standard deviation
         """
 
         dt, u, dtu, y = self.prepare_data(df)
@@ -423,16 +429,24 @@ class Regressor:
         return res[["k", "S"]].rename({"k": "residual", "S": "residual_std"})
 
     def log_likelihood(self, df: pd.DataFrame) -> Union[float, np.ndarray]:
-        """Evaluate the negative log-likelihood
+        """
+        Evaluate the log-likelihood of the model.
 
-        Args:
-            df: Data
-            outputs: Outputs name(s)
-            inputs: Inputs name(s)
-            pointwise: Evaluate the log-likelihood pointwise
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            Data.
+        outputs : str or list of str, optional
+            Outputs name(s). If None, all outputs are used.
+        inputs : str or list of str, optional
+            Inputs name(s). If None, all inputs are used.
+        pointwise : bool, optional
+            Evaluate the log-likelihood pointwise.
 
-        Returns:
-            Negative log-likelihood or predictive density evaluated point-wise
+        Returns
+        -------
+        float or numpy.ndarray
+            Negative log-likelihood or predictive density evaluated point-wise.
         """
 
         dt, u, dtu, y = self.prepare_data(df)
@@ -442,6 +456,25 @@ class Regressor:
         self,
         df: pd.DataFrame,
     ) -> Union[float, np.ndarray]:
+        """Evaluate the negative log-posterior, defined as
+
+        .. math::
+            -\\log p(\\theta | y) = -\\log p(y | \\theta) - \\log p(\\theta) + \\log
+
+        with :math:`y` the data, :math:`\\theta` the parameters, :math:`p(y | \\theta)`
+        the likelihood, :math:`p(\\theta)` the prior and :math:`\\log p(\\theta | y)`
+        the log-posterior.
+
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            Training data
+
+        Returns
+        -------
+        log_posterior : float
+            The negative log-posterior
+        """
         return (
             self.log_likelihood(df)
             - self.ss.parameters.prior
@@ -473,6 +506,14 @@ class Regressor:
             taken from the state-space model.
         smooth : bool, optional
             If True, the Kalman smoother is used instead of the Kalman filter
+        use_outputs : bool, optional
+            If True, the outputs are used to do the estimation. Default is False.
+
+        Returns
+        -------
+        xr.Dataset
+            Dataset containing the predicted outputs and their covariance
+
         """
 
         if self.ss.ny > 1:
@@ -493,11 +534,11 @@ class Regressor:
             ds = ds.sel(**{idx_name: tnew})
         ds["y_mean"] = (
             (idx_name, "outputs"),
-            (self.ss.C @ ds.x_predict.values.reshape(-1, self.ss.nx, 1))[..., 0],
+            (self.ss.C @ ds.x.values.reshape(-1, self.ss.nx, 1))[..., 0],
         )
         ds["y_std"] = (
             (idx_name, "outputs", "outputs"),
-            np.sqrt(self.ss.C @ ds.P_predict.values @ self.ss.C.T) + self.ss.R,
+            np.sqrt(self.ss.C @ ds.P.values @ self.ss.C.T) + self.ss.R,
         )
         return ds
 
@@ -513,60 +554,150 @@ class Regressor:
                     # theta.append(pm.Normal(name, par.eta, 1))
                     theta.append(par.prior.pymc_dist(name))
                 theta = pt.as_tensor_variable(theta)
-                pm.Potential("likelihood", -Loglike(reg, df)(theta))
+                pm.Potential("likelihood", -_Loglike(reg, df)(theta))
 
         return PyMCModel
 
     def sample(self, df, draws=1000, tune=500, chains=4, **kwargs):
+        """ Sample from the posterior distribution
+
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            Dataframe containing the inputs and outputs
+        draws : int, optional
+            Number of samples, by default 1000
+        tune : int, optional
+            Number of tuning samples, by default 500
+        chains : int, optional
+            Number of chains, by default 4
+        cores : int, optional
+            Number of cores, by default cpu_count()
+
+        Returns
+        -------
+        arviz.InferenceData
+            Inference data containing the posterior samples
+
+        Notes
+        -----
+        The number of cores is set to the minimum between the number of cores and the
+        number of chains.
+
+        The sample method directly use the `pymc3.sample` method. See the PyMC3
+        documentation for more details.
+        """
         cores = min(kwargs.pop("cores", cpu_count()), chains)
         with self.pymc_model(df):
             self._trace = pm.sample(
                 draws=draws, tune=tune, chains=chains, cores=cores, **kwargs
             )
+
         return self.trace
 
     def prior_predictive(self, df, samples=1000, **kwargs):
-        with self.pymc_model(df):
+        """ Sample from the prior predictive distribution
+
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            Dataframe containing the inputs and outputs
+        samples : int, optional
+            Number of samples, by default 1000
+
+        Returns
+        -------
+        xarray.Dataset
+            Dataset containing the simulated outputs
+
+        """
+        with self.pymc_model(df), warnings.catch_warnings():
+            warnings.simplefilter("ignore", UserWarning)
             self._prior_trace = pm.sample_prior_predictive(samples=samples, **kwargs)
-        parameters = self.trace.prior.to_dataframe().to_numpy()
+        parameters = self._prior_trace.prior.to_dataframe().to_numpy()
         data = self.prepare_data(df)
         with ProcessPoolExecutor() as executor:
-            results = list(
-                executor.map(
-                    partial(_make_estimate, data=data, estimator=self.estimator),
-                    parameters,
+            results = np.vstack(
+                list(
+                    executor.map(
+                        partial(_make_estimate, data=data, estimator=self.estimator),
+                        parameters,
+                    )
                 )
             )
-        return results
+
+        idx_name = df.index.name or "time"
+        return xr.DataArray(
+            results,
+            dims=("draw", idx_name, "outputs"),
+            coords={
+                "draw": np.arange(samples),
+                "outputs": self.outputs,
+                idx_name: df.index,
+            },
+        ).to_dataset("outputs")
 
     def posterior_predictive(self, df, **kwargs):
-        parameters = self.trace.posterior.to_dataframe().to_numpy()
+        """ Sample from the posterior predictive distribution
+
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            Dataframe containing the inputs and outputs
+
+        Returns
+        -------
+        xarray.Dataset
+
+        Raises
+        ------
+        RuntimeError
+            If the model has not been sampled yet
+        """
+        try:
+            trace = self.trace
+        except AttributeError:
+            raise RuntimeError("No trace available : run `sample` first")
+        parameters = trace.posterior.to_dataframe().to_numpy()
         data = self.prepare_data(df)
 
+        data = self.prepare_data(df)
         with ProcessPoolExecutor() as executor:
-            results = list(
-                executor.map(
-                    partial(_make_estimate, data=data, estimator=self.estimator),
-                    parameters,
+            results = np.vstack(
+                list(
+                    executor.map(
+                        partial(_make_estimate, data=data, estimator=self.estimator),
+                        parameters,
+                    )
                 )
             )
-        return results
+        results = results.reshape(
+            trace.posterior.chain.shape[0],
+            trace.posterior.draw.shape[0],
+            *results.shape[1:],
+        )
 
-    @property
-    def prior_trace(self):
-        return getattr(self, "_prior_trace", None)
-
-    @property
-    def posterior_trace(self):
-        return getattr(self, "_posterior_trace", None)
+        idx_name = df.index.name or "time"
+        return xr.DataArray(
+            results,
+            dims=("chain", "draw", idx_name, "outputs"),
+            coords={
+                "chain": trace.posterior.chain,
+                "draw": trace.posterior.draw,
+                "outputs": self.outputs,
+                idx_name: df.index,
+            },
+        ).to_dataset("outputs")
 
     @property
     def trace(self):
         main_trace = getattr(self, "_trace", None)
-        if main_trace is None:
-            raise ValueError("Model has not been fitted yet")
-        if (prior_trace := self.prior_trace) is not None:
-            main_trace.extend(prior_trace)
-        if (posterior_trace := self.prior_trace) is not None:
-            main_trace.extend(posterior_trace)
-        return main_trace
+        prior_trace = getattr(self, "_prior_trace", None)
+
+        if main_trace is not None:
+            if prior_trace is not None:
+                main_trace.extend(prior_trace)
+            return main_trace
+        if prior_trace is not None:
+            return prior_trace
+        raise AttributeError("No trace available")

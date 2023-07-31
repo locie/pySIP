@@ -207,3 +207,20 @@ class LogNormal(BasePrior, metaclass=PriorMeta):
     sigma: float = 1.0
     scipy_dist: lambda mu, sigma: stats.lognorm(scale=np.exp(mu), s=sigma)
     pymc_dist: pm.Lognormal
+
+
+class Uniform(BasePrior, metaclass=PriorMeta):
+    """Uniform prior distribution
+
+    Parameters
+    ----------
+    lower: float
+        Lower bound of the uniform distribution
+    upper: float
+        Upper bound of the uniform distribution
+    """
+
+    lower: float = 0.0
+    upper: float = 1.0
+    scipy_dist: lambda lower, upper: stats.uniform(loc=lower, scale=upper - lower)
+    pymc_dist: pm.Uniform
