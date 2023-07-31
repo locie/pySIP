@@ -3,9 +3,8 @@ import pandas as pd
 import pytest
 
 from pysip.params.prior import LogNormal, Normal
-from pysip.regressors import FreqRegressor as Regressor
+from pysip.regressors import Regressor
 from pysip.statespace.thermal_network import TwTi_RoRi
-from pysip.utils.check import check_model
 from pysip.utils.math import fit, mad, mae, ned, rmse, smape
 from pysip.utils.statistics import aic, ccf, check_ccf, check_cpgram, cpgram, lrtest
 

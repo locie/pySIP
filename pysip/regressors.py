@@ -1,18 +1,76 @@
-"""Regressor template"""
-from copy import deepcopy
+from __future__ import annotations
+
 import warnings
+from concurrent.futures import ProcessPoolExecutor
+from copy import deepcopy
 from dataclasses import dataclass
-from typing import Literal, Optional, Sequence, Tuple, Union, Type
+from functools import partial
+from multiprocessing import cpu_count
+from typing import Literal, Optional, Sequence, Tuple, Union
 
 import numpy as np
 import pandas as pd
+import pymc as pm
+import pytensor.tensor as pt
 import xarray as xr
-from scipy.optimize import minimize
+from scipy.optimize import approx_fprime, minimize
 
-from ..statespace_estimator import BayesianFilter, KalmanQR
-from ..params.parameters import Parameters
-from ..statespace.base import StateSpace
-from ..utils.statistics import ttest
+from .params.parameters import Parameters
+from .statespace.base import StateSpace
+from .statespace_estimator import KalmanQR
+from .utils.statistics import ttest
+
+
+def _make_estimate(theta, data, estimator):
+    estimator = deepcopy(estimator)
+    estimator.ss.parameters.theta_free = theta
+    y_res, *_ = estimator.estimate_output(*data)
+    return y_res
+
+
+class FdiffLoglikeGrad(pt.Op):
+    itypes = [pt.dvector]
+    otypes = [pt.dvector]
+
+    def __init__(self, reg: Regressor, df, eps=None):
+        self.estimator = reg.estimator
+        self.data = reg.prepare_data(df)
+        self.eps = eps
+
+    def perform(self, _, inputs, outputs):
+        def _target(eta) -> float:
+            estimator = deepcopy(self.estimator)
+            estimator.ss.parameters.theta_free = eta
+            return estimator.log_likelihood(*self.data)
+
+        (eta,) = inputs  # this will contain my variables
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            outputs[0][0] = approx_fprime(eta, _target, self.eps)
+
+
+class Loglike(pt.Op):
+    itypes = [pt.dvector]
+    otypes = [pt.dscalar]
+
+    def __init__(self, reg: Regressor, df, eps=None):
+        self.estimator = reg.estimator
+        self.data = reg.prepare_data(df)
+        self.eps = eps
+        self.logpgrad = FdiffLoglikeGrad(reg, df, eps)
+
+    def perform(self, _, inputs, outputs):
+        estimator = deepcopy(self.estimator)
+        (eta,) = inputs
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            estimator.ss.parameters.theta_free = eta
+            logl = estimator.log_likelihood(*self.data)
+        outputs[0][0] = np.array(logl)
+
+    def grad(self, inputs, g):
+        (eta,) = inputs
+        return [g[0] * self.logpgrad(eta)]
 
 
 @dataclass
@@ -36,19 +94,15 @@ class Regressor:
         state-space model.
     time_scale : str
         Time series frequency, e.g. 's': seconds, 'D': days, etc.
-    estimator_cls : Type[BayesianFilter], optional
-        Bayesian filter to use for prediction, by default KalmanQR available in
-        pysip.statespace_estimator.
     """
 
     ss: StateSpace
     inputs: Optional[Union[str, Sequence[str]]] = None
     outputs: Optional[Union[str, Sequence[str]]] = None
     time_scale: str = "s"
-    estimator_cls: Type[BayesianFilter] = KalmanQR
 
     def __post_init__(self):
-        self.estimator = self.estimator_cls(self.ss)
+        self.estimator = KalmanQR(self.ss)
         if self.inputs is None:
             self.inputs = [node.name for node in self.ss.inputs]
         if self.outputs is None:
@@ -109,27 +163,16 @@ class Regressor:
         """
 
         dt, u, dtu, _ = self.prepare_data(df, with_outputs=False)
-        y_res, x_res = self.estimator.simulate(dt, u, dtu)
-        idx_name = df.index.name or "time"
-        y_da = xr.DataArray(
-            y_res[:, :, 0],
-            coords=[df.index, self.outputs],
-            dims=[idx_name, "outputs"],
-            name="y",
+        return self.estimator.simulate(dt, u, dtu).to_xarray(
+            df.index.name or "time", df.index, self.states, self.outputs
         )
-        x_da = xr.DataArray(
-            x_res[:, :, 0],
-            coords=[df.index, self.states],
-            dims=[idx_name, "states"],
-            name="x",
-        )
-        return xr.merge([y_da, x_da])
 
     def estimate_output(
         self,
         df: pd.DataFrame,
         x0: np.ndarray = None,
         P0: np.ndarray = None,
+        use_outputs: bool = True,
     ) -> Tuple[np.ndarray, np.ndarray]:
         """Estimate the output filtered distribution
 
@@ -142,34 +185,10 @@ class Regressor:
 
         """
 
-        dt, u, dtu, y = self.prepare_data(df)
-        y_res, x_res, P_res, y_std_res = self.estimator.estimate_output(dt, u, dtu, y)
-        idx_name = df.index.name or "time"
-        y_da = xr.DataArray(
-            y_res[:, :, 0],
-            coords=[df.index, self.outputs],
-            dims=[idx_name, "outputs"],
-            name="y",
+        dt, u, dtu, y = self.prepare_data(df, with_outputs=use_outputs)
+        return self.estimator.estimate_output(dt, u, dtu, y, x0, P0).to_xarray(
+            df.index.name or "time", df.index, self.states, self.outputs
         )
-        x_da = xr.DataArray(
-            x_res[:, :, 0],
-            coords=[df.index, self.states],
-            dims=[idx_name, "states"],
-            name="x",
-        )
-        P_da = xr.DataArray(
-            P_res,
-            coords=[df.index, self.states, self.states],
-            dims=[idx_name, "states", "states"],
-            name="P",
-        )
-        y_std_da = xr.DataArray(
-            y_std_res[:, :, 0],
-            coords=[df.index, self.outputs],
-            dims=[idx_name, "outputs"],
-            name="y_std",
-        )
-        return xr.merge([y_da, x_da, P_da, y_std_da])
 
     def estimate_states(
         self,
@@ -208,24 +227,11 @@ class Regressor:
 
         dt, u, dtu, y = self.prepare_data(df, with_outputs=use_outputs)
 
-        if smooth:
-            x_res, P_res = self.estimator.smoothing(dt, u, dtu, y)
-        else:
-            x_res, P_res, *_ = self.estimator.filtering(dt, u, dtu, y)
-        idx_name = df.index.name or "time"
-        x_da = xr.DataArray(
-            x_res[:, :, 0],
-            coords=[df.index, self.states],
-            dims=[idx_name, "states"],
-            name="x",
-        )
-        P_da = xr.DataArray(
-            P_res,
-            coords=[df.index, self.states, self.states],
-            dims=[idx_name, "states", "states"],
-            name="P",
-        )
-        return xr.merge([x_da, P_da])
+        return (
+            self.estimator.smoothing(dt, u, dtu, y, x0, P0)
+            if smooth
+            else self.estimator.filtering(dt, u, dtu, y, x0, P0)
+        ).to_xarray(df.index.name or "time", df.index, self.states, self.outputs)
 
     def _target(
         self,
@@ -411,22 +417,10 @@ class Regressor:
         """
 
         dt, u, dtu, y = self.prepare_data(df)
-        residual, residual_std = self.estimator.filtering(dt, u, dtu, y)[2:]
-
-        idx_name = df.index.name or "time"
-        res_da = xr.DataArray(
-            residual[:, :, 0],
-            coords=[df.index, self.outputs],
-            dims=[idx_name, "outputs"],
-            name="residual",
+        res = self.estimator.filtering(dt, u, dtu, y, x0, P0).to_xarray(
+            df.index.name or "time", df.index, self.states, self.outputs
         )
-        res_std_da = xr.DataArray(
-            residual_std,
-            coords=[df.index, self.outputs, self.outputs],
-            dims=[idx_name, "outputs", "outputs"],
-            name="residual_std",
-        )
-        return xr.merge([res_da, res_std_da])
+        return res[["k", "S"]].rename({"k": "residual", "S": "residual_std"})
 
     def log_likelihood(self, df: pd.DataFrame) -> Union[float, np.ndarray]:
         """Evaluate the negative log-likelihood
@@ -491,16 +485,88 @@ class Regressor:
         else:
             itp_df = df.copy()
 
-        ds = self.estimate_states(itp_df, smooth=smooth, use_outputs=use_outputs)
+        ds = self.estimate_states(
+            itp_df, smooth=smooth, use_outputs=use_outputs, x0=x0, P0=P0
+        )
         idx_name = df.index.name or "time"
         if tnew is not None:
             ds = ds.sel(**{idx_name: tnew})
         ds["y_mean"] = (
             (idx_name, "outputs"),
-            (self.ss.C @ ds.x.values.reshape(-1, self.ss.nx, 1))[..., 0],
+            (self.ss.C @ ds.x_predict.values.reshape(-1, self.ss.nx, 1))[..., 0],
         )
         ds["y_std"] = (
             (idx_name, "outputs", "outputs"),
-            np.sqrt(self.ss.C @ ds.P.values @ self.ss.C.T) + self.ss.R,
+            np.sqrt(self.ss.C @ ds.P_predict.values @ self.ss.C.T) + self.ss.R,
         )
         return ds
+
+    @property
+    def pymc_model(reg):
+        class PyMCModel(pm.Model):
+            def __init__(self, df):
+                super().__init__()
+                theta = []
+                for name, par in zip(
+                    reg.parameters.names_free, reg.parameters.parameters_free
+                ):
+                    # theta.append(pm.Normal(name, par.eta, 1))
+                    theta.append(par.prior.pymc_dist(name))
+                theta = pt.as_tensor_variable(theta)
+                pm.Potential("likelihood", -Loglike(reg, df)(theta))
+
+        return PyMCModel
+
+    def sample(self, df, draws=1000, tune=500, chains=4, **kwargs):
+        cores = min(kwargs.pop("cores", cpu_count()), chains)
+        with self.pymc_model(df):
+            self._trace = pm.sample(
+                draws=draws, tune=tune, chains=chains, cores=cores, **kwargs
+            )
+        return self.trace
+
+    def prior_predictive(self, df, samples=1000, **kwargs):
+        with self.pymc_model(df):
+            self._prior_trace = pm.sample_prior_predictive(samples=samples, **kwargs)
+        parameters = self.trace.prior.to_dataframe().to_numpy()
+        data = self.prepare_data(df)
+        with ProcessPoolExecutor() as executor:
+            results = list(
+                executor.map(
+                    partial(_make_estimate, data=data, estimator=self.estimator),
+                    parameters,
+                )
+            )
+        return results
+
+    def posterior_predictive(self, df, **kwargs):
+        parameters = self.trace.posterior.to_dataframe().to_numpy()
+        data = self.prepare_data(df)
+
+        with ProcessPoolExecutor() as executor:
+            results = list(
+                executor.map(
+                    partial(_make_estimate, data=data, estimator=self.estimator),
+                    parameters,
+                )
+            )
+        return results
+
+    @property
+    def prior_trace(self):
+        return getattr(self, "_prior_trace", None)
+
+    @property
+    def posterior_trace(self):
+        return getattr(self, "_posterior_trace", None)
+
+    @property
+    def trace(self):
+        main_trace = getattr(self, "_trace", None)
+        if main_trace is None:
+            raise ValueError("Model has not been fitted yet")
+        if (prior_trace := self.prior_trace) is not None:
+            main_trace.extend(prior_trace)
+        if (posterior_trace := self.prior_trace) is not None:
+            main_trace.extend(posterior_trace)
+        return main_trace

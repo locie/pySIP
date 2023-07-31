@@ -1406,6 +1406,25 @@ files = [
 ]
 
 [[package]]
+name = "numpydoc"
+version = "1.5.0"
+description = "Sphinx extension to support docstrings in Numpy format"
+category = "dev"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "numpydoc-1.5.0-py3-none-any.whl", hash = "sha256:c997759fb6fc32662801cece76491eedbc0ec619b514932ffd2b270ae89c07f9"},
+    {file = "numpydoc-1.5.0.tar.gz", hash = "sha256:b0db7b75a32367a0e25c23b397842c65e344a1206524d16c8069f0a1c91b5f4c"},
+]
+
+[package.dependencies]
+Jinja2 = ">=2.10"
+sphinx = ">=4.2"
+
+[package.extras]
+testing = ["matplotlib", "pytest", "pytest-cov"]
+
+[[package]]
 name = "packaging"
 version = "21.3"
 description = "Core utilities for Python packages"
@@ -2746,4 +2765,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "18b371d5bade2bcced22708af029f28bafaf16e569dc46dfbd8a50157414ac74"
+content-hash = "fc496c5fcc10ec9ea6d38f973334ca8bc7fd1a9423cfef8da999fee0a19dbc06"

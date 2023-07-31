@@ -34,6 +34,7 @@ sphinx-rtd-theme = "^1.1.1"
 sphinxcontrib-tikz = "^0.4.16"
 sphinx-autodoc-typehints = "^1.19.5"
 pydot = "^1.4.2"
+numpydoc = "^1.5.0"
 
 
 [tool.poetry.group.tests.dependencies]

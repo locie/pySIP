@@ -3,7 +3,7 @@ import pandas as pd
 import pytest
 
 from pysip.params.prior import InverseGamma as iGa
-from pysip.regressors import FreqRegressor as Regressor
+from pysip.regressors import Regressor
 from pysip.statespace import Matern32
 
 
