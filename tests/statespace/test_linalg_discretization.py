@@ -1,16 +1,16 @@
-import pytest
+
 import numpy as np
-from scipy.linalg import inv, eigvals, eig, expm, expm_frechet
+import pytest
+from scipy.linalg import eig, eigvals, expm, expm_frechet, inv
+
 from pysip.statespace.discretization import (
-    inv_2x2,
-    inv_3x3,
+    eig_2x2,
     eigvals_2x2,
     eigvals_3x3,
-    eig_2x2,
     expm_2x2,
-    dexpm_2x2,
+    inv_2x2,
+    inv_3x3,
 )
-from time import time
 
 
 def random_real_eig(n):
@@ -65,17 +65,3 @@ def test_eig_2x2(random_2x2):
 
 def test_expm_2x2(random_2x2):
     assert np.allclose(expm(random_2x2), expm_2x2(random_2x2))
-
-
-def test_dexpm_2x2(random_2x2):
-    X = random_2x2
-    dX = np.random.random((10, 2, 2))
-
-    dM_truth = np.zeros((10, 2, 2))
-    for n in range(10):
-        M_truth, dM_truth[n] = expm_frechet(X, dX[n])
-
-    M, dM = dexpm_2x2(X, dX)
-
-    assert np.allclose(M_truth, M)
-    assert np.allclose(dM_truth, dM)

@@ -8,10 +8,10 @@ def percentile_plot(
     n=4,
     percentile_min=2.5,
     percentile_max=97.5,
-    color='darkred',
+    color="darkred",
     plot_mean=False,
     plot_median=True,
-    line_color='maroon',
+    line_color="maroon",
     **kwargs,
 ):
     """Percentile plot for time series"""
@@ -23,8 +23,8 @@ def percentile_plot(
     perc2 = np.percentile(y, linspace2, axis=0)
 
     # transparency
-    if 'alpha' in kwargs:
-        alpha = kwargs.pop('alpha')
+    if "alpha" in kwargs:
+        alpha = kwargs.pop("alpha")
     else:
         alpha = 1 / (n / 2)
 
@@ -55,12 +55,14 @@ def plot_ccf(lags, coeffs, confidence, ax=None):
         _, ax = plt.subplots()
 
     _, stemlines, baseline = ax.stem(
-        lags, coeffs, linefmt='-', markerfmt='None', use_line_collection=True
+        lags, coeffs, linefmt="-", markerfmt="None", use_line_collection=True
     )
-    ax.fill_between(lags, -confidence, confidence, facecolor='darkred', edgecolor='None', alpha=0.3)
+    ax.fill_between(
+        lags, -confidence, confidence, facecolor="darkred", edgecolor="None", alpha=0.3
+    )
 
-    plt.setp(baseline, color='darkblue')
-    plt.setp(stemlines, color='darkblue')
+    plt.setp(baseline, color="darkblue")
+    plt.setp(stemlines, color="darkblue")
 
     return ax
 
@@ -78,9 +80,14 @@ def plot_cpgram(y, freq, crit, ax=None):
     if ax is None:
         _, ax = plt.subplots()
 
-    ax.plot(freq, np.cumsum(y) / np.sum(y), color='darkblue')
+    ax.plot(freq, np.cumsum(y) / np.sum(y), color="darkblue")
     ax.fill_between(
-        freq, 2 * freq - crit, 2 * freq + crit, facecolor='darkred', edgecolor='None', alpha=0.3
+        freq,
+        2 * freq - crit,
+        2 * freq + crit,
+        facecolor="darkred",
+        edgecolor="None",
+        alpha=0.3,
     )
     ax.set_xlim(0, 0.5)
     ax.set_ylim(0, 1)

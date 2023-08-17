@@ -3,10 +3,10 @@ import numpy as np
 import pytest
 from scipy.linalg import LinAlgError
 
-from pysip.utils.math import nearest_cholesky, diff_upper_cholesky
+from pysip.utils.math import diff_upper_cholesky, nearest_cholesky
 
 
-@pytest.mark.parametrize('N', [5, 10, 25, 50])
+@pytest.mark.parametrize("N", [5, 10, 25, 50])
 def test_nearest_upper_cholesky(N):
 
     S = np.cov(np.random.randn(N, 2 * N))
@@ -27,7 +27,7 @@ def test_nearest_upper_cholesky(N):
     assert np.allclose(nearest_upper_chol.T @ nearest_upper_chol, S)
 
 
-@pytest.mark.parametrize('N', [5, 10, 25, 50])
+@pytest.mark.parametrize("N", [5, 10, 25, 50])
 def test_diff_upper_cholesky(N):
     S = np.cov(np.random.randn(N, 2 * N))
     dS = np.cov(np.random.randn(N, 2 * N))

@@ -1,77 +1,274 @@
-from collections import defaultdict, namedtuple
-from dataclasses import dataclass, field
-from functools import partial
-from typing import NamedTuple, Tuple, Union
+from collections import defaultdict
+from dataclasses import field
+from enum import Enum
+from itertools import chain
+from typing import Literal, NamedTuple, Optional, Sequence, Tuple, Union
+from typing_extensions import Self
 
 import numpy as np
+import pandas as pd
+from pydantic import ConfigDict, conint
+from pydantic.dataclasses import dataclass
+from jinja2 import Template
 
-from ..core import Parameters
-from .discretization import (
-    disc_state,
-    disc_state_input,
-    disc_diffusion_mfd,
-    disc_diffusion_stationary,
-    disc_diffusion_lyap,
-    disc_d_state,
-    disc_d_state_input,
-    disc_d_diffusion_mfd,
-    disc_d_diffusion_stationary,
-    disc_d_diffusion_lyap,
-)
-from ..utils.draw import TikzStateSpace
-from ..utils.math import nearest_cholesky, diff_upper_cholesky
-from .meta import MetaStateSpace
-from .nodes import Node
-
-ssm = namedtuple('ssm', 'A, B0, B1, C, D, Q, R, x0, P0')
-dssm = namedtuple('dssm', 'dA, dB0, dB1, dC, dD, dQ, dR, dx0, dP0')
+from ..params import Parameters
+from ..utils.math import nearest_cholesky
+from ..utils.misc import Namespace
+from . import discretization
 
 
-def zeros(m, n):
-    return np.zeros((m, n))
+model_registry = Namespace()
+
+
+class Io(Enum):
+    """Input/Output data type"""
+
+    TEMPERATURE = ("Temperature", "°C")
+    POWER = ("Power", "W")
+    ANY = ("Any type", "any")
+
+
+class Par(Enum):
+    """Parameter type"""
+
+    THERMAL_RESISTANCE = ("Thermal resistance", "°C/W")
+    THERMAL_TRANSMITTANCE = ("Thermal transmittance", "W/°C")
+    THERMAL_CAPACITY = ("Thermal capacity", "J/°C")
+    SOLAR_APERTURE = ("Solar aperture", "m²")
+    STATE_DEVIATION = ("State deviation", "any")
+    MEASURE_DEVIATION = ("Measure deviation", "any")
+    INITIAL_DEVIATION = ("Initial deviation", "any")
+    INITIAL_MEAN = ("Initial mean", "any")
+    COEFFICIENT = ("Coefficient", "any")
+    MAGNITUDE_SCALE = ("Magnitude scale", "any")
+    LENGTH_SCALE = ("Length scale", "any")
+    PERIOD = ("Period", "any")
 
 
 @dataclass
-class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
-    '''Linear Gaussian Continuous-Time State-Space Model'''
+class Node:
+    """Description of model variables
 
-    parameters: list = field(default=None)
-    _names: list = field(init=False)
-    nx: int = field(init=False)
-    nu: int = field(init=False)
-    ny: int = field(init=False)
-    hold_order: int = field(default=0)
-    method: str = 'mfd'
-    name: str = field(default='')
+    Parameters
+    ----------
+    category : Io or Par
+        Category of the node
+    name : str
+        Name of the node
+    description : str
+        Description of the node
+    """
+
+    category: Union[Io, Par] = field()
+    name: str = field(default="")
+    description: str = field(default="")
 
     def __post_init__(self):
+        if isinstance(self.category, str):
+            try:
+                self.category = Io[self.category]
+            except KeyError:
+                self.category = Par[self.category]
 
-        if self.hold_order not in [0, 1]:
-            raise TypeError("`hold_order` must be either 0 or 1")
+    def unpack(self):
+        """Unpack the Node"""
+        return self.category.name, self.name, self.description
 
-        if self.name == '':
-            self.name = self.__class__.__name__
 
-        if hasattr(self, 'states'):
-            self.nx = len(self.states)
-            self.states = [Node(*s) for s in self.states]
-        if hasattr(self, 'params'):
-            self.params = [Node(*s) for s in self.params]
-            self._names = [p.name for p in self.params]
-        if hasattr(self, 'inputs'):
-            self.nu = len(self.inputs)
-            self.inputs = [Node(*s) for s in self.inputs]
-        if hasattr(self, 'outputs'):
-            self.ny = len(self.outputs)
-            self.outputs = [Node(*s) for s in self.outputs]
+def statespace(cls, *args, **kwargs):
+    if cls not in model_registry:
+        return None
+    if args or kwargs:
+        return model_registry[cls](*args, **kwargs)
+    return model_registry[cls]
+
+
+class MetaStateSpace(type):
+    """Metaclass for the state-space models
+
+    Mainly used to build the documentation of the models from the sections
+    (inputs, outputs, states, params) available as class attributes. Will also add
+    the class to the registry.
+    """
+
+    def __new__(cls, name, bases, attrs):
+        # Add the class to the registry
+        new_class = super(MetaStateSpace, cls).__new__(cls, name, bases, attrs)
+        if "__base__" not in attrs:
+            model_registry[attrs.get("__name__") or attrs["__qualname__"]] = new_class
+        return new_class
+
+    def _format_section(self, section_name):
+        if not (nodes := getattr(self, section_name, False)):
+            return None
+        nodes = [Node(*x) for x in nodes]
+        return self._section_template.render(section_name=section_name, nodes=nodes)
+
+    @property
+    def _sections(self) -> dict:
+        return {
+            section: [Node(*x) for x in getattr(self, section, [])]
+            for section in ["inputs", "outputs", "states"]
+        }
+
+    @property
+    def _parameters_cat(self) -> dict:
+        parameters_cat = defaultdict(list)
+        for par in getattr(self, "params", []):
+            par = Node(*par)
+            parameters_cat[par.category].append(par)
+        return dict(parameters_cat)
+
+    def _build_doc(self):
+        _doc_template_str = """{{base_doc}}
+
+Model Variables
+---------------
+
+{% for section, nodes in sections.items() %}
+- {{section.capitalize()}}
+{% for node in nodes %}
+    - ``{{node.name}}``: {{node.description}} `({{node.category.value[1]}})`
+{% endfor %}
+{% endfor %}
+
+{% if parameters_cat %}
+
+Model Parameters
+----------------
+
+{% for category, parameters in parameters_cat.items() %}
+- {{category.value[0]}}
+{% for parameter in parameters %}
+    - ``{{parameter.name}}``: {{parameter.description}}
+      `({{parameter.category.value[1]}})`
+{% endfor %}
+{% endfor %}
+{% endif %}
+    """
+        _doc_template = Template(
+            _doc_template_str,
+            trim_blocks=True,
+            lstrip_blocks=True,
+            keep_trailing_newline=False,
+        )
+
+        return _doc_template.render(
+            base_doc=self.__doc__,
+            sections=self._sections,
+            parameters_cat=self._parameters_cat,
+        )
+
+    def __init__(self, name, bases, attr):
+        self.__doc__ = self._build_doc()
+
+
+def prepare_data(
+    df: pd.DataFrame,
+    inputs: Union[str, list],
+    outputs: Union[str, list, bool],
+    time_scale: str = "s",
+):
+    """Prepare data for the state-space model
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Dataframe containing the data
+    inputs : str or list
+        Inputs names
+    outputs : str or list
+        Outputs names
+    time_scale : str, optional
+        Time scale, by default "s"
+
+    Returns
+    -------
+    dt : pandas.Series
+        Time steps
+    u : pandas.DataFrame
+        Inputs
+    dtu : pandas.DataFrame
+        Inputs time derivative
+    y : pandas.DataFrame
+        Outputs
+    """
+    df = df.copy()
+    time = df.index.to_series()
+    if not isinstance(df, pd.DataFrame):
+        raise TypeError("`df` must be a dataframe")
+    time_scale = pd.to_timedelta(1, time_scale)
+
+    # diff and forward-fill the nan-last value
+    dt = time.diff().shift(-1)
+    dt.iloc[-1] = dt.iloc[-2]
+    # deal with numerical approximation that lead to almost equal values
+    if np.isclose(dt.to_numpy(), dt.iloc[0]).all():
+        dt[:] = dt.iloc[0]
+    if isinstance(df.index, pd.DatetimeIndex):
+        dt = dt / time_scale
+    else:
+        dt = dt.astype(float)
+
+    u = pd.DataFrame(df[inputs])
+
+    dtu = u.diff().shift(-1) / dt.to_numpy()[:, None]
+    dtu.iloc[-1, :] = 0
+
+    for subdf in [dt, u, dtu]:
+        if not np.all(np.isfinite(subdf)):
+            raise ValueError(f"{subdf} contains undefinite values")
+
+    if outputs:
+        y = pd.DataFrame(df[outputs])
+    else:
+        y = pd.DataFrame(data=np.full(len(df), np.nan), index=df.index)
+    if not np.all(np.isnan(y[~np.isfinite(y)])):
+        raise TypeError("The output vector must contains numerical values or numpy.nan")
+    return dt, u, dtu, y
+
+
+class ContinuousStates(NamedTuple):
+    A: np.ndarray
+    B: np.ndarray
+    C: np.ndarray
+    D: np.ndarray
+    Q: np.ndarray
+    R: np.ndarray
+
+
+class DiscreteStates(NamedTuple):
+    A: np.ndarray
+    B0: np.ndarray
+    B1: np.ndarray
+    Q: np.ndarray
+
+
+@dataclass(config=ConfigDict(arbitrary_types_allowed=True), repr=False)
+class StateSpace(metaclass=MetaStateSpace):
+    """Linear Gaussian Continuous-Time State-Space Model"""
+
+    parameters: Parameters = field(default=None, repr=False)
+    hold_order: conint(ge=0, le=1) = 0
+    method: str = "mfd"
+    name: str = ""
+
+    def _coerce_attributes(self):
+        for attr in ["states", "params", "inputs", "outputs"]:
+            setattr(self, attr, [Node(*s) for s in getattr(self, attr)])
+        self.states: Sequence[Node]
+        self.params: Sequence[Node]
+        self.inputs: Sequence[Node]
+        self.outputs: Sequence[Node]
 
         if self.parameters:
             if not isinstance(self.parameters, Parameters):
                 self.parameters = Parameters(self.parameters)
         else:
-            self.parameters = Parameters(self._names)
-        self.parameters._name = self.name
+            self.parameters = Parameters([p.name for p in self.params])
+        self.parameters.name = self.name
 
+    def _init_states(self):
         self.A = np.zeros((self.nx, self.nx))
         self.B = np.zeros((self.nx, self.nu))
         self.C = np.zeros((self.ny, self.nx))
@@ -80,267 +277,192 @@ class StateSpace(TikzStateSpace, metaclass=MetaStateSpace):
         self.R = np.zeros((self.ny, self.ny))
         self.x0 = np.zeros((self.nx, 1))
         self.P0 = np.zeros((self.nx, self.nx))
-
-        self.set_constant_continuous_ssm()
-        self._init_continuous_dssm()
-        self.set_constant_continuous_dssm()
-
         self._diag = np.diag_indices_from(self.A)
+        self.set_constant_continuous_ssm()
 
-    def init_continuous_dssm(self):
-        """Initialize the jacobians of the continuous state-space model"""
-        self._init_continuous_dssm()
-        self.set_constant_continuous_dssm()
+    def __repr__(self):
+        tpl = Template(
+            """{{name}}
+{{'-' * name|length}}
+States:
+{% for state in states %}
+- {{state.name}}: {{state.description}}
+{% endfor %}
 
-    def _init_continuous_dssm(self):
-        """Initialize the jacobians of the continuous state-space model"""
+Inputs:
+{% for input in inputs %}
+- {{input.name}}: {{input.description}}
+{% endfor %}
 
-        self.dA = defaultdict(partial(zeros, self.nx, self.nx))
-        self.dB = defaultdict(partial(zeros, self.nx, self.nu))
-        self.dC = defaultdict(partial(zeros, self.ny, self.nx))
-        self.dD = defaultdict(partial(zeros, self.ny, self.nu))
-        self.dQ = defaultdict(partial(zeros, self.nx, self.nx))
-        self.dR = defaultdict(partial(zeros, self.ny, self.ny))
-        self.dx0 = defaultdict(partial(zeros, self.nx, 1))
-        self.dP0 = defaultdict(partial(zeros, self.nx, self.nx))
+Outputs:
+{% for output in outputs %}
+- {{output.name}}: {{output.description}}
+{% endfor %}
 
-    def delete_continuous_dssm(self):
-        """Delete the jacobians of the continuous state-space model"""
-        self._delete_continuous_dssm()
+Parameters:
+{% for parameter in parameters %}
+- {{parameter.name}}: {{parameter.value}}
+{% endfor %}""",
+            trim_blocks=True,
+            lstrip_blocks=True,
+        )
+        return tpl.render(
+            name=self.name,
+            states=self.states,
+            inputs=self.inputs,
+            outputs=self.outputs,
+            parameters=self.parameters,
+        )
 
-    def _delete_continuous_dssm(self):
-        """Delete the jacobians of the continuous state-space model"""
+    def __post_init__(self):
+        if self.name == "":
+            self.name = self.__class__.__name__
+        self._coerce_attributes()
+        self._init_states()
 
-        jacobians = ['dA', 'dB', 'dC', 'dD', 'dQ', 'dR', 'dx0', 'dP0']
-        for j in jacobians:
-            delattr(self, j)
+    @property
+    def nx(self):
+        return len(self.states)
+
+    @property
+    def ny(self):
+        return len(self.outputs)
+
+    @property
+    def nu(self):
+        return len(self.inputs)
 
     def set_constant_continuous_ssm(self):
         """Set constant values in state-space model"""
-        pass
-
-    def set_constant_continuous_dssm(self):
-        """Set constant values in jacobians"""
         pass
 
     def update_continuous_ssm(self):
         """Update the state-space model with the constrained parameters"""
         pass
 
-    def update_continuous_dssm(self):
-        """Update the jacobians with the constrained parameters"""
-        pass
+    def update(self):
+        """Update the state-space model with the constrained parameters"""
+        self.update_continuous_ssm()
 
-    def get_discrete_ssm(self, dt: np.ndarray) -> Tuple[NamedTuple, np.ndarray]:
+    def get_discrete_ssm(self, dt: float) -> DiscreteStates:
         """Return the updated discrete state-space model
 
-        Args:
-            dt: Sampling time
+        Parameters
+        ----------
+        dt : float
+            Sampling time
 
-        Retuns:
-            2-elements tuple containing
-                - **ssm**: Discrete state-space model
-                - **index**: Index of unique sampling time
+        Returns
+        -------
+        DiscreteStates
+            Discrete state-space model, a 4-elements namedtuple containing
+            - A: Discrete state matrix
+            - B0: Discrete input matrix (zero order hold)
+            - B1: Discrete input matrix (first order hold)
+            - Q: Upper Cholesky factor of the process noise covariance matrix
         """
-
         self.update_continuous_ssm()
-        index, Ad, B0d, B1d, Qd, *_ = self.discretization(dt, False)
-        return ssm(Ad, B0d, B1d, self.C, self.D, Qd, self.R, self.x0, self.P0), index
+        return DiscreteStates(*self.discretization(dt))
 
-    def get_discrete_dssm(self, dt: np.ndarray) -> Tuple[NamedTuple, NamedTuple, np.ndarray]:
-        """Return the updated discrete state-space model with the discrete jacobians
+    def discretization(
+        self, dt: float
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        """Discretization of LTI state-space model. Should be overloaded by subclasses.
 
-        Args:
-            dt: Sampling time
+        Parameters
+        ----------
+        dt : float
+            Sampling time
 
-        Retuns:
-            3-elements tuple containing
-                - **ssm**: Discrete state-space model
-                - **dssm**: Jacobian discrete state-space model
-                - **index**: Index of unique sampling time
-        """
-
-        self.update_continuous_ssm()
-        self.update_continuous_dssm()
-        index, Ad, B0d, B1d, Qd, dAd, dB0d, dB1d, dQd = self.discretization(dt, True)
-
-        free = self.parameters.free
-        dC = np.asarray([self.dC[n] for n, f in zip(self._names, free) if f])
-        dD = np.asarray([self.dD[n] for n, f in zip(self._names, free) if f])
-        dR = np.asarray([self.dR[n] for n, f in zip(self._names, free) if f])
-        dx0 = np.asarray([self.dx0[n] for n, f in zip(self._names, free) if f])
-        dP0 = np.asarray([self.dP0[n] for n, f in zip(self._names, free) if f])
-
-        return (
-            ssm(Ad, B0d, B1d, self.C, self.D, Qd, self.R, self.x0, self.P0),
-            dssm(dAd, dB0d, dB1d, dC, dD, dQd, dR, dx0, dP0),
-            index,
-        )
-
-    def _lti_disc(self, dt: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-        """Discretization of LTI state-space model
-
-        Args:
-            dt: sampling time
-
-        Returns:
-            4-elements tuple containing
-                - **Ad**: Discrete state matrix
-                - **B0d**: Discrete input matrix (zero order hold)
-                - **B1d**: Discrete input matrix (first order hold)
-                - **Qd**: Upper Cholesky factor of the process noise covariance
+        Returns
+        -------
+        Tuple[np.ndarray, ...]
+            a 4-elements tuple containing
+            - A: Discrete state matrix
+            - B0: Discrete input matrix (zero order hold)
+            - B1: Discrete input matrix (first order hold)
+            - Q: Upper Cholesky factor of the process noise covariance matrix
         """
 
         if self.nu == 0:
-            Ad = disc_state(self.A, dt)
+            Ad = discretization.state(self.A, dt)
             B0d = np.zeros((self.nx, self.nu))
             B1d = B0d
         else:
-            Ad, B0d, B1d = disc_state_input(self.A, self.B, dt, self.hold_order, 'expm')
+            Ad, B0d, B1d = discretization.state_input(
+                self.A, self.B, dt, self.hold_order, "expm"
+            )
 
-        Qd = nearest_cholesky(disc_diffusion_mfd(self.A, self.Q.T @ self.Q, dt))
+        Qd = nearest_cholesky(
+            discretization.diffusion_mfd(self.A, self.Q.T @ self.Q, dt)
+        )
 
         return Ad, B0d, B1d, Qd
 
-    def _lti_jacobian_disc(
-        self, dt: float, dA: np.ndarray, dB: np.ndarray, dQ: np.ndarray
-    ) -> Tuple[
-        np.ndarray,
-        np.ndarray,
-        np.ndarray,
-        np.ndarray,
-        np.ndarray,
-        np.ndarray,
-        np.ndarray,
-        np.ndarray,
-    ]:
-        """Discretization of augmented LTI state-space model
+    def prepare_data(
+        self,
+        df: pd.DataFrame,
+        inputs: Optional[Sequence[str]] = None,
+        outputs: Optional[Union[Sequence[str], Literal[False]]] = None,
+        time_scale: str = "s",
+    ):
+        """Prepare data for training
 
-        Args:
-            dt: Sampling time
-            dA: Jacobian state matrix
-            dB: Jacobian input matrix
-            dQ: Jacobian Wiener process scaling matrix
+        Parameters
+        ----------
+        df : pd.DataFrame
+            Dataframe containing the data
+        inputs : Optional[Sequence[str]], optional
+            List of input variables, by default None. If None, the inputs defined in
+            the model are used.
+        outputs : Optional[Sequence[str] or False], optional
+            List of output variables, by default None. If None, the outputs defined in
+            the model are used. If False, no output is returned.
 
-        Returns:
-            8-elements tuple containing
-                - **Ad**: Discrete state matrix
-                - **B0d**: Discrete input matrix (zero order hold)
-                - **B1d**: Discrete input matrix (first order hold)
-                - **Qd**: Upper Cholesky factor of the process noise covariance matrix
-                - **dAd**: Jacobian discrete state matrix
-                - **dB0d**: Jacobian discrete input matrix (zero order hold)
-                - **dB1d**: Jacobian discrete input matrix (first order hold)
-                - **dQd**: Jacobian of the upper Cholesky factor of the process noise covariance
+        Returns
+        -------
+        DataFrame:
+            time steps
+        DataFrame:
+            input data
+        DataFrame:
+            derivative of input data
+        DataFrame:
+            output data (only if outputs is not False)
         """
-        nj = dA.shape[0]
-
-        if self.nu == 0:
-            Ad, dAd = disc_d_state(self.A, dA, dt)
-
-            B0d = np.zeros((self.nx, self.nu))
-            dB0d = np.zeros((nj, self.nx, self.nu))
-
-            B1d = B0d
-            dB1d = dB0d
-        else:
-            Ad, B0d, B1d, dAd, dB0d, dB1d = disc_d_state_input(
-                self.A, self.B, dA, dB, dt, self.hold_order, 'expm'
-            )
-
-        Qc = self.Q.T @ self.Q
-        dQc = dQ.swapaxes(1, 2) @ self.Q + self.Q.T @ dQ
-        Qcd, dQcd = disc_d_diffusion_mfd(self.A, Qc, dA, dQc, dt)
-
-        Qd = nearest_cholesky(Qcd)
-        dQd = np.zeros((nj, self.nx, self.nx))
-        for n in range(nj):
-            if dQcd[n].any():
-                dQd[n] = diff_upper_cholesky(Qd, dQcd[n])
-
-        return Ad, B0d, B1d, Qd, dAd, dB0d, dB1d, dQd
-
-    def discretization(
-        self, dt: np.ndarray, jacobian: bool = False
-    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, Tuple]:
-        """Discretization of LTI state-space model
-
-        Args:
-            dt: Sampling time
-            jacobian: Discretize the jacobian if True
-
-        Returns:
-            6-elements tuple containing
-                - **idx**: Index of unique time intervals
-                - **Ad**: Discrete state matrix
-                - **B0d**: Discrete input matrix (zero order hold)
-                - **B1d**: Discrete input matrix (first order hold)
-                - **Qd**: Upper Cholesky factor of the process noise covariance matrix
-                - **d**: Tuple of the discrete jacobian matrices if `jacobian` = True
-                    - **dAd**: Jacobian discrete state matrix
-                    - **dB0d**: Jacobian discrete input matrix (zero order hold)
-                    - **dB1d**: Jacobian discrete input matrix (first order hold)
-                    - **dQd**: Jacobian of the upper Cholesky factor of the process noise covariance
-        """
-        # Different sampling time up to the nanosecond
-        dt, _, idx = np.unique(np.round(dt, 9), True, True)
-        N = len(dt)
-
-        Ad = np.empty((N, self.nx, self.nx))
-        B0d = np.empty((N, self.nx, self.nu))
-        B1d = np.empty((N, self.nx, self.nu))
-        Qd = np.empty((N, self.nx, self.nx))
-
-        if jacobian:
-            free = self.parameters.free
-
-            dA = np.array([self.dA[n] for n, f in zip(self._names, free) if f])
-            dB = np.array([self.dB[n] for n, f in zip(self._names, free) if f])
-            if isinstance(self, GPModel):
-                dQ = np.array([self.dP0[n] for n, f in zip(self._names, free) if f])
-            else:
-                dQ = np.array([self.dQ[n] for n, f in zip(self._names, free) if f])
-
-            Np = dA.shape[0]
-            dAd = np.empty((N, Np, self.nx, self.nx))
-            dB0d = np.empty((N, Np, self.nx, self.nu))
-            dB1d = np.empty((N, Np, self.nx, self.nu))
-            dQd = np.empty((N, Np, self.nx, self.nx))
-
-            for n in range(N):
-                (
-                    Ad[n],
-                    B0d[n],
-                    B1d[n],
-                    Qd[n],
-                    dAd[n],
-                    dB0d[n],
-                    dB1d[n],
-                    dQd[n],
-                ) = self._lti_jacobian_disc(dt[n], dA, dB, dQ)
-
-            d = (dAd, dB0d, dB1d, dQd)
-
-        else:
-            for n in range(N):
-                Ad[n], B0d[n], B1d[n], Qd[n] = self._lti_disc(dt[n])
-
-            d = ()
-
-        return (idx, Ad, B0d, B1d, Qd, *d)
+        if inputs is None:
+            inputs = [par.name for par in self.inputs]
+        if outputs is None:
+            outputs = [par.name for par in self.outputs]
+        if isinstance(inputs, str):
+            inputs = [inputs]
+        if isinstance(outputs, str):
+            outputs = [outputs]
+        if outputs is False:
+            outputs = []
+        for key in chain(inputs, outputs):
+            if key not in df.columns:
+                raise KeyError(
+                    f"Missing column {key}. Use `inputs` and `outputs` parameters to "
+                    "specify the inputs and outputs if they diverge from the model "
+                    "definition."
+                )
+        return prepare_data(df, inputs, outputs, time_scale=time_scale)
 
 
-@dataclass
+@dataclass(config=ConfigDict(arbitrary_types_allowed=True), repr=False)
 class RCModel(StateSpace):
     """Dynamic thermal model"""
 
-    latent_forces: str = field(default='')
+    latent_forces: str = ""
 
     def __post_init__(self):
         super().__post_init__()
-
-    def __repr__(self):
-        return f"\n{self.__class__.__name__}" + "-" * len(self.__class__.__name__)
+        eig = np.real(np.linalg.eigvals(self.A))
+        if np.all(eig < 0) and eig.max() / eig.min():
+            self._method = "analytic"
+        else:
+            self._method = "mfd"
 
     def __le__(self, gp):
         """Create a Latent Force Model"""
@@ -348,194 +470,91 @@ class RCModel(StateSpace):
 
         return LatentForceModel(self, gp, self.latent_forces)
 
-    def _lti_disc(self, dt: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    def discretization(
+        self, dt: float
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """Discretization of RC model
 
-        Args:
-            dt: sampling time
+        Parameters
+        ----------
+        dt : float
+            Sampling time
 
-        Returns:
-            4-elements tuple containing
-                - **Ad**: Discrete state matrix
-                - **B0d**: Discrete input matrix (zero order hold)
-                - **B1d**: Discrete input matrix (first order hold)
-                - **Qd**: Upper Cholesky factor of the process noise covariance
+        Returns
+        -------
+        Tuple[np.ndarray, ...]
+            a 4-elements tuple containing
+            - A: Discrete state matrix
+            - B0: Discrete input matrix (zero order hold)
+            - B1: Discrete input matrix (first order hold)
+            - Q: Upper Cholesky factor of the process noise covariance matrix
         """
-        eig = np.real(np.linalg.eigvals(self.A))
 
-        if np.all(eig < 0) and eig.max() / eig.min() > 1e-10:
-            Ad, B0d, B1d = disc_state_input(self.A, self.B, dt, self.hold_order, 'analytic')
-            Qd = nearest_cholesky(disc_diffusion_lyap(self.A, self.Q.T @ self.Q, Ad))
+        if self.method == "analytic":
+            Ad, B0d, B1d = discretization.state_input(
+                self.A, self.B, dt, self.hold_order, "analytic"
+            )
+            Qd = nearest_cholesky(
+                discretization.diffusion_lyap(self.A, self.Q.T @ self.Q, Ad)
+            )
         else:
-            Ad, B0d, B1d = disc_state_input(self.A, self.B, dt, self.hold_order, 'expm')
-            Qd = nearest_cholesky(disc_diffusion_mfd(self.A, self.Q.T @ self.Q, dt))
+            Ad, B0d, B1d = discretization.state_input(
+                self.A, self.B, dt, self.hold_order, "expm"
+            )
+            Qd = nearest_cholesky(
+                discretization.diffusion_mfd(self.A, self.Q.T @ self.Q, dt)
+            )
 
         return Ad, B0d, B1d, Qd
 
-    def _lti_jacobian_disc(
-        self, dt: float, dA: np.ndarray, dB: np.ndarray, dQ: np.ndarray
-    ) -> Tuple[
-        np.ndarray,
-        np.ndarray,
-        np.ndarray,
-        np.ndarray,
-        np.ndarray,
-        np.ndarray,
-        np.ndarray,
-        np.ndarray,
-    ]:
-        """Discretization of RC model and its derivatives
 
-        Args:
-            dt: Sampling time
-            dA: Derivative state matrix
-            dB: Derivative input matrix
-            dQ: Derivative Wiener process scaling matrix
-
-        Returns:
-            8-elements tuple containing
-                - **Ad**: Discrete state matrix
-                - **B0d**: Discrete input matrix (zero order hold)
-                - **B1d**: Discrete input matrix (first order hold)
-                - **Qd**: Upper Cholesky factor of the process noise covariance matrix
-                - **dAd**: Derivative discrete state matrix
-                - **dB0d**: Derivative discrete input matrix (zero order hold)
-                - **dB1d**: Derivative discrete input matrix (first order hold)
-                - **dQd**: Derivative of the upper Cholesky factor of the process noise covariance
-        """
-        Qc = self.Q.T @ self.Q
-        dQc = dQ.swapaxes(1, 2) @ self.Q + self.Q.T @ dQ
-
-        eig = np.real(np.linalg.eigvals(self.A))
-
-        if np.all(eig < 0) and eig.max() / eig.min() > 1e-10:
-            Ad, B0d, B1d, dAd, dB0d, dB1d = disc_d_state_input(
-                self.A, self.B, dA, dB, dt, self.hold_order, 'analytic'
-            )
-            Qcd, dQcd = disc_d_diffusion_lyap(self.A, Qc, Ad, dA, dQc, dAd)
-        else:
-            Ad, B0d, B1d, dAd, dB0d, dB1d = disc_d_state_input(
-                self.A, self.B, dA, dB, dt, self.hold_order, 'expm'
-            )
-            Qcd, dQcd = disc_d_diffusion_mfd(self.A, Qc, dA, dQc, dt)
-
-        nj = dQcd.shape[0]
-        Qd = nearest_cholesky(Qcd)
-        dQd = np.zeros((nj, self.nx, self.nx))
-        for n in range(nj):
-            if dQcd[n].any():
-                dQd[n] = diff_upper_cholesky(Qd, dQcd[n])
-
-        return Ad, B0d, B1d, Qd, dAd, dB0d, dB1d, dQd
-
-
-@dataclass
 class GPModel(StateSpace):
     """Gaussian Process"""
 
     def __post_init__(self):
-        if hasattr(self, 'J'):
+        if hasattr(self, "J"):
             self.states = self.states_block * int(self.J + 1)
         super().__post_init__()
 
-    def __repr__(self):
-        return f"\n{self.__class__.__name__}" + "-" * len(self.__class__.__name__)
-
-    def __mul__(self, gp):
-        """Product of two Gaussian Process model
-
-        Args:
-            gp: GPModel instance
-
-        Returns:
-            product of the two GP model
-        """
+    def __mul__(self, gp: Self):
         if not isinstance(gp, GPModel):
-            raise TypeError('`gp` must be an GPModel instance')
-
+            raise TypeError("`gp` must be an GPModel instance")
+        # TODO: refactor to avoid circular import
         from .gaussian_process import GPProduct
 
         return GPProduct(self, gp)
 
-    def __add__(self, gp):
-        """Sum of two Gaussian Process model
-
-        Args:
-            gp: GPModel instance
-
-        Returns:
-            sum of the two GP model
-        """
+    def __add__(self, gp: Self):
         if not isinstance(gp, GPModel):
-            raise TypeError('`gp` must be an GPModel instance')
-
+            raise TypeError("`gp` must be an GPModel instance")
+        # TODO: refactor to avoid circular import
         from .gaussian_process import GPSum
 
         return GPSum(self, gp)
 
-    def _lti_disc(self, dt: float) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-        """Discretization of temporal Gaussian Process
+    def discretization(
+        self, dt: float
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        """Discretization of the temporal Gaussian Process
 
-        Args:
-            dt: sampling time
+        Parameters
+        ----------
+        dt : float
+            Sampling time
 
-        Returns:
-            4-elements tuple containing
-                - **Ad**: Discrete state matrix
-                - **B0d**: Discrete input matrix (zero order hold)
-                - **B1d**: Discrete input matrix (first order hold)
-                - **Qd**: Upper Cholesky factor of the process noise covariance
+        Returns
+        -------
+        Tuple[np.ndarray, ...]
+            a 4-elements tuple containing
+            - A: Discrete state matrix
+            - B0: Discrete input matrix (zero order hold)
+            - B1: Discrete input matrix (first order hold)
+            - Q: Upper Cholesky factor of the process noise covariance matrix
         """
-        Ad = disc_state(self.A, dt)
+        Ad = discretization.state(self.A, dt)
         B0d = np.zeros((self.nx, self.nu))
-        Qd = nearest_cholesky(disc_diffusion_stationary(self.P0.T @ self.P0, Ad))
+        Qd = nearest_cholesky(
+            discretization.diffusion_stationary(self.P0.T @ self.P0, Ad)
+        )
 
         return Ad, B0d, B0d, Qd
-
-    def _lti_jacobian_disc(
-        self, dt: float, dA: np.ndarray, dB: np.ndarray, dPinf_upper: np.ndarray
-    ) -> Tuple[
-        np.ndarray,
-        np.ndarray,
-        np.ndarray,
-        np.ndarray,
-        np.ndarray,
-        np.ndarray,
-        np.ndarray,
-        np.ndarray,
-    ]:
-        """Discretization of augmented temportal Gaussian Process
-
-        Args:
-            dt: Sampling time
-            dA: Jacobian state matrix
-            dB: Jacobian input matrix
-            dPinf: Jacobian upper Cholesky factor of the stationary covariance matrix
-
-        Returns:
-            8-elements tuple containing
-                - **Ad**: Discrete state matrix
-                - **B0d**: Discrete input matrix (zero order hold)
-                - **B1d**: Discrete input matrix (first order hold)
-                - **Qd**: Upper Cholesky factor of the process noise covariance matrix
-                - **dAd**: Jacobian discrete state matrix
-                - **dB0d**: Jacobian discrete input matrix (zero order hold)
-                - **dB1d**: Jacobian discrete input matrix (first order hold)
-                - **dQd**: Jacobian of the upper Cholesky factor of the process noise covariance
-        """
-        nj = dA.shape[0]
-        Ad, dAd = disc_d_state(self.A, dA, dt)
-
-        B0d = np.zeros((self.nx, self.nu))
-        dB0d = np.zeros((nj, self.nx, self.nu))
-
-        dPinf = dPinf_upper.swapaxes(1, 2) @ self.P0 + self.P0.T @ dPinf_upper
-        Qcd, dQcd = disc_d_diffusion_stationary(self.P0.T @ self.P0, Ad, dPinf, dAd)
-
-        Qd = nearest_cholesky(Qcd)
-        dQd = np.zeros((nj, self.nx, self.nx))
-        for n in range(nj):
-            if dQcd[n].any():
-                dQd[n] = diff_upper_cholesky(Qd, dQcd[n])
-
-        return Ad, B0d, B0d, Qd, dAd, dB0d, dB0d, dQd

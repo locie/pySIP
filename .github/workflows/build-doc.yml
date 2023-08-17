@@ -1,0 +1,40 @@
+name: Documentation
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+
+  build-doc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
+      - name: Install poetry
+        uses: abatilo/actions-poetry@v2
+      - name: Install dependancies
+        run: poetry install --with docs
+      - name: Build doc
+        run: poetry run make -C doc html
+      - name: Upload page artefact
+        uses: actions/upload-pages-artifact@v1.0.5
+        with:
+          path: doc/_build/html/
+
+
+  deploy-doc:  # deploy the artifact build on build-doc
+    needs: build-doc
+    permissions:
+      pages: write      # to deploy to Pages
+      id-token: write   # to verify the deployment originates from an appropriate source
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1

@@ -1,12 +1,11 @@
 import itertools
 
 import numpy as np
-import pylfsr
 from pylfsr import LFSR
 
 
-def prbs(Tmax, Tmin, initstate='random'):
-    '''Pseudo Random Binary signal (PRBS)
+def prbs(Tmax, Tmin, initstate="random"):
+    """Pseudo Random Binary signal (PRBS)
 
     Args:
         Tmax: maximum number of samples in one state
@@ -21,31 +20,34 @@ def prbs(Tmax, Tmin, initstate='random'):
     Notes:
         The Linear Feedback Shift Register (LFSR) can be installed
         from PyPi: https://pypi.org/project/pylfsr/
-        or from the source:  https://github.com/Nikeshbajaj/Linear_Feedback_Shift_Register
-    '''
+        or from the source:
+        https://github.com/Nikeshbajaj/Linear_Feedback_Shift_Register
+    """
     if not isinstance(Tmax, int):
-        raise TypeError('`Tmax` must be an integer')
+        raise TypeError("`Tmax` must be an integer")
 
     if Tmax < 2:
-        raise ValueError('`Tmax` must be > 2')
+        raise ValueError("`Tmax` must be > 2")
 
     if not isinstance(Tmin, int):
-        raise TypeError('`Tmax` must be an integer')
+        raise TypeError("`Tmax` must be an integer")
 
     if Tmin < 1:
-        raise ValueError('`Tmin` must be > 1')
+        raise ValueError("`Tmin` must be > 1")
 
     if Tmin >= Tmax:
-        raise ValueError('`Tmax` must be strictly superior to `Tmin`')
+        raise ValueError("`Tmax` must be strictly superior to `Tmin`")
 
-    __init_availabble__ = ['random', 'ones']
+    __init_availabble__ = ["random", "ones"]
     if initstate not in __init_availabble__:
-        raise ValueError(f'`initstate` must be either {__init_availabble__}')
+        raise ValueError(f"`initstate` must be either {__init_availabble__}")
 
     # get the register length
     n = np.ceil(Tmax / Tmin)
     if n < 2 or n > 31:
-        raise ValueError('The PRBS cannot be generated, ' 'decompose the signal in two sequences')
+        raise ValueError(
+            "The PRBS cannot be generated, " "decompose the signal in two sequences"
+        )
 
     # Linear feedback register up to 32 bits
     fpoly = {
@@ -115,17 +117,17 @@ def generate_time(n=50, bounds=(0, 50), random=False):
         t (np.array): Time data
     """
     if not isinstance(n, int):
-        raise ValueError('`n` must be an integer')
+        raise ValueError("`n` must be an integer")
 
     if not isinstance(bounds, tuple):
-        raise ValueError('`bounds` must be a tuple')
+        raise ValueError("`bounds` must be a tuple")
 
     bounds = np.asarray(bounds)
     if bounds[1] <= bounds[0]:
-        raise ValueError('upper bound > lower bound')
+        raise ValueError("upper bound > lower bound")
 
     if not isinstance(random, bool):
-        raise ValueError('`random` must be a boolean')
+        raise ValueError("`random` must be a boolean")
 
     if random:
         t = np.sort(bounds[0] + (bounds[1] - bounds[0]) * np.random.rand(n))
@@ -166,19 +168,19 @@ def generate_sine(
         y (np.array): Sinusoidal data
     """
     if not isinstance(period, float) or period <= 0.0:
-        raise ValueError('`period` must be a positive float')
+        raise ValueError("`period` must be a positive float")
 
     if not isinstance(amplitude, float) or amplitude <= 0.0:
-        raise ValueError('`amplitude` must be a positive float')
+        raise ValueError("`amplitude` must be a positive float")
 
     if not isinstance(noise_std, float) or noise_std < 0.0:
-        raise ValueError('`noise_std` must be a positive float')
+        raise ValueError("`noise_std` must be a positive float")
 
     if not isinstance(phase, float) or phase < 0.0:
-        raise ValueError('`phase` must be a positive float')
+        raise ValueError("`phase` must be a positive float")
 
     if not isinstance(offset, float):
-        raise ValueError('`offset` must be a float')
+        raise ValueError("`offset` must be a float")
 
     t = generate_time(n, bounds, random)
     y = (
@@ -204,13 +206,15 @@ def generate_random_binary(n: int = 50, bounds: tuple = (0, 1e3)):
        Random binary signal
     """
     if not isinstance(n, int):
-        raise ValueError('`n` must be an integer')
+        raise ValueError("`n` must be an integer")
 
     if not isinstance(bounds, tuple):
-        raise ValueError('`bounds` must be a tuple')
+        raise ValueError("`bounds` must be a tuple")
 
     bounds = np.asarray(bounds)
     if bounds[1] <= bounds[0]:
-        raise ValueError('upper bound > lower bound')
+        raise ValueError("upper bound > lower bound")
 
-    return np.asarray([bounds[1] if np.random.randn() > 0 else bounds[0] for _ in range(n)])
+    return np.asarray(
+        [bounds[1] if np.random.randn() > 0 else bounds[0] for _ in range(n)]
+    )

@@ -19,19 +19,19 @@ def eigen_values(model, summary, corr):
 @stack
 def summary(model, summary, corr):
     """All ??? are less than 10^-4"""
-    return (summary["|g(\u03B7)|"] < 1e-4).all()
+    return (summary["|g(η)|"] < 1e-4).all()
 
 
 @stack
 def summary_penalty(model, summary, corr):
     """??"""
-    return (summary["|dpen(\u03B8)|"] < summary["|g(\u03B7)|"]).all()
+    return (summary["|dpen(θ)|"] < summary["|g(η)|"]).all()
 
 
 @stack
 def summary_pvalue(model, summary, corr):
     """P-value"""
-    return (summary['pvalue'] <= 5e-2).all()
+    return (summary["pvalue"] <= 5e-2).all()
 
 
 @stack
@@ -41,7 +41,7 @@ def corr(model, summary, corr):
     return (np.ma.masked_array(corr, mask=non_diag) < 0.9).all()
 
 
-Test = namedtuple('Test', 'name description function')
+Test = namedtuple("Test", "name description function")
 tests = [Test(f.__name__, f.__doc__, f) for f in s]
 
 
@@ -65,13 +65,17 @@ def check_model(model, summary=None, corr=None, verbose=False, raise_error=False
             print(s)
 
     diag = True
-    _print('')
+    _print("")
 
     for idx, test in enumerate(tests):
         result = test.function(model, summary, corr)
         diag &= result
-        _print(('\033[92m' if result else '\033[91m') + f'{idx}. {test.description}' + '\033[0m')
+        _print(
+            ("\033[92m" if result else "\033[91m")
+            + f"{idx}. {test.description}"
+            + "\033[0m"
+        )
         if raise_error:
-            raise Exception(f'Failed {test.name}')
+            raise Exception(f"Failed {test.name}")
 
     return diag
