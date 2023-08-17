@@ -26,7 +26,7 @@ jobs:
       - name: Upload page artefact
         uses: actions/upload-pages-artifact@v1.0.5
         with:
-          path: doc/_build/html/
+          path: docs/_build/html/
 
 
   deploy-doc:  # deploy the artifact build on build-doc
