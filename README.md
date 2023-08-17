@@ -28,8 +28,8 @@ are being prioritized. Nevertheless, any model following the formalism of
 to contact us if you want to be involved in the current development process.
 
 You can find the documentation [here](https://locie.github.io/pySIP/) : it
-contains a quick start guide, a cookbook (under construction), a tour of the
-library internals (under construction) and a reference documentation.
+contains a quick start guide, a cookbook, a tour of the
+library internals and a reference documentation.
 
 ## IMPORTANT - Migration to v1.0.0
 
