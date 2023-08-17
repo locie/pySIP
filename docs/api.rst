@@ -37,7 +37,7 @@ Transforms
 Priors
 ------
 
-.. automodule:: pysip.params.priors
+.. automodule:: pysip.params.prior
     :members:
     :show-inheritance:
 

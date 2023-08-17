@@ -30,6 +30,7 @@ class Parameters:
             - `parameters` is a list of dictionaries, where the arguments of Parameter
               can be modified as key-value pairs
             - `parameters` is a list of Parameter instances
+
     name : str, optional
         Name of this specific instance, by default ""
 

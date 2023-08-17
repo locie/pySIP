@@ -326,8 +326,8 @@ The Statespace Estimator is the class that hold the data and the model and that
 is used to estimate the parameters. In pySIP, a Square Root Kalman filter is
 used to estimate the states and the parameters.
 
-It is written using :ref:`https://numba.pydata.org/` to speed up the computation
-as much as possible.
+It is written using `numba <https://numba.pydata.org/>`_ to speed up the
+computation as much as possible.
 
 The estimator hold the model (and its parameters) and will use provided data
 to estimate and predict the states and their covariance. You can have a look at

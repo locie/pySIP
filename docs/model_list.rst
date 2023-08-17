@@ -1,5 +1,5 @@
 List of implemented models
-=========================
+==========================
 
 Thermal networks
 ----------------
