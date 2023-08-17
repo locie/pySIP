@@ -13,6 +13,8 @@ def _coerce_params(parameters: Union[List[str], List[dict]]) -> List[dict]:
         return parameters
     if isinstance(parameters[0], str):
         return {name: Parameter(name) for name in parameters}
+    if isinstance(parameters[0], Parameter):
+        return {p.name: p for p in parameters}
     return {k["name"]: Parameter(**k) for k in parameters}
 
 
@@ -22,11 +24,12 @@ class Parameters:
     Parameters
     ----------
     parameters : list
-        There is two options for instantiating Parameters
+        There is three options for instantiating Parameters
             - `parameters` is a list of strings corresponding to the parameters names.
               In this case all the parameters have the default settings
             - `parameters` is a list of dictionaries, where the arguments of Parameter
               can be modified as key-value pairs
+            - `parameters` is a list of Parameter instances
     name : str, optional
         Name of this specific instance, by default ""
 
@@ -117,7 +120,7 @@ class Parameters:
         return _leafs(self._parameters)
 
     def __len__(self) -> int:
-        return len(self.parameters)
+        return self.n_par
 
     def set_parameter(self, *args, **kwargs):
         """Change settings of Parameters after instantiation
@@ -152,8 +155,8 @@ class Parameters:
 
     @theta.setter
     def theta(self, x: Sequence[float]):
-        if len(x) != len(self):
-            raise ValueError(f"{len(x)} values are given but {len(self)} are expected")
+        if len(x) != self.n_par:
+            raise ValueError(f"{len(x)} values are given but {self.n_par} are expected")
 
         for p, value in zip(self.parameters, x):
             p.theta = value
@@ -164,8 +167,10 @@ class Parameters:
 
     @theta_free.setter
     def theta_free(self, x: Sequence[float]):
-        if len(x) != self.n_par:
-            raise ValueError(f"{len(x)} values are given but {len(self)} are expected")
+        if len(x) != self.n_par_free:
+            raise ValueError(
+                f"{len(x)} values are given but {self.n_par_free} are expected"
+            )
 
         for p, value in zip(self.parameters_free, x):
             p.theta = value
@@ -205,6 +210,16 @@ class Parameters:
     @property
     def eta_free(self) -> np.ndarray:
         return self.eta[self.free]
+
+    @eta_free.setter
+    def eta_free(self, x: Sequence[float]):
+        if len(x) != self.n_par_free:
+            raise ValueError(
+                f"{len(x)} values are given but {self.n_par_free} are expected"
+            )
+
+        for p, value in zip(self.parameters_free, x):
+            p.eta = value
 
     @property
     def eta_jacobian(self) -> List:
@@ -270,7 +285,11 @@ class Parameters:
 
     @property
     def n_par(self) -> int:
-        return np.sum(self.free)
+        return len(self.parameters)
+
+    @property
+    def n_par_free(self) -> int:
+        return len(self.parameters_free)
 
     @property
     def parameters_free(self) -> List[Parameter]:

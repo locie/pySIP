@@ -190,7 +190,7 @@ the `cores` argument (default: all available cores).
 After that, the model can be evaluated on the posterior distribution of the
 parameters, using the `Regressor.posterior_predictive` method.
 
-All the data from borh the prior and posterior predictive evaluations can be
+All the data from both the prior and posterior predictive evaluations can be
 be found under the `Regressor.trace` attribute. It is a `arviz.InferenceData`, a
 format used by the `arviz` package to store the results of Bayesian inference
 that heavily use the `xarray` format. You can find more information about the

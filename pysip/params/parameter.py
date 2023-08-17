@@ -80,12 +80,6 @@ class Parameter:
                 f"Initial value {self.value} is out of bounds {self.bounds}"
             )
 
-    def __repr__(self):
-        return (
-            f"name={self.name} value={self.value:.3e} transform={self.transform}"
-            f" bounds={self.bounds} prior={self.prior}"
-        )
-
     @property
     def theta(self) -> float:
         """Returns constrained parameter value θ"""

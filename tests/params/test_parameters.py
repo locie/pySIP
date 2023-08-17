@@ -33,9 +33,9 @@ def test_repr(parameters, parameters_beta, parameters_with_transforms):
     assert (
         parameters.__repr__()
         == """Parameters alpha
-name=a value=0.000e+00 transform=none bounds=(None, None) prior=None
-name=b value=0.000e+00 transform=none bounds=(None, None) prior=None
-name=c value=0.000e+00 transform=none bounds=(None, None) prior=None
+Parameter(name='a', value=0.0, loc=0.0, scale=1.0, bounds=(None, None), transform=none, prior=None)
+Parameter(name='b', value=0.0, loc=0.0, scale=1.0, bounds=(None, None), transform=none, prior=None)
+Parameter(name='c', value=0.0, loc=0.0, scale=1.0, bounds=(None, None), transform=none, prior=None)
 """
     )
 
@@ -45,16 +45,16 @@ name=c value=0.000e+00 transform=none bounds=(None, None) prior=None
         == """Parameters alpha__beta__transform
 * alpha__beta
     * alpha
-        name=a value=0.000e+00 transform=none bounds=(None, None) prior=None
-        name=b value=0.000e+00 transform=none bounds=(None, None) prior=None
-        name=c value=0.000e+00 transform=none bounds=(None, None) prior=None
+        Parameter(name='a', value=0.0, loc=0.0, scale=1.0, bounds=(None, None), transform=none, prior=None)
+        Parameter(name='b', value=0.0, loc=0.0, scale=1.0, bounds=(None, None), transform=none, prior=None)
+        Parameter(name='c', value=0.0, loc=0.0, scale=1.0, bounds=(None, None), transform=none, prior=None)
     * beta
-        name=c value=0.000e+00 transform=none bounds=(None, None) prior=None
-        name=d value=0.000e+00 transform=none bounds=(None, None) prior=None
-        name=e value=0.000e+00 transform=none bounds=(None, None) prior=None
+        Parameter(name='c', value=0.0, loc=0.0, scale=1.0, bounds=(None, None), transform=none, prior=None)
+        Parameter(name='d', value=0.0, loc=0.0, scale=1.0, bounds=(None, None), transform=none, prior=None)
+        Parameter(name='e', value=0.0, loc=0.0, scale=1.0, bounds=(None, None), transform=none, prior=None)
 * transform
-    name=a value=1.000e+00 transform=log bounds=(None, None) prior=None
-    name=b value=2.000e+00 transform=logit bounds=(1.0, 3.0) prior=None
+    Parameter(name='a', value=1.0, loc=0.0, scale=1.0, bounds=(None, None), transform=log, prior=None)
+    Parameter(name='b', value=2.0, loc=0.0, scale=1.0, bounds=(1.0, 3.0), transform=logit, prior=None)
 """
     )
 

@@ -76,11 +76,11 @@ def models():
     ]
 
     truth = R2C2_Qgh_Matern32(p_truth)
-    truth.parameters.eta = p
+    truth.parameters.eta_free = p
     truth.update()
 
     lfm = LatentForceModel(R2C2Qgh(p_rc), Matern32(p_gp), "Qgh")
-    lfm.parameters.eta = p
+    lfm.parameters.eta_free = p
     lfm.update()
 
     return truth, lfm

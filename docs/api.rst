@@ -19,7 +19,25 @@ Statespace Estimators
 Parameters and Priors
 +++++++++++++++++++++
 
+Parameters
+----------
+
+
 .. automodule:: pysip.params
+    :members:
+    :show-inheritance:
+
+Transforms
+----------
+
+.. automodule:: pysip.params.transforms
+    :members:
+    :show-inheritance:
+
+Priors
+------
+
+.. automodule:: pysip.params.priors
     :members:
     :show-inheritance:
 

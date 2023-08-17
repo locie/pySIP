@@ -12,7 +12,6 @@ import numpy as np
 import pandas as pd
 import pymc as pm
 import pytensor.tensor as pt
-from sphinx.search import it
 import xarray as xr
 from scipy.optimize import approx_fprime, minimize
 
@@ -271,7 +270,7 @@ class Regressor:
             The negative log-posterior
         """
         estimator = deepcopy(self.estimator)
-        estimator.ss.parameters.eta = eta
+        estimator.ss.parameters.eta_free = eta
         log_likelihood = estimator.log_likelihood(dt, u, dtu, y)
         log_posterior = (
             log_likelihood
@@ -344,7 +343,7 @@ class Regressor:
             minimize_options.update(options)
         minimize_options = {"disp": True, "gtol": 1e-4} | minimize_options
 
-        self.parameters.eta = self.parameters.init_parameters(1, init, hpd)
+        self.parameters.eta_free = self.parameters.init_parameters(1, init, hpd)
         data = self.prepare_data(df)
 
         results = minimize(
@@ -356,7 +355,7 @@ class Regressor:
             options=minimize_options,
         )
 
-        self.parameters.eta = results.x
+        self.parameters.eta_free = results.x
         # inverse jacobian of the transform eta = f(theta)
         inv_jac = np.diag(1.0 / np.array(self.parameters.eta_jacobian))
 
