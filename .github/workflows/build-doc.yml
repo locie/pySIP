@@ -18,7 +18,7 @@ jobs:
       - name: Install dependancies
         run: poetry install --with docs
       - name: Build doc
-        run: poetry run make -C doc html
+        run: poetry run make -C docs html
       - name: Upload page artefact
         uses: actions/upload-pages-artifact@v1.0.5
         with:
