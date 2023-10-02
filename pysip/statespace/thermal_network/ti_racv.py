@@ -5,7 +5,6 @@ from ..base import RCModel
 
 @dataclass
 class Ti_RAcv(RCModel):
-
     states = [("TEMPERATURE", "xi", "indoor temperature")]
 
     params = [

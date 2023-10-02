@@ -258,6 +258,7 @@ def state_input(
     else:
         raise ValueError("`method must be `expm` or `analytic`")
 
+
 def state(A: np.ndarray, dt: float = 1.0) -> np.ndarray:
     """Discretize the state matrix
 

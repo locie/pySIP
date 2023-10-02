@@ -5,7 +5,6 @@ from ..base import RCModel
 
 @dataclass
 class R2C2Qgh(RCModel):
-
     states = [
         ("TEMPERATURE", "xw", "wall temperature"),
         ("TEMPERATURE", "xi", "indoor space temperature"),

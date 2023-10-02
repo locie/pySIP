@@ -89,6 +89,7 @@ class GPProduct(GPModel):
             self._Q2 = self._gp2.Q
 
         super().__post_init__()
+
     def set_constant_continuous_ssm(self):
         self._gp1.set_constant_continuous_ssm()
         self._gp2.set_constant_continuous_ssm()

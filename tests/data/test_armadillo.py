@@ -62,7 +62,9 @@ def test_fit_predict(data_armadillo, regressor_armadillo):
 
     y = data_armadillo["T_int"].values
 
-    ym = regressor_armadillo.predict(df=data_armadillo, use_outputs=False).y_mean.values.squeeze()
+    ym = regressor_armadillo.predict(
+        df=data_armadillo, use_outputs=False
+    ).y_mean.values.squeeze()
     res = regressor_armadillo.eval_residuals(
         df=data_armadillo
     ).residual.values.squeeze()

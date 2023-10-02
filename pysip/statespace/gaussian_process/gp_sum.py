@@ -22,7 +22,6 @@ class GPSum(GPModel):
     """
 
     def __init__(self, gp1: GPModel, gp2: GPModel):
-
         if not isinstance(gp1, GPModel):
             raise TypeError("`gp1` must be an GPModel instance")
 

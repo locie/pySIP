@@ -1,5 +1,3 @@
-""" To test with Gaussian Processes and Latent Force models (integrator) and time it !"""
-
 from time import time
 
 import numpy as np
@@ -98,17 +96,8 @@ par_qp = [
 
 model_list = [
     TwTi_RoRiAwAicv(par_rc1),
-    # TwTi_RoRiAwAicv(par_rc1, latent_forces='Qv') <= Matern32(parameters=par_m),
-    # TwTi_RoRiAwAicv(par_rc1, latent_forces='Qv') <= Periodic(parameters=par_p),
-    # TwTi_RoRiAwAicv(par_rc1, latent_forces='Qv') <= QuasiPeriodic32(parameters=par_qp),
     TwTiTm_RoRiRmAwAicv(par_rc2),
-    # TwTiTm_RoRiRmAwAicv(par_rc2, latent_forces='Qv') <= Matern32(parameters=par_m),
-    # TwTiTm_RoRiRmAwAicv(par_rc2, latent_forces='Qv') <= Periodic(parameters=par_p),
-    # TwTiTm_RoRiRmAwAicv(par_rc2, latent_forces='Qv') <= QuasiPeriodic32(parameters=par_qp),
     TwTiTh_RoRiRhAwAicv(par_rc3),
-    # TwTiTh_RoRiRhAwAicv(par_rc3, latent_forces='Qv') <= Matern32(parameters=par_m),
-    # TwTiTh_RoRiRhAwAicv(par_rc3, latent_forces='Qv') <= Periodic(parameters=par_p),
-    # TwTiTh_RoRiRhAwAicv(par_rc3, latent_forces='Qv') <= QuasiPeriodic32(parameters=par_qp),
 ]
 
 

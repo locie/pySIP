@@ -1,4 +1,4 @@
-from .base import  StateSpace, model_registry
+from .base import StateSpace, model_registry
 
 from .gaussian_process import __all__ as gaussian_process
 from .thermal_network import __all__ as thermal_network
