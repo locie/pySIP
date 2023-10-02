@@ -36,7 +36,7 @@ def test_repr(parameters, parameters_beta, parameters_with_transforms):
 Parameter(name='a', value=0.0, loc=0.0, scale=1.0, bounds=(None, None), transform=none, prior=None)
 Parameter(name='b', value=0.0, loc=0.0, scale=1.0, bounds=(None, None), transform=none, prior=None)
 Parameter(name='c', value=0.0, loc=0.0, scale=1.0, bounds=(None, None), transform=none, prior=None)
-"""
+"""  # noqa
     )
 
     s = parameters + parameters_beta + parameters_with_transforms
@@ -55,7 +55,7 @@ Parameter(name='c', value=0.0, loc=0.0, scale=1.0, bounds=(None, None), transfor
 * transform
     Parameter(name='a', value=1.0, loc=0.0, scale=1.0, bounds=(None, None), transform=log, prior=None)
     Parameter(name='b', value=2.0, loc=0.0, scale=1.0, bounds=(1.0, 3.0), transform=logit, prior=None)
-"""
+"""  # noqa
     )
 
 

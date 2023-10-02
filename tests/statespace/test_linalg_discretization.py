@@ -1,7 +1,6 @@
-
 import numpy as np
 import pytest
-from scipy.linalg import eig, eigvals, expm, expm_frechet, inv
+from scipy.linalg import eig, eigvals, expm, inv
 
 from pysip.statespace.discretization import (
     eig_2x2,

@@ -75,6 +75,7 @@ class QuasiPeriodic12(GPModel):
         self.P0[self._diag] = np.repeat(np.sqrt(q2), 2)
         self.Q[:] = self.P0 * 2.0**0.5 * decay ** (-0.5)
 
+
 @dataclass
 class QuasiPeriodic32(GPModel):
     """Quasi Periodic covariance function, e.g. Periodic x Matern32
