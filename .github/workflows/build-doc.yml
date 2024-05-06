@@ -10,19 +10,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: pdm-project/setup-pdm@v4 
         with:
           python-version: "3.11.2"
       - name: Install pandoc
         run: |
           sudo apt-get update
           sudo apt-get install -y pandoc
-      - name: Install poetry
-        uses: abatilo/actions-poetry@v2
       - name: Install dependancies
-        run: poetry install --with docs
+        run: pdm install
       - name: Build doc
-        run: poetry run make -C docs html
+        run: pdm run make -C docs html
       - name: Upload page artefact
         uses: actions/upload-pages-artifact@v1.0.5
         with:
